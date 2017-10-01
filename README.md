@@ -17,7 +17,7 @@ Memo (mempool.observer) periodically takes a snapshot of a nodes memory pool. Re
     * median / avg confirming fee in the last X blocks
     * fee estimators in comparison + lowest fee that was included in the past block
 
-For everything else please open an issue or contact [me](https:twitter.com/0xb10c).
+For everything else please open an issue or contact [me](https://twitter.com/0xb10c).
 
 ## thanks to
 * https://bitaps.com: for the api
