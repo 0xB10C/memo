@@ -1,7 +1,7 @@
 body {
-  font-family: 'Roboto', sans-serif;
-  color: #a7c6db;
-  background-color: #0d2738;
+    font-family: 'Roboto', sans-serif;
+    color: #a7c6db;
+    background-color: #0d2738;
 }
 pre {
     color: #a7c6db;
@@ -23,8 +23,8 @@ h6 {
     font-size: 1.1em;
 }
 a,a:hover {
-  color: #c83737;
-  font-weight: 400;
+    color: #c83737;
+    font-weight: 400;
 }
 
 hr {
@@ -41,10 +41,10 @@ hr {
 }
 
 #input_txid {
-  width: 100%;
-  background-color: #0d2738;
-  color: #a7c6db;
-  border-color: #a7c6db;
+    width: 100%;
+    background-color: #0d2738;
+    color: #a7c6db;
+    border-color: #a7c6db;
 }
 
 .img-padding{

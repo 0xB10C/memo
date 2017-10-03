@@ -4,10 +4,7 @@ var http = require('https');
 
 class Backend {
 
-    constructor(){
-        console.log("backend created");
-    }
-
+    constructor(){}
 
     makeHTTPrequest(in_path, fn){
         var options = {

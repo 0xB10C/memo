@@ -143,40 +143,40 @@ var makeGraph = function(data, isStacked) {
                 }
             },
             clickCallback: function(e, x, points){ // TODO FIX: this somehow dosn't work. The callback is never called.
-                if (g.isSeriesLocked()) {
-                    g.clearSelection();
-                } else {
-                    g.setSelection(g.getSelection(), g.getHighlightSeries(), true);
-                }
-            }
-        });
-    };
-
-
-    window.onload = function () {
-
-        // register onClickListener for the 'load tx id'-button
-        $("#button_load_tx_info").click(function(){
-            loadTXinfo();
-        });
-
-        // loads stacked graph with data from https://mempool.observer/data.csv
-        makeGraph('data.csv', true);
-
-        // if load_txid was defined by the ejs renderer load the tx
-        // load_txid is the permalink txid
-        if (typeof load_txid !== 'undefined') {
-            $("#input_txid").val(load_txid)
-            loadTXinfo();
-        }
-
-        // onChangeListener for the confirm sound checkbox
-        $('#card_info_tx_confirmed_sound_checkbox').change(function(){
-            if($(this).is(':checked')) {
-                new Audio('mp3/attention-seeker.mp3').play(); // plays audio once
-                tx_unconfirmed_timer = setInterval(checkConfirmed, 60000); // checks with the backend (over ajax) every 60 seconds if the transaction is confirmed
+            if (g.isSeriesLocked()) {
+                g.clearSelection();
             } else {
-                window.clearInterval(tx_unconfirmed_timer) // disables the timer
+                g.setSelection(g.getSelection(), g.getHighlightSeries(), true);
             }
-        });
+        }
+    });
+};
+
+
+window.onload = function () {
+
+    // register onClickListener for the 'load tx id'-button
+    $("#button_load_tx_info").click(function(){
+        loadTXinfo();
+    });
+
+    // loads stacked graph with data from https://mempool.observer/data.csv
+    makeGraph('data.csv', true);
+
+    // if load_txid was defined by the ejs renderer load the tx
+    // load_txid is the permalink txid
+    if (typeof load_txid !== 'undefined') {
+        $("#input_txid").val(load_txid)
+        loadTXinfo();
     }
+
+    // onChangeListener for the confirm sound checkbox
+    $('#card_info_tx_confirmed_sound_checkbox').change(function(){
+        if($(this).is(':checked')) {
+            new Audio('mp3/attention-seeker.mp3').play(); // plays audio once
+            tx_unconfirmed_timer = setInterval(checkConfirmed, 60000); // checks with the backend (over ajax) every 60 seconds if the transaction is confirmed
+        } else {
+            window.clearInterval(tx_unconfirmed_timer) // disables the timer
+        }
+    });
+}

@@ -12,9 +12,9 @@ CREATE TABLE Feelevel (
 );
 
 CREATE TRIGGER delete_old_fee_data
-    AFTER INSERT ON State
+AFTER INSERT ON State
 BEGIN
-    -- 24h * 60 min * 60 seconds -> 86400 seconds
-    --  3h * 60 min * 60 seconds -> 10800 seconds
+-- 24h * 60 min * 60 seconds -> 86400 seconds
+--  3h * 60 min * 60 seconds -> 10800 seconds
     DELETE FROM State WHERE strftime('%s','now') - statetime > 10800;
 END;
