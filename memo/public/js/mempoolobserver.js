@@ -47,13 +47,14 @@ function loadTXinfo(){
                 tx_unconfirmed_timer_last_block = result.data.block;
                 $("#card_info_tx_id").text(result.data.hash);
                 $("#card_info_tx_permalink").attr("href", "https://mempool.observer/"+result.data.hash);
-                if(result.data.block!=null){
+                if(result.data.block!=null){ // transaction confirmed
                     $("#card_info_tx_confirmed_block").text(result.data.block);
                     $("#card_info_tx_confirmed").css("display", "block");
                     $("#card_info_tx_confirmed_sound").css("display", "none");
-                }else {
+                }else { // transaction unconfirmed (block = null -> not inclued in a block)
                     $("#card_info_tx_confirmed").css("display", "none");
                     $("#card_info_tx_confirmed_sound").css("display", "block");
+                    changeGraphColor(result.data.rate.toFixed(0));
                 }
                 $("#card_info_tx_input").text("");
                 $("#card_info_tx_output").text("");
@@ -71,7 +72,7 @@ function loadTXinfo(){
                 });
 
                 $("#card_info_tx").css("display", "block");
-                changeGraphColor(result.data.rate.toFixed(0));
+
             }else{
                 alert(result.statusCode+" - "+result.message);
             }
