@@ -8,6 +8,10 @@ var api = require('./routes/api');
 
 var app = express();
 
+//setting process name to be able to pkill it
+process.title = "mempoolobserver";
+
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.engine('html', require('ejs').renderFile);
