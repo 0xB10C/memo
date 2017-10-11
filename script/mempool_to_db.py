@@ -6,13 +6,43 @@ import re
 
 # const
 DATABASE_LOCATION_STRING = './db/memo.sqlite3'
-
+BUCKETCOUNT = 97
+BUCKETS = [] # stores a list of fee buckets used in core fee estimation
 
 # var
 conn = None
 size = None
 fee = None
+bucket = None
 rates = {}
+bucketrates = {}
+
+# fills the bucket list
+bucketFillIndex = 0
+BUCKETS.append(1)
+for bucketFillIndex in range(1,BUCKETCOUNT):
+    BUCKETS.append(BUCKETS[bucketFillIndex-1]*1.10) # append bucket with 10% more than the previous
+
+# methods
+
+# binary find bucket by feerate
+def findBucketByFeerate(feerate):
+    posFirst = 0
+    posLast = len(BUCKETS)-1
+
+    if feerate >= BUCKETS[posLast]:
+        return posLast
+    if feerate <= BUCKETS[posFirst]:
+        return posFirst
+
+    while posFirst<=posLast:
+        posMid = (posFirst+posLast)//2
+        if BUCKETS[posMid] <= feerate and BUCKETS[posMid+1] > feerate:
+            return posMid
+        if BUCKETS[posMid] > feerate:
+            posLast = posMid - 1
+        if BUCKETS[posMid] < feerate:
+            posFirst = posMid + 1
 
 for line in sys.stdin:
     re_size = re.search('(?<=\"size\": )(.*)(?=,)', line)
@@ -22,13 +52,20 @@ for line in sys.stdin:
     if re_fee:
         fee = float(re_fee.group(0))
         rate = int((fee*100000000/size)+.5)
-        if rate in rates:
-            rates[rate]=rates[rate]+1
+        bucket = findBucketByFeerate(fee*100000000/size))
+
+        if bucket in bucketrates:
+            bucketrates[bucket] = bucketrates[bucket] + 1                       # increase bucketrate-counter
         else:
+            bucketrates[bucket] = 1                                             # or set to 1 if not existing
+
+        if rate in rates:                                                       # increase rate-counter
+            rates[rate] = rates[rate] + 1
+        else:                                                                   # or set to 1 if not existing
             rates[rate] = 1
 
-statetime_string = str(int(time.time()))
 
+statetime_string = str(int(time.time()))
 try:
     conn = db.connect(DATABASE_LOCATION_STRING)
 
