@@ -23,7 +23,6 @@ BUCKETS.append(1)
 for bucketFillIndex in range(1,BUCKETCOUNT):
     BUCKETS.append(BUCKETS[bucketFillIndex-1]*1.10) # append bucket with 10% more than the previous
 
-# methods
 
 # binary find bucket by feerate
 def findBucketByFeerate(feerate):
@@ -44,6 +43,8 @@ def findBucketByFeerate(feerate):
         if BUCKETS[posMid] < feerate:
             posFirst = posMid + 1
 
+
+# reads "getrawmempool true" from stdin
 for line in sys.stdin:
     re_size = re.search('(?<=\"size\": )(.*)(?=,)', line)
     if re_size:
@@ -64,8 +65,9 @@ for line in sys.stdin:
         else:                                                                   # or set to 1 if not existing
             rates[rate] = 1
 
-
+# current timestamp for the new state
 statetime_string = str(int(time.time()))
+
 try:
     conn = db.connect(DATABASE_LOCATION_STRING)
 
@@ -76,20 +78,28 @@ try:
     enable_foreign_key_support_string  = "PRAGMA foreign_keys = ON"
     cur.execute(enable_foreign_key_support_string)
 
+    # insert new state into db with current timestamp
     insert_state_string = "INSERT INTO State (statetime) VALUES (" + statetime_string + ");"
     cur.execute(insert_state_string)
 
-
+    # get the state_id from the just inserted state
     query_state_string = "SELECT state_id FROM State WHERE statetime = "+statetime_string+";"
     cur.execute(query_state_string)
     state_id = cur.fetchone()[0]
 
-
+    # insert Feelevel data into db
     insert_feelevel_string = "INSERT INTO Feelevel (spb,state_id,tally) VALUES "
     for key, value in rates.iteritems():
         insert_feelevel_string += "(" + str(key) + "," + str(state_id) + "," + str(value) +"),"
     insert_feelevel_string = insert_feelevel_string[:-1] # removes the last ,
     cur.execute(insert_feelevel_string)
+
+    # insert Bucketlevel data into db
+    insert_bucket_string = "INSERT INTO Bucketlevel (bucket,state_id,tally) VALUES "
+    for key, value in bucketrates.iteritems():
+        insert_bucket_string += "(" + str(key) + "," + str(state_id) + "," + str(value) +"),"
+    insert_bucket_string = insert_bucket_string[:-1] # removes the last ,
+    cur.execute(insert_bucket_string)
 
     conn.commit()
 
