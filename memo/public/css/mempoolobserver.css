@@ -32,6 +32,30 @@ hr {
     margin-top: 40px;
 }
 
+.nav-item.nav-link {
+    border-radius: 2px;
+    color: #a7c6db;
+    border-color: #0d2738;
+    background-color: #0d2738;
+    margin-right: 10px;
+}
+
+.nav-item.nav-link.active {
+    color: #c83737;
+    border-color: #0d2738;
+    background-color: #0d2738;
+    border-bottom-color: #00000000
+}
+.nav-item.nav-link:hover {
+    border: 1px solid transparent;
+}
+
+.nav-tabs {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-color: #0d2738;
+}
+
 .dygraph-axis-label.dygraph-axis-label-x,.dygraph-axis-label.dygraph-axis-label-y{
     color: #a7c6db;
 }

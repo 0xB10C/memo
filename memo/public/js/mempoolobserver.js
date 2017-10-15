@@ -82,8 +82,8 @@ function loadTXinfo(){
     }
 }
 
-var makeGraph = function(data, isStacked) {
-    var chart = document.getElementById('chart');
+var makeGraph = function(data, isStacked, elementID) {
+    var chart = document.getElementById(elementID);
     var div = document.createElement('div');
     div.className = "chartclass";
     div.style.display = 'inline-block';
@@ -143,7 +143,7 @@ var makeGraph = function(data, isStacked) {
                     includeZero:true
                 }
             },
-            clickCallback: function(e, x, points){ // TODO FIX: this somehow dosn't work. The callback is never called.
+            clickCallback: function(e, x, points){ // TODO FIX: this example code from dygraph somehow dosn't work. The callback is never called. 
             if (g.isSeriesLocked()) {
                 g.clearSelection();
             } else {
@@ -161,8 +161,10 @@ window.onload = function () {
         loadTXinfo();
     });
 
-    // loads stacked graph with data from https://mempool.observer/data.csv
-    makeGraph('data.csv', true);
+    // loads stacked graph with data from https://mempool.observer/dyn/*
+    makeGraph('/dyn/feelevel.csv', true, "chart_detailed");
+    makeGraph('/dyn/bucketlevel.csv', true, "chart_buckets");
+
 
     // if load_txid was defined by the ejs renderer load the tx
     // load_txid is the permalink txid
@@ -180,4 +182,6 @@ window.onload = function () {
             window.clearInterval(tx_unconfirmed_timer) // disables the timer
         }
     });
+
+
 }

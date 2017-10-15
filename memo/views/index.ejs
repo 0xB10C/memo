@@ -1,321 +1,339 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no" />
-        <!--meta name="viewport" content="width=1200, initial-scale=0.5"-->
-        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-        <meta name="theme-color" content="#0d2738"/>
-        <link rel="icon" sizes="256x256" href="img/og_preview.png">
-        <meta name="description" content="This page visualizes the current mempool of my bitcoin node. You can lookup your unconfirmed transaction enable an alert once it confirms.">
-        <meta name="author" content="0xB10C">
-        <meta property="og:title" content="mempool.observer" />
-        <meta property="og:description" content="This page visualizes the current mempool of my bitcoin node. You can lookup your unconfirmed transaction enable an alert once it confirms." />
-        <meta property="og:image" content="/img/og_preview.png" />
-        <meta property="og:url" content="https://mempool.observer/" />
-        <meta name="twitter:card" content="summary" />
-        <meta name="twitter:site" content="@mempoolobserver" />
-        <meta name="twitter:creator" content="@0xb10c" />
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no" />
+    <!--meta name="viewport" content="width=1200, initial-scale=0.5"-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="theme-color" content="#0d2738"/>
+    <link rel="icon" sizes="256x256" href="img/og_preview.png">
+    <meta name="description" content="This page visualizes the current mempool of my bitcoin node. You can lookup your unconfirmed transaction enable an alert once it confirms.">
+    <meta name="author" content="0xB10C">
+    <meta property="og:title" content="mempool.observer" />
+    <meta property="og:description" content="This page visualizes the current mempool of my bitcoin node. You can lookup your unconfirmed transaction enable an alert once it confirms." />
+    <meta property="og:image" content="/img/og_preview.png" />
+    <meta property="og:url" content="https://mempool.observer/" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@mempoolobserver" />
+    <meta name="twitter:creator" content="@0xb10c" />
 
-        <link rel="icon" href="favicon.png">
+    <link rel="icon" href="favicon.png">
 
-        <title>mempool.observer</title>
+    <title>mempool.observer</title>
 
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.css" />
 
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-        <!-- mempoolobserver specific stylesheets -->
-        <link href="/css/mempoolobserver.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <!-- mempoolobserver specific stylesheets -->
+    <link href="/css/mempoolobserver.css" rel="stylesheet">
 
-        <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Slab" rel="stylesheet">
-    </head>
+    <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Slab" rel="stylesheet">
+</head>
 <body>
     <% if (load_txid) { %>
         <script>var load_txid ="<%= load_txid %>";</script>
-    <% } %>
+        <% } %>
 
-    <div class="container" id="main_container">
-        <div class="page-header">
+        <div class="container" id="main_container">
+            <div class="page-header">
+                <div class="row">
+                    <div class="col-md-12">
+                        <img class="img-fluid center img-padding" alt="mempool.observer logo" src="img/web_header_transparent.png">
+                    </div>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-md-12">
-                    <img class="img-fluid center img-padding" alt="mempool.observer logo" src="img/web_header_transparent.png">
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card card_margin">
-                    <div class="card-body">
-                        <h2 class="card-title">Transaction lookup</h2>
-                        <p class="card-text">
-                            Paste a transaction id here. The position of the transaction will be highlighted below.
-                        </p>
-                        <form id="form_tx_info">
-                            <div class="input-group">
-                                <input type="text" id="input_txid" class="form-control" placeholder="f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16" pattern="[a-fA-F0-9]{64}"  title="transaction id [a-fA-F0-9]{64}">
-                                <span class="input-group-btn">
-                                    <button type="button" id="button_load_tx_info" class="btn btn-light"> <img src="img/web_button_show.png" /></button>
-                                </span>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card card_margin" id="card_info_tx">
-                    <div class="card-body">
-                        <h4 class="card-title">
-                            <span class="text-lowercase" id="card_info_tx_id"></span>
-                            <small class="text-muted"><a id="card_info_tx_permalink" target="_blank" href="https://mempool.observer/">permalink</a></small>
-                        </h4>
-                        <hr>
-                        <div id="card_info_tx_unconfirmed" class="container">
-                            <div class="row text_center">
-                                <div class="col" id="card_info_tx_input"></div>
-                                <div class="col-2" id="card_info_tx_middle">
-                                    <div class="text_center">
-                                        <span class="red_text" id="card_info_tx_middle_arrow">&rarr;</span>
-                                    </div>
-                                </div>
-                                <div class="col" id="card_info_tx_output"></div>
-                            </div>
-                            <hr>
-                            <div class="row text_center">
-                                <div class="col">
-                                    <span class="badge badge-dark" id="card_info_tx_middle_SpB"></span>
-                                </div>
-                                <div class="col">
-                                    <span class="badge badge-dark" id="card_info_tx_middle_fee"></span>
-                                </div>
-                                <div class="col">
-                                    <span class="badge badge-dark" id="card_info_tx_middle_size"></span>
-                                </div>
-                                <div class="col">
-                                    <span class="badge badge-dark" id="card_info_tx_middle_timestamp"></span>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="row text_center">
-                                <div class="col" id="card_info_tx_confirmed_sound">
-                                    <span>
-                                        <label>Sound on first confirmation? <input id="card_info_tx_confirmed_sound_checkbox" type="checkbox" value=""></label>
-                                        <br>
-                                        <span class="small">
-                                            <a target="_blank" href="https://notificationsounds.com/message-tones/attention-seeker-480">Attention Seeker</a>
-                                            by
-                                            <a target="_blank" href="https://notificationsounds.com">notificationsounds.com</a>
-                                            is licensed under
-                                            <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/legalcode">CC BY 4.0</a>
-                                        </span>
+                    <div class="card card_margin">
+                        <div class="card-body">
+                            <h2 class="card-title">Transaction lookup</h2>
+                            <p class="card-text">
+                                Paste a transaction id here. The position of the transaction will be highlighted below.
+                            </p>
+                            <form id="form_tx_info">
+                                <div class="input-group">
+                                    <input type="text" id="input_txid" class="form-control" placeholder="f4184fc596403b9d638783cf57adfe4c75c605f6356fbc91338530e9831e9e16" pattern="[a-fA-F0-9]{64}"  title="transaction id [a-fA-F0-9]{64}">
+                                    <span class="input-group-btn">
+                                        <button type="button" id="button_load_tx_info" class="btn btn-light"> <img src="img/web_button_show.png" /></button>
                                     </span>
                                 </div>
-                            </div>
+                            </form>
                         </div>
-
-                        <p id="card_info_tx_confirmed" class="text_center">
-                            <span>This transaction confirmed in block
-                                <span id="card_info_tx_confirmed_block"></span>.
-                            </span>
-                        </p>
-
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card card_margin" id="card_chart">
-                    <div class="card-body">
-                        <p class="card-text text_center">
-                            <span id="cursortext" class=""><span class="red_text" id="cursortext_date"></span>  - <span class="red_text" id="cursortext_tally">NaN</span> tx with <span class="red_text" id="cursortext_SpB">NaN</span> sat/byte</span>
-                        </p>
-                        <div id="chart"></div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card_margin" id="card_info_tx">
+                        <div class="card-body">
+                            <h4 class="card-title">
+                                <span class="text-lowercase" id="card_info_tx_id"></span>
+                                <small class="text-muted"><a id="card_info_tx_permalink" target="_blank" href="https://mempool.observer/">permalink</a></small>
+                            </h4>
+                            <hr>
+                            <div id="card_info_tx_unconfirmed" class="container">
+                                <div class="row text_center">
+                                    <div class="col" id="card_info_tx_input"></div>
+                                    <div class="col-2" id="card_info_tx_middle">
+                                        <div class="text_center">
+                                            <span class="red_text" id="card_info_tx_middle_arrow">&rarr;</span>
+                                        </div>
+                                    </div>
+                                    <div class="col" id="card_info_tx_output"></div>
+                                </div>
+                                <hr>
+                                <div class="row text_center">
+                                    <div class="col">
+                                        <span class="badge badge-dark" id="card_info_tx_middle_SpB"></span>
+                                    </div>
+                                    <div class="col">
+                                        <span class="badge badge-dark" id="card_info_tx_middle_fee"></span>
+                                    </div>
+                                    <div class="col">
+                                        <span class="badge badge-dark" id="card_info_tx_middle_size"></span>
+                                    </div>
+                                    <div class="col">
+                                        <span class="badge badge-dark" id="card_info_tx_middle_timestamp"></span>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row text_center">
+                                    <div class="col" id="card_info_tx_confirmed_sound">
+                                        <span>
+                                            <label>Sound on first confirmation? <input id="card_info_tx_confirmed_sound_checkbox" type="checkbox" value=""></label>
+                                            <br>
+                                            <span class="small">
+                                                <a target="_blank" href="https://notificationsounds.com/message-tones/attention-seeker-480">Attention Seeker</a>
+                                                by
+                                                <a target="_blank" href="https://notificationsounds.com">notificationsounds.com</a>
+                                                is licensed under
+                                                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/legalcode">CC BY 4.0</a>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p id="card_info_tx_confirmed" class="text_center">
+                                <span>This transaction confirmed in block
+                                    <span id="card_info_tx_confirmed_block"></span>.
+                                </span>
+                            </p>
+
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="card card_margin">
-            <div class="card-body">
-                <section>
-                    <article>
-                        <header>
-                            <h2>
-                                <strong>
-                                    <a id="faq-what-is-this">What is this?</a>
-                                </strong>
-                            </h2>
-                        </header>
-                        <p class="info_text">
-                            <a target="_blank" href="https://mempool.observer/">mempool.observer</a> periodically takes a snapshot of my nodes memory pool.
-                            You can see a visualization of this data above.
-                            The idea is to inform about the mempool and to provide tool, to double check estimated fee/size-ratios.
-                        </p>
-                    </article>
-                    <article>
-                        <header>
-                            <h3>
-                                <strong>
-                                    <a id="faq-how-does-this-work">How does this work?</a>
-                                </strong>
-                            </h3>
-                        </header>
-                        <p class="info_text">
-                            On receiving a before unseen transaction the node starts validating it.
-                            Once validated, the transaction is added to the nodes memory pool (mempool) and gets forwarded to other peers.
-                            The transaction remains in the nodes mempool until a miner includes it in a block.
-                            Keep in mind that each node has its own mempool with the transactions it sees as valid.
-                        </p>
-                        <p class="info_text">
-                            If the total size of all transactions in the mempool is bigger than the available space in the next block,
-                            a miner chooses a combination of transactions with the highest fees. The miner receives the fees in addition to the current blockreward.
-                        </p>
-                        <h6 class="text-uppercase"><a id="info-txsize"><strong>transaction size</strong></a></h6>
-                        <p class="info_text">
-                            The size of a transaction is based on the number of its inputs <code>n<sub>i</sub></code> and outputs <code>n<sub>o</sub></code>.
-                            Transactions with one input and two outputs (<code>n<sub>i</sub>=1</code>, <code>n<sub>o</sub>=2</code>) are quite common.
-                            Often one output is a payment and the other is change to a changeaddress owned by the sender.
-                            This transactions has a size of 226byte (<code>148byte + 2 * 34byte + 10byte</pre></code>).
-                        </p>
-                        <p class="text_center info_text"><code> size = n<sub>i</sub> * 148byte + n<sub>o</sub> * 34byte + 10byte</code></p>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card_margin" id="card_chart">
+                        <div class="card-body">
 
-                        <h6 class="text-uppercase"><a id="info-txsize"><strong>fee/size-ratio</strong></a></h6>
-                        <p class="info_text">
-                            Since bigger transaction use more space in a block and thus occupy space which could be filled with small transactions with high fees,
-                            bigger transaction need higher fees than a small transaction to be confirmed in the same block.
-                        </p>
-                        <p class="info_text">
-                            This can be expressed as a fee/size-ratio: <code>statoshis per byte</code>
-                        </p>
-                    </article>
-                    <article>
-                        <header>
-                            <h3>
-                                <strong>
-                                    <a id="faq-what-can-i-do">What can I do?</a>
-                                </strong>
-                            </h3>
-                        </header>
-                        <h6 class="text-uppercase">
-                            <a id="info-cpfp">
-                                <strong>Child Pays For Parent</strong>
-                            </a>
-                        </h6>
-                        <p class="info_text">
-                            Child pays for parent works by creating child transaction from the unconfirmed parent transaction.
-                            The idea is to pay the missing fee from the parent by overpaying the child's fee.
-                            This only works if you control at least one output of the parent transaction.
-                            For example a change output from a transaction you send, or an output from a transaction you receive.
-                        </p>
-                        <p class="info_text">
-                            This is how a child transaction based on a change output would look:
-                            <img class="img-fluid center img-padding" alt="child pays for parent" src="img/web_cpfp_transparent.png">
-                        </p>
-                        <!-- not yet..
-                        p class="info_text"
-                        As a rule of thumb you should sum the size of the parent transaction with the child transaction size (typically 192byte with <code>n<sub>i</sub>=1</code>, <code>n<sub>o</sub>=1</code>), and divide
-                        /p-->
+                            <nav class="nav nav-tabs" id="charts" role="tablist">
+                                <a class="nav-item nav-link active" id="nav-detailed-tab" data-toggle="tab" href="#nav-detailed" role="tab" aria-controls="nav-detailed" aria-expanded="true"><strong>detailed</strong></a>
+                                <a class="nav-item nav-link" id="nav-bucket-tab" data-toggle="tab" href="#nav-buckets" role="tab" aria-controls="nav-buckets"><strong>buckets</strong></a>
+                            </nav>
 
-                        <h6 class="text-uppercase"><a id="info-rbf"><strong>Replace by Fee</strong></a></h6>
-                        <p class="info_text">
-                            Once a node stores a transaction in its mempool, it rejects all other transactions, that spend one of the UTXO's already spend by the first-seen transaction.
-                            On one hand this lowers the risk of 0-conf double-spends, on the other hand it prevents the payer to renegotiate the fee if the transaction seems stuck.
-                            This is where replace-by-fee (RBF) and its derivatives come into play.
-                        </p>
-                        <p class="info_text">
-                            With <strong>opt-in full-RBF</strong> a transaction can be flagged by the sender as replaceable.
-                            A sequence number less than <code>MAX_INT - 1 (0xFFFFFFFF - 1)</code> in any of its inputs is used as flag.
-                            Bitcoin Core includes opt-in full-RBF since version 0.12 (released early 2016).
-                            A replacement of one or multiple flagged transactions is possible as long as the replacement:
-                        </p>
-                        <ul class="info_text">
-                            <li>pays an absolute higher fee than the original transaction or transactions</li>
-                            <li>pays at least <code>minRelayFee * sizeOfReplacementTx + feeOfOriginalTx</code> satoshis.</li>
-                            <li>does not replace more than 100 original transactions</li>
-                            <li>does not include a new input from a unconfirmed transaction</li>
-                        </ul>
-                        <p class="info_text">
-                            This is completely opt-in as the name suggest.
-                            Everyone can decide to treat transactions flagged as replaceable as unsafe till confirmed or don't even allow replacement at all.
-                        </p>
+                            <div class="tab-content" id="nav-tabContent">
+
+                                <div class="tab-pane fade show active" id="nav-detailed" role="tabpanel" aria-labelledby="nav-home-tab">
+                                    <div id="chart_detailed"></div>
+                                    <p class="card-text text_center">
+                                        <span id="cursortext" class=""><span class="red_text" id="cursortext_date"></span>  - <span class="red_text" id="cursortext_tally">NaN</span> tx with <span class="red_text" id="cursortext_SpB">NaN</span> sat/byte</span>
+                                    </p>
+                                </div>
+
+                                <div class="tab-pane fade" id="nav-buckets" role="tabpanel" aria-labelledby="nav-profile-tab">
+                                    <div id="chart_buckets"></div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card card_margin">
+                <div class="card-body">
+                    <section>
+                        <article>
+                            <header>
+                                <h2>
+                                    <strong>
+                                        <a id="faq-what-is-this">What is this?</a>
+                                    </strong>
+                                </h2>
+                            </header>
+                            <p class="info_text">
+                                <a target="_blank" href="https://mempool.observer/">mempool.observer</a> periodically takes a snapshot of my nodes memory pool.
+                                You can see a visualization of this data above.
+                                The idea is to inform about the mempool and to provide tool, to double check estimated fee/size-ratios.
+                            </p>
+                        </article>
+                        <article>
+                            <header>
+                                <h3>
+                                    <strong>
+                                        <a id="faq-how-does-this-work">How does this work?</a>
+                                    </strong>
+                                </h3>
+                            </header>
+                            <p class="info_text">
+                                On receiving a before unseen transaction the node starts validating it.
+                                Once validated, the transaction is added to the nodes memory pool (mempool) and gets forwarded to other peers.
+                                The transaction remains in the nodes mempool until a miner includes it in a block.
+                                Keep in mind that each node has its own mempool with the transactions it sees as valid.
+                            </p>
+                            <p class="info_text">
+                                If the total size of all transactions in the mempool is bigger than the available space in the next block,
+                                a miner chooses a combination of transactions with the highest fees. The miner receives the fees in addition to the current blockreward.
+                            </p>
+                            <h6 class="text-uppercase"><a id="info-txsize"><strong>transaction size</strong></a></h6>
+                            <p class="info_text">
+                                The size of a transaction is based on the number of its inputs <code>n<sub>i</sub></code> and outputs <code>n<sub>o</sub></code>.
+                                Transactions with one input and two outputs (<code>n<sub>i</sub>=1</code>, <code>n<sub>o</sub>=2</code>) are quite common.
+                                Often one output is a payment and the other is change to a changeaddress owned by the sender.
+                                This transactions has a size of 226byte (<code>148byte + 2 * 34byte + 10byte</pre></code>).
+                            </p>
+                            <p class="text_center info_text"><code> size = n<sub>i</sub> * 148byte + n<sub>o</sub> * 34byte + 10byte</code></p>
+
+                            <h6 class="text-uppercase"><a id="info-txsize"><strong>fee/size-ratio</strong></a></h6>
+                            <p class="info_text">
+                                Since bigger transaction use more space in a block and thus occupy space which could be filled with small transactions with high fees,
+                                bigger transaction need higher fees than a small transaction to be confirmed in the same block.
+                            </p>
+                            <p class="info_text">
+                                This can be expressed as a fee/size-ratio: <code>statoshis per byte</code>
+                            </p>
+                        </article>
+                        <article>
+                            <header>
+                                <h3>
+                                    <strong>
+                                        <a id="faq-what-can-i-do">What can I do?</a>
+                                    </strong>
+                                </h3>
+                            </header>
+                            <h6 class="text-uppercase">
+                                <a id="info-cpfp">
+                                    <strong>Child Pays For Parent</strong>
+                                </a>
+                            </h6>
+                            <p class="info_text">
+                                Child pays for parent works by creating child transaction from the unconfirmed parent transaction.
+                                The idea is to pay the missing fee from the parent by overpaying the child's fee.
+                                This only works if you control at least one output of the parent transaction.
+                                For example a change output from a transaction you send, or an output from a transaction you receive.
+                            </p>
+                            <p class="info_text">
+                                This is how a child transaction based on a change output would look:
+                                <img class="img-fluid center img-padding" alt="child pays for parent" src="img/web_cpfp_transparent.png">
+                            </p>
+                            <!-- not yet..
+                            p class="info_text"
+                            As a rule of thumb you should sum the size of the parent transaction with the child transaction size (typically 192byte with <code>n<sub>i</sub>=1</code>, <code>n<sub>o</sub>=1</code>), and divide
+                            /p-->
+
+                            <h6 class="text-uppercase"><a id="info-rbf"><strong>Replace by Fee</strong></a></h6>
+                            <p class="info_text">
+                                Once a node stores a transaction in its mempool, it rejects all other transactions, that spend one of the UTXO's already spend by the first-seen transaction.
+                                On one hand this lowers the risk of 0-conf double-spends, on the other hand it prevents the payer to renegotiate the fee if the transaction seems stuck.
+                                This is where replace-by-fee (RBF) and its derivatives come into play.
+                            </p>
+                            <p class="info_text">
+                                With <strong>opt-in full-RBF</strong> a transaction can be flagged by the sender as replaceable.
+                                A sequence number less than <code>MAX_INT - 1 (0xFFFFFFFF - 1)</code> in any of its inputs is used as flag.
+                                Bitcoin Core includes opt-in full-RBF since version 0.12 (released early 2016).
+                                A replacement of one or multiple flagged transactions is possible as long as the replacement:
+                            </p>
+                            <ul class="info_text">
+                                <li>pays an absolute higher fee than the original transaction or transactions</li>
+                                <li>pays at least <code>minRelayFee * sizeOfReplacementTx + feeOfOriginalTx</code> satoshis.</li>
+                                <li>does not replace more than 100 original transactions</li>
+                                <li>does not include a new input from a unconfirmed transaction</li>
+                            </ul>
+                            <p class="info_text">
+                                This is completely opt-in as the name suggest.
+                                Everyone can decide to treat transactions flagged as replaceable as unsafe till confirmed or don't even allow replacement at all.
+                            </p>
 
 
-                        <p class="source">
-                            <a target="_blank" href="https://github.com/bitcoin/bips/blob/master/bip-0125.mediawiki">github.com/bitcoin/bips/blob/master/bip-0125</a>
-                            <br>
-                            <a target="_blank" href="https://bitcoincore.org/en/faq/optin_rbf/">bitcoincore.org/en/faq/optin_rbf</a>
-                        </p>
+                            <p class="source">
+                                <a target="_blank" href="https://github.com/bitcoin/bips/blob/master/bip-0125.mediawiki">github.com/bitcoin/bips/blob/master/bip-0125</a>
+                                <br>
+                                <a target="_blank" href="https://bitcoincore.org/en/faq/optin_rbf/">bitcoincore.org/en/faq/optin_rbf</a>
+                            </p>
 
 
-                        <h6 class="text-uppercase">
-                            <a id="info-txaccel">
-                                <strong>ViaBTC Transaction Accelerator</strong>
-                            </a>
-                        </h6>
-                        <p class="info_text">
-                            ViaBTC offers to accelerate your transaction with their <a target="_blank" href="https://pool.viabtc.com/tools/txaccelerator/">Transaction Accelerator</a> for free.
-                            They offer to include up to 100 low-fee transactions per hour in the next block they mine.
-                            However they don't accelerate transactions with a fee-size ratio less than 10 sat/byte.
-                        </p>
+                            <h6 class="text-uppercase">
+                                <a id="info-txaccel">
+                                    <strong>ViaBTC Transaction Accelerator</strong>
+                                </a>
+                            </h6>
+                            <p class="info_text">
+                                ViaBTC offers to accelerate your transaction with their <a target="_blank" href="https://pool.viabtc.com/tools/txaccelerator/">Transaction Accelerator</a> for free.
+                                They offer to include up to 100 low-fee transactions per hour in the next block they mine.
+                                However they don't accelerate transactions with a fee-size ratio less than 10 sat/byte.
+                            </p>
 
-                    </article>
-                    <hr>
-                    <article>
-                        <h6 class="text-uppercase"> <a id="faq-links"><strong>links</strong></a></h6>
-                        <dl class="row info_text">
-                            <dt class="col-sm-4"><a target="_blank" href="https://en.bitcoin.it/wiki/Fee_bumping">bitcoin.it/wiki/Fee_Bumping</a></dt>
-                            <dd class="col-sm-8">Bitcoin wiki entry for fee bumping</dd>
+                        </article>
+                        <hr>
+                        <article>
+                            <h6 class="text-uppercase"> <a id="faq-links"><strong>links</strong></a></h6>
+                            <dl class="row info_text">
+                                <dt class="col-sm-4"><a target="_blank" href="https://en.bitcoin.it/wiki/Fee_bumping">bitcoin.it/wiki/Fee_Bumping</a></dt>
+                                <dd class="col-sm-8">Bitcoin wiki entry for fee bumping</dd>
 
-                            <dt class="col-sm-4"><a target="_blank" href="https://jochen-hoenicke.de/queue/">jochen-hoenicke.de/queue</a></dt>
-                            <dd class="col-sm-8">Provides a real-time data and displays how Jochen's mempool evolves over time. Has data back to January 2017 and supports different forks.</dd>
+                                <dt class="col-sm-4"><a target="_blank" href="https://jochen-hoenicke.de/queue/">jochen-hoenicke.de/queue</a></dt>
+                                <dd class="col-sm-8">Provides a real-time data and displays how Jochen's mempool evolves over time. Has data back to January 2017 and supports different forks.</dd>
 
-                            <dt class="col-sm-4"><a target="_blank" href="https://p2sh.info/dashboard/db/fee-estimation?panelId=2&fullscreen">p2sh.info/dashboard/db/fee-estimation</a></dt>
-                            <dd class="col-sm-8">Historical data of estimated fees by API's from bitgo, blocktrail, blockchain.info, 21inc, bitcoind, bitpay, blockcypher, btc.com and insight</dd>
+                                <dt class="col-sm-4"><a target="_blank" href="https://p2sh.info/dashboard/db/fee-estimation?panelId=2&fullscreen">p2sh.info/dashboard/db/fee-estimation</a></dt>
+                                <dd class="col-sm-8">Historical data of estimated fees by API's from bitgo, blocktrail, blockchain.info, 21inc, bitcoind, bitpay, blockcypher, btc.com and insight</dd>
 
-                            <dt class="col-sm-4"><a target="_blank" href="http://blockear.com/">blockear.com</a></dt>
-                            <dd class="col-sm-8">Notifies you with a sound once a new Bitcoin block is found.</dd>
+                                <dt class="col-sm-4"><a target="_blank" href="http://blockear.com/">blockear.com</a></dt>
+                                <dd class="col-sm-8">Notifies you with a sound once a new Bitcoin block is found.</dd>
 
-                            <dt class="col-sm-4"><a target="_blank" href="https://statoshi.info/">statoshi.info</a></dt>
-                            <dd class="col-sm-8">Real time Bitcoin node stats</dd>
-                        </dl>
-                        <h6 class="text-uppercase"><a id="faq-posts"><strong>posts, literature</strong></a></h6>
-                        <dl class="row info_text">
-                            <dt class="col-sm-4"><a target="_blank" href="https://blog.bitgo.com/the-challenges-of-bitcoin-transaction-fee-estimation-e47a64a61c72">The Challenges of Bitcoin Transaction Fee Estimation</a></dt>
-                            <dd class="col-sm-8">Jameson Lopp provides an great overview over the problems with accurate fee estimation.</dd>
-                            <dt class="col-sm-4"><a target="_blank" href="https://medium.com/@jimmysong/the-fee-market-explained-76b294947b42">The Fee Market Explained</a></dt>
-                            <dd class="col-sm-8">Jimmy Song explains why Bitcoin without fees would not work.</dd>
-                            <dt class="col-sm-4"><a target="_blank" href="https://bitcointechtalk.com/an-introduction-to-bitcoin-core-fee-estimation-27920880ad0">An introduction to Bitcoin Core fee estimation</a></dt>
-                            <dd class="col-sm-8">An excellent article about fee estimation in general and how Bitcoin Core [v0.14] handles it.</dd>
-                        </dl>
-                    </article>
-                </section>
+                                <dt class="col-sm-4"><a target="_blank" href="https://statoshi.info/">statoshi.info</a></dt>
+                                <dd class="col-sm-8">Real time Bitcoin node stats</dd>
+                            </dl>
+                            <h6 class="text-uppercase"><a id="faq-posts"><strong>posts, literature</strong></a></h6>
+                            <dl class="row info_text">
+                                <dt class="col-sm-4"><a target="_blank" href="https://blog.bitgo.com/the-challenges-of-bitcoin-transaction-fee-estimation-e47a64a61c72">The Challenges of Bitcoin Transaction Fee Estimation</a></dt>
+                                <dd class="col-sm-8">Jameson Lopp provides an great overview over the problems with accurate fee estimation.</dd>
+                                <dt class="col-sm-4"><a target="_blank" href="https://medium.com/@jimmysong/the-fee-market-explained-76b294947b42">The Fee Market Explained</a></dt>
+                                <dd class="col-sm-8">Jimmy Song explains why Bitcoin without fees would not work.</dd>
+                                <dt class="col-sm-4"><a target="_blank" href="https://bitcointechtalk.com/an-introduction-to-bitcoin-core-fee-estimation-27920880ad0">An introduction to Bitcoin Core fee estimation</a></dt>
+                                <dd class="col-sm-8">An excellent article about fee estimation in general and how Bitcoin Core [v0.14] handles it.</dd>
+                            </dl>
+                        </article>
+                    </section>
+                </div>
             </div>
         </div>
-    </div>
 
-    <footer class="footer container">
-        <hr>
-        <div class="row">
-            <div class="col-md text_center">
-                <p>
-                    <a target="_blank" href="bitcoin:1memoUrCooGaN1Qgv2KebFDRBrZTjREyY">1memoUrCooGaN1Qgv2KebFDRBrZTjREyY</a>
-                    <br>
-                    <a href="https://github.com/0xb10c/memo">work in progress</a>
-                    <br>
-                    big/small mistakes and everything else: <a href="https://twitter.com/0xB10C">@0xB10C</a>
-                    <br>
-                    &copy; 2017 0xB10C
-                </p>
+        <footer class="footer container">
+            <hr>
+            <div class="row">
+                <div class="col-md text_center">
+                    <p>
+                        <a target="_blank" href="bitcoin:1memoUrCooGaN1Qgv2KebFDRBrZTjREyY">1memoUrCooGaN1Qgv2KebFDRBrZTjREyY</a>
+                        <br>
+                        <a href="https://github.com/0xb10c/memo">work in progress</a>
+                        <br>
+                        misteakes and everything else: <a href="https://twitter.com/0xB10C">@0xB10C</a>
+                        <br>
+                        &copy; 2017 0xB10C
+                    </p>
+                </div>
             </div>
-        </div>
-    </footer>
+        </footer>
 
-
-    <!-- js -->
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-    <script src="/js/mempoolobserver.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.js"></script>
-</body>
-</html>
+        <!-- js -->
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+        <script src="/js/mempoolobserver.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.js"></script>
+    </body>
+    </html>
