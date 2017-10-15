@@ -53,7 +53,7 @@ for line in sys.stdin:
     if re_fee:
         fee = float(re_fee.group(0))
         rate = int((fee*100000000/size)+.5)
-        bucket = findBucketByFeerate(fee*100000000/size))
+        bucket = findBucketByFeerate(fee*100000000/size)
 
         if bucket in bucketrates:
             bucketrates[bucket] = bucketrates[bucket] + 1                       # increase bucketrate-counter
