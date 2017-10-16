@@ -130,26 +130,27 @@
                     <div class="card card_margin" id="card_chart">
                         <div class="card-body">
 
+                            <h4>Chart</h4>
                             <nav class="nav nav-tabs" id="charts" role="tablist">
+
                                 <a class="nav-item nav-link active" id="nav-detailed-tab" data-toggle="tab" href="#nav-detailed" role="tab" aria-controls="nav-detailed" aria-expanded="true"><strong>detailed</strong></a>
                                 <a class="nav-item nav-link" id="nav-bucket-tab" data-toggle="tab" href="#nav-buckets" role="tab" aria-controls="nav-buckets"><strong>buckets</strong></a>
                             </nav>
-
                             <div class="tab-content" id="nav-tabContent">
 
                                 <div class="tab-pane fade show active" id="nav-detailed" role="tabpanel" aria-labelledby="nav-home-tab">
                                     <div id="chart_detailed"></div>
-                                    <p class="card-text text_center">
-                                        <span id="cursortext" class=""><span class="red_text" id="cursortext_date"></span>  - <span class="red_text" id="cursortext_tally">NaN</span> tx with <span class="red_text" id="cursortext_SpB">NaN</span> sat/byte</span>
+                                    <p class="card-text text_center cursortext">
+                                        <span id="cursortext_detailed"><span class="red_text" id="cursortext_date_detailed"></span>  - <span class="red_text" id="cursortext_tally_detailed">NaN</span> tx with <span class="red_text" id="cursortext_SpB_detailed">NaN</span> sat/byte</span>
                                     </p>
                                 </div>
-
                                 <div class="tab-pane fade" id="nav-buckets" role="tabpanel" aria-labelledby="nav-profile-tab">
                                     <div id="chart_buckets"></div>
+                                    <p class="card-text text_center cursortext">
+                                        <span id="cursortext_bucket"><span class="red_text" id="cursortext_date_bucket"></span>  - <span class="red_text" id="cursortext_tally_bucket">NaN</span> tx in bucket <span class="red_text" id="cursortext_buckets_bucket">NaN</span></span>
+                                    </p>
                                 </div>
-
                             </div>
-
                         </div>
                     </div>
                 </div>

@@ -1,5 +1,6 @@
 var colorSet = ["#373854","#493267","#7bb3ff","#e86af0","#7bb3ff","#9e379f"];
 var g; // graph
+var bucketlevelGraph;
 var tx_unconfirmed_timer;
 var tx_unconfirmed_timer_last_block;
 var txid;
@@ -26,16 +27,28 @@ function changeGraphColor(index) {
     g.setSelection(false, ''+index,false);
 }
 
-function setCursorText(date,key,value) {
+function setCursorTextFeelevel(date,key,value) {
     date = new Date(date*1000);
     var time = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
     if(value>0){
-        $("#cursortext").css("visibility","visible");
-        $("#cursortext_tally").text(value);
-        $("#cursortext_SpB").text(key);
-        $("#cursortext_date").text(time);
+        $("#cursortext_detailed").css("visibility","visible");
+        $("#cursortext_tally_detailed").text(value);
+        $("#cursortext_SpB_detailed").text(key);
+        $("#cursortext_date_detailed").text(time);
     }else{
-        $("#cursortext").css("visibility","hidden");
+        $("#cursortext_detailed").css("visibility","hidden");
+    }
+}
+function setCursorTextBucketlevel(date,key,value) {
+    date = new Date(date*1000);
+    var time = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
+    if(value>0){
+        $("#cursortext_bucket").css("visibility","visible");
+        $("#cursortext_tally_bucket").text(value);
+        $("#cursortext_buckets_bucket").text(key);
+        $("#cursortext_date_bucket").text(time);
+    }else{
+        $("#cursortext_bucket").css("visibility","hidden");
     }
 }
 
@@ -82,7 +95,7 @@ function loadTXinfo(){
     }
 }
 
-var makeGraph = function(data, isStacked, elementID) {
+var makeFeeGraph = function(data, isStacked, elementID) {
     var chart = document.getElementById(elementID);
     var div = document.createElement('div');
     div.className = "chartclass";
@@ -120,7 +133,7 @@ var makeGraph = function(data, isStacked, elementID) {
             highlightSeriesBackgroundAlpha: 0.5,
             highlightSeriesBackgroundColor: "#000",
             highlightCallback: function(e, x, pts, row) {
-                setCursorText(x,g.getHighlightSeries(),g.rolledSeries_[g.rolledSeries_.length-g.getHighlightSeries()-1][row][1]);
+                setCursorTextFeelevel(x,g.getHighlightSeries(),g.rolledSeries_[g.rolledSeries_.length-g.getHighlightSeries()-1][row][1]);
             },
             unhighlightCallback: function(e) {
                 $("#cursortext").css("visibility","hidden");
@@ -143,7 +156,7 @@ var makeGraph = function(data, isStacked, elementID) {
                     includeZero:true
                 }
             },
-            clickCallback: function(e, x, points){ // TODO FIX: this example code from dygraph somehow dosn't work. The callback is never called. 
+            clickCallback: function(e, x, points){ // TODO FIX: this example code from dygraph somehow dosn't work. The callback is never called.
             if (g.isSeriesLocked()) {
                 g.clearSelection();
             } else {
@@ -154,6 +167,79 @@ var makeGraph = function(data, isStacked, elementID) {
 };
 
 
+var makeBucketGraph = function(data, isStacked, elementID) {
+    var chart = document.getElementById(elementID);
+    var div = document.createElement('div');
+    div.className = "chartclass";
+    div.style.display = 'inline-block';
+    chart.appendChild(div);
+
+    var labels = data[1];
+    bucketlevelGraph = new Dygraph(
+        div,
+        data,
+        {
+            width: 1000,
+            height: 650,
+            colors: colorSet,
+            fillAlpha: 1,
+            strokeWidth: 4,
+            strokeBorderWidth: 0,
+            highlightCircleSize: 0,
+            stackedGraph: isStacked,
+            stackedGraphNaNFill:"none",
+            rightGap: 0,
+
+
+            legend: "never",
+            ylabel: "transactions in mempool",
+            xlabel: "time",
+
+            highlightSeriesOpts: {
+                strokeWidth: 5,
+                strokeBorderWidth: 2,
+                strokeBorderColor: "#FDD",
+                highlightCircleSize: 1
+            },
+            interactionModel:  {},
+            highlightSeriesBackgroundAlpha: 0.5,
+            highlightSeriesBackgroundColor: "#000",
+            highlightCallback: function(e, x, pts, row) {
+                setCursorTextBucketlevel(x,bucketlevelGraph.getHighlightSeries(),bucketlevelGraph.rolledSeries_[bucketlevelGraph.rolledSeries_.length-bucketlevelGraph.getHighlightSeries()-1][row][1]);
+            },
+            unhighlightCallback: function(e) {
+                $("#cursortext").css("visibility","hidden");
+            },
+            axes: {
+                x: {
+                    axisLabelFormatter: function(d, gran, opts) {
+                        return Dygraph.dateAxisLabelFormatter(new Date((d/60).toFixed(0)*60000), gran, opts);
+                    }
+                },
+                y: {
+                    axisLabelFormatter: function(y) {
+                        if(y>999){
+                            return + y/1000 + 'k';
+                        }else{
+                            return y;
+                        }
+                    },
+                    axisLabelWidth: 50,
+                    includeZero:true
+                }
+            },
+            clickCallback: function(e, x, points){ // TODO FIX: this example code from dygraph somehow dosn't work. The callback is never called.
+            if (g.isSeriesLocked()) {
+                g.clearSelection();
+            } else {
+                g.setSelection(g.getSelection(), g.getHighlightSeries(), true);
+            }
+        }
+    });
+};
+
+
+
 window.onload = function () {
 
     // register onClickListener for the 'load tx id'-button
@@ -162,8 +248,8 @@ window.onload = function () {
     });
 
     // loads stacked graph with data from https://mempool.observer/dyn/*
-    makeGraph('/dyn/feelevel.csv', true, "chart_detailed");
-    makeGraph('/dyn/bucketlevel.csv', true, "chart_buckets");
+    makeFeeGraph('/dyn/feelevel.csv', true, "chart_detailed");
+    makeBucketGraph('/dyn/bucketlevel.csv', true, "chart_buckets");
 
 
     // if load_txid was defined by the ejs renderer load the tx

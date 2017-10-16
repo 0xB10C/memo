@@ -126,7 +126,7 @@ hr {
     vertical-align: middle;
 }
 
-#cursortext{
+.cursortext{
     font-size: 1.5em;
     visibility: hidden;
 }
