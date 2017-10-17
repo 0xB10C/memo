@@ -14,9 +14,9 @@ CREATE TABLE Feelevel (
     FOREIGN KEY (state_id) REFERENCES State(state_id) ON DELETE CASCADE
 );
 
--- there are 97 different buckets in core
--- ranging from the smallest with a feerate up to 1 sat/byte to the biggest with a feerate higher than ~9412 sat/byte
--- the bucketsize is spaced exponentially and increases 10% every bucket
+-- bitcoin core groups transactions buckets to avoid tracking each transaction feerate independently
+-- the smallest bucket has a feerate of 1 sat/byte
+-- the bucketsize is spaced exponentially and increases 5% every bucket
 -- a bucket cointains a amount (tally) of transaction is it
 CREATE TABLE Bucketlevel (
     bucket int NOT NULL,
@@ -37,3 +37,11 @@ BEGIN
 --  3h * 60 min * 60 seconds -> 10800 seconds
     DELETE FROM State WHERE strftime('%s','now') - statetime > 10800;
 END;
+
+-- DB Version
+CREATE TABLE MemoDBVersion (
+    version varchar not NULL,
+    PRIMARY KEY (version)
+)
+-- set DB Version to v1.1.0
+INSERT INTO MEMODBVERSION VALUES("v1.1.0");
