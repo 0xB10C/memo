@@ -1,6 +1,5 @@
 var colorSet = ["#373854","#493267","#7bb3ff","#e86af0","#7bb3ff","#9e379f"];
-var g; // graph
-var bucketlevelGraph;
+var graph;
 var tx_unconfirmed_timer;
 var tx_unconfirmed_timer_last_block;
 var txid;
@@ -24,7 +23,7 @@ function checkConfirmed() {
 }
 
 function changeGraphColor(index) {
-    g.setSelection(false, ''+index,false);
+    graph.setSelection(false, ''+index,false);
 }
 
 function setCursorTextFeelevel(date,key,value) {
@@ -95,149 +94,118 @@ function loadTXinfo(){
     }
 }
 
-var makeFeeGraph = function(data, isStacked, elementID) {
-    var chart = document.getElementById(elementID);
+var buildGraph = function(data,options) {
+    var chart = document.getElementById("graphdiv");
     var div = document.createElement('div');
     div.className = "chartclass";
     div.style.display = 'inline-block';
     chart.appendChild(div);
-
     var labels = data[1];
-    g = new Dygraph(
-        div,
-        data,
-        {
-            width: 1000,
-            height: 650,
-            colors: colorSet,
-            fillAlpha: 1,
-            strokeWidth: 4,
-            strokeBorderWidth: 0,
-            highlightCircleSize: 0,
-            stackedGraph: isStacked,
-            stackedGraphNaNFill:"none",
-            rightGap: 0,
+    graph = new Dygraph(div, data, options)
+}
 
 
-            legend: "never",
-            ylabel: "transactions in mempool",
-            xlabel: "time",
+var options_detailed = {
+    width: 1000,
+    height: 650,
+    colors: colorSet,
+    fillAlpha: 1,
+    strokeWidth: 4,
+    strokeBorderWidth: 0,
+    highlightCircleSize: 0,
+    stackedGraph: true,
+    stackedGraphNaNFill:"none",
+    rightGap: 0,
 
-            highlightSeriesOpts: {
-                strokeWidth: 5,
-                strokeBorderWidth: 2,
-                strokeBorderColor: "#FDD",
-                highlightCircleSize: 1
-            },
-            interactionModel:  {},
-            highlightSeriesBackgroundAlpha: 0.5,
-            highlightSeriesBackgroundColor: "#000",
-            highlightCallback: function(e, x, pts, row) {
-                setCursorTextFeelevel(x,g.getHighlightSeries(),g.rolledSeries_[g.rolledSeries_.length-g.getHighlightSeries()-1][row][1]);
-            },
-            unhighlightCallback: function(e) {
-                $("#cursortext").css("visibility","hidden");
-            },
-            axes: {
-                x: {
-                    axisLabelFormatter: function(d, gran, opts) {
-                        return Dygraph.dateAxisLabelFormatter(new Date((d/60).toFixed(0)*60000), gran, opts);
-                    }
-                },
-                y: {
-                    axisLabelFormatter: function(y) {
-                        if(y>999){
-                            return + y/1000 + 'k';
-                        }else{
-                            return y;
-                        }
-                    },
-                    axisLabelWidth: 50,
-                    includeZero:true
+    legend: "never",
+    ylabel: "transactions in mempool",
+    xlabel: "time",
+
+    highlightSeriesOpts: {
+        strokeWidth: 5,
+        strokeBorderWidth: 2,
+        strokeBorderColor: "#FDD",
+        highlightCircleSize: 1
+    },
+    interactionModel:  {},
+    highlightSeriesBackgroundAlpha: 0.5,
+    highlightSeriesBackgroundColor: "#000",
+    highlightCallback: function(e, x, pts, row) {
+        setCursorTextFeelevel(x,graph.getHighlightSeries(),graph.rolledSeries_[graph.rolledSeries_.length-graph.getHighlightSeries()-1][row][1]);
+    },
+    unhighlightCallback: function(e) {
+        $("#cursortext").css("visibility","hidden");
+    },
+    axes: {
+        x: {
+            axisLabelFormatter: function(d, gran, opts) {
+                return Dygraph.dateAxisLabelFormatter(new Date((d/60).toFixed(0)*60000), gran, opts);
+            }
+        },
+        y: {
+            axisLabelFormatter: function(y) {
+                if(y>999){
+                    return + y/1000 + 'k';
+                }else{
+                    return y;
                 }
             },
-            clickCallback: function(e, x, points){ // TODO FIX: this example code from dygraph somehow dosn't work. The callback is never called.
-            if (g.isSeriesLocked()) {
-                g.clearSelection();
-            } else {
-                g.setSelection(g.getSelection(), g.getHighlightSeries(), true);
-            }
+            axisLabelWidth: 50,
+            includeZero:true
         }
-    });
-};
+    }
+}
 
+var options_bucket = {
+    width: 1000,
+    height: 650,
+    colors: colorSet,
+    fillAlpha: 1,
+    strokeWidth: 4,
+    strokeBorderWidth: 0,
+    highlightCircleSize: 0,
+    stackedGraph: true,
+    stackedGraphNaNFill:"none",
+    rightGap: 0,
 
-var makeBucketGraph = function(data, isStacked, elementID) {
-    var chart = document.getElementById(elementID);
-    var div = document.createElement('div');
-    div.className = "chartclass";
-    div.style.display = 'inline-block';
-    chart.appendChild(div);
+    legend: "never",
+    ylabel: "transactions in mempool",
+    xlabel: "time",
 
-    var labels = data[1];
-    bucketlevelGraph = new Dygraph(
-        div,
-        data,
-        {
-            width: 1000,
-            height: 650,
-            colors: colorSet,
-            fillAlpha: 1,
-            strokeWidth: 4,
-            strokeBorderWidth: 0,
-            highlightCircleSize: 0,
-            stackedGraph: isStacked,
-            stackedGraphNaNFill:"none",
-            rightGap: 0,
-
-
-            legend: "never",
-            ylabel: "transactions in mempool",
-            xlabel: "time",
-
-            highlightSeriesOpts: {
-                strokeWidth: 5,
-                strokeBorderWidth: 2,
-                strokeBorderColor: "#FDD",
-                highlightCircleSize: 1
-            },
-            interactionModel:  {},
-            highlightSeriesBackgroundAlpha: 0.5,
-            highlightSeriesBackgroundColor: "#000",
-            highlightCallback: function(e, x, pts, row) {
-                setCursorTextBucketlevel(x,bucketlevelGraph.getHighlightSeries(),bucketlevelGraph.rolledSeries_[bucketlevelGraph.rolledSeries_.length-bucketlevelGraph.getHighlightSeries()-1][row][1]);
-            },
-            unhighlightCallback: function(e) {
-                $("#cursortext").css("visibility","hidden");
-            },
-            axes: {
-                x: {
-                    axisLabelFormatter: function(d, gran, opts) {
-                        return Dygraph.dateAxisLabelFormatter(new Date((d/60).toFixed(0)*60000), gran, opts);
-                    }
-                },
-                y: {
-                    axisLabelFormatter: function(y) {
-                        if(y>999){
-                            return + y/1000 + 'k';
-                        }else{
-                            return y;
-                        }
-                    },
-                    axisLabelWidth: 50,
-                    includeZero:true
+    highlightSeriesOpts: {
+        strokeWidth: 5,
+        strokeBorderWidth: 2,
+        strokeBorderColor: "#FDD",
+        highlightCircleSize: 1
+    },
+    interactionModel:  {},
+    highlightSeriesBackgroundAlpha: 0.5,
+    highlightSeriesBackgroundColor: "#000",
+    highlightCallback: function(e, x, pts, row) {
+        setCursorTextBucketlevel(x,graph.getHighlightSeries(),graph.rolledSeries_[graph.rolledSeries_.length-graph.getHighlightSeries()-1][row][1]);
+    },
+    unhighlightCallback: function(e) {
+        $("#cursortext").css("visibility","hidden");
+    },
+    axes: {
+        x: {
+            axisLabelFormatter: function(d, gran, opts) {
+                return Dygraph.dateAxisLabelFormatter(new Date((d/60).toFixed(0)*60000), gran, opts);
+            }
+        },
+        y: {
+            axisLabelFormatter: function(y) {
+                if(y>999){
+                    return + y/1000 + 'k';
+                }else{
+                    return y;
                 }
             },
-            clickCallback: function(e, x, points){ // TODO FIX: this example code from dygraph somehow dosn't work. The callback is never called.
-            if (g.isSeriesLocked()) {
-                g.clearSelection();
-            } else {
-                g.setSelection(g.getSelection(), g.getHighlightSeries(), true);
-            }
+            axisLabelWidth: 50,
+            includeZero:true
         }
-    });
-};
-
+    }
+}
 
 
 window.onload = function () {
@@ -247,13 +215,10 @@ window.onload = function () {
         loadTXinfo();
     });
 
-    // loads stacked graph with data from https://mempool.observer/dyn/*
-    makeFeeGraph('/dyn/feelevel.csv', true, "chart_detailed");
-    makeBucketGraph('/dyn/bucketlevel.csv', true, "chart_buckets");
+    buildGraph('/dyn/feelevel.csv', options_detailed);
 
-
-    // if load_txid was defined by the ejs renderer load the tx
-    // load_txid is the permalink txid
+    // if 'load_txid' was defined by the ejs renderer load the tx
+    // 'load_txid' is the permalink txid
     if (typeof load_txid !== 'undefined') {
         $("#input_txid").val(load_txid)
         loadTXinfo();
@@ -269,5 +234,15 @@ window.onload = function () {
         }
     });
 
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        switch (e.target.id) {
+            case "nav-detailed-tab":
+                graph.updateOptions($.extend(options_detailed, {file: "/dyn/feelevel.csv"}),false);
+                break;
+            case "nav-bucket-tab":
+                graph.updateOptions($.extend(options_bucket, {file: "/dyn/bucketlevel-orig.csv"}),false);
+                break;
+        }
+    })
 
 }
