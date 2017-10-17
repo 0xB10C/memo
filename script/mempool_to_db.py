@@ -6,8 +6,13 @@ import re
 
 # const
 DATABASE_LOCATION_STRING = './db/memo.sqlite3'
-BUCKETCOUNT = 97
-BUCKETS = [] # stores a list of fee buckets used in core fee estimation
+
+# last bucket with more than 2^14 sat/byte
+BUCKETCOUNT = 200
+
+# exponential increase by 5% per bucket
+# https://github.com/bitcoin/bitcoin/commit/e5007bae35ce22036a816505038277d99c84e3f7#diff-8c0941572d1cdf184d1751f7b7f1db4eR109
+FEE_SPACING = 1.05
 
 # var
 conn = None
@@ -16,6 +21,10 @@ fee = None
 bucket = None
 rates = {}
 bucketrates = {}
+
+# stores a list of fee buckets used in core fee estimation
+BUCKETS = []
+
 
 # fills the bucket list
 bucketFillIndex = 0
