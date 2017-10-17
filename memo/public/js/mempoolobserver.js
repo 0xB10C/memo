@@ -240,7 +240,7 @@ window.onload = function () {
                 graph.updateOptions($.extend(options_detailed, {file: "/dyn/feelevel.csv"}),false);
                 break;
             case "nav-bucket-tab":
-                graph.updateOptions($.extend(options_bucket, {file: "/dyn/bucketlevel-orig.csv"}),false);
+                graph.updateOptions($.extend(options_bucket, {file: "/dyn/bucketlevel.csv"}),false);
                 break;
         }
     })
