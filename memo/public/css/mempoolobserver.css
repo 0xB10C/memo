@@ -33,12 +33,21 @@ hr {
 }
 
 .nav-item.nav-link {
+    padding: 3px 10px 3px 10px;
     border-radius: 2px;
     color: #a7c6db;
     border-color: #0d2738;
     background-color: #0d2738;
     margin-right: 10px;
+    margin-bottom: 5px;
+    margin-top: 5px;
 }
+
+.nav-item.nav-link.nav-title{
+    border-color: transparent;
+    background-color: transparent;
+}
+
 
 .nav-item.nav-link.active {
     color: #c83737;
@@ -145,24 +154,44 @@ hr {
 }
 
 @media (min-width: 576px) {
+    .responsive-margin{
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+
     section > article{
         margin-left: 20px;
         margin-right: 20px;
     }
 }
 @media (min-width: 768px) {
+    .responsive-margin{
+        margin-left: 30px;
+        margin-right: 30px;
+    }
+
     section > article{
         margin-left: 30px;
         margin-right: 30px;
     }
 }
 @media (min-width: 992px) {
+    .responsive-margin{
+        margin-left: 40px;
+        margin-right: 40px;
+    }
+
     section > article{
         margin-left: 40px;
         margin-right: 40px;
     }
 }
 @media (min-width: 1200px) {
+    .responsive-margin{
+        margin-left: 50px;
+        margin-right: 50px;
+    }
+
     section > article{
         margin-left: 50px;
         margin-right: 50px;
