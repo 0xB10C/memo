@@ -41,7 +41,7 @@ class Backend {
             }
             var retval = {
                 statusCode: 200,
-                message: "invalid request",
+                message: "success",
                 data: {tx_confirmed_in_block: confirmed}
             }
             fn(retval);
