@@ -104,7 +104,6 @@ var buildGraph = function(data,options) {
     graph = new Dygraph(div, data, options)
 }
 
-
 var options_detailed = {
     width: 1000,
     height: 650,
@@ -182,7 +181,11 @@ var options_bucket = {
     highlightSeriesBackgroundAlpha: 0.5,
     highlightSeriesBackgroundColor: "#000",
     highlightCallback: function(e, x, pts, row) {
-        setCursorTextBucketlevel(x,graph.getHighlightSeries(),graph.rolledSeries_[graph.rolledSeries_.length-graph.getHighlightSeries()-1][row][1]);
+        setCursorTextBucketlevel(
+            x,
+            graph.getHighlightSeries(), // bucket
+            graph.rolledSeries_[graph.rolledSeries_.length-graph.getHighlightSeries()-2][row][1]
+        );
     },
     unhighlightCallback: function(e) {
         $("#cursortext").css("visibility","hidden");
