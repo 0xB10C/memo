@@ -28,9 +28,9 @@ BUCKETS = []
 
 # fills the bucket list
 bucketFillIndex = 0
-BUCKETS.append(1)
+BUCKETS.append(1) # initial bucket with 1 sat / byte
 for bucketFillIndex in range(1,BUCKETCOUNT):
-    BUCKETS.append(BUCKETS[bucketFillIndex-1]*1.10) # append bucket with 10% more than the previous
+    BUCKETS.append(BUCKETS[bucketFillIndex-1] * FEE_SPACING) # append bucket with 5% more than the previous
 
 
 # binary find bucket by feerate
