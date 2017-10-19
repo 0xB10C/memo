@@ -1,5 +1,6 @@
 var colorSet = ["#373854","#493267","#7bb3ff","#e86af0","#7bb3ff","#9e379f"];
-var g; // graph
+const FEE_SPACING = 1.05;
+var graph;
 var tx_unconfirmed_timer;
 var tx_unconfirmed_timer_last_block;
 var txid;
@@ -23,19 +24,33 @@ function checkConfirmed() {
 }
 
 function changeGraphColor(index) {
-    g.setSelection(false, ''+index,false);
+    graph.setSelection(false, ''+index,false);
 }
 
-function setCursorText(date,key,value) {
+function setCursorTextFeelevel(date,key,value) {
     date = new Date(date*1000);
     var time = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
     if(value>0){
-        $("#cursortext").css("visibility","visible");
-        $("#cursortext_tally").text(value);
-        $("#cursortext_SpB").text(key);
-        $("#cursortext_date").text(time);
+        $("#cursortext_detailed").css("visibility","visible");
+        $("#cursortext_tally_detailed").text(value);
+        $("#cursortext_SpB_detailed").text(key);
+        $("#cursortext_date_detailed").text(time);
     }else{
-        $("#cursortext").css("visibility","hidden");
+        $("#cursortext_detailed").css("visibility","hidden");
+    }
+}
+function setCursorTextBucketlevel(date,key,value) {
+
+    date = new Date(date*1000);
+    var time = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
+    if(value>0){
+        let fee = calcFeeForBucket(key);
+        $("#cursortext_bucket").css("visibility","visible");
+        $("#cursortext_tally_bucket").text(value);
+        $("#cursortext_buckets_bucket").text(key + " (" + fee.toFixed(2) + "s/B - " + (fee * FEE_SPACING).toFixed(2) + "s/B)");
+        $("#cursortext_date_bucket").text(time);
+    }else{
+        $("#cursortext_bucket").css("visibility","hidden");
     }
 }
 
@@ -82,77 +97,129 @@ function loadTXinfo(){
     }
 }
 
-var makeGraph = function(data, isStacked) {
-    var chart = document.getElementById('chart');
+var buildGraph = function(data,options) {
+    var chart = document.getElementById("graphdiv");
     var div = document.createElement('div');
     div.className = "chartclass";
     div.style.display = 'inline-block';
     chart.appendChild(div);
-
     var labels = data[1];
-    g = new Dygraph(
-        div,
-        data,
-        {
-            width: 1000,
-            height: 650,
-            colors: colorSet,
-            fillAlpha: 1,
-            strokeWidth: 4,
-            strokeBorderWidth: 0,
-            highlightCircleSize: 0,
-            stackedGraph: isStacked,
-            stackedGraphNaNFill:"none",
-            rightGap: 0,
+    graph = new Dygraph(div, data, options)
+}
 
+var options_detailed = {
+    width: 1000,
+    height: 650,
+    colors: colorSet,
+    fillAlpha: 1,
+    strokeWidth: 4,
+    strokeBorderWidth: 0,
+    highlightCircleSize: 0,
+    stackedGraph: true,
+    stackedGraphNaNFill:"none",
+    rightGap: 0,
 
-            legend: "never",
-            ylabel: "transactions in mempool",
-            xlabel: "time",
+    legend: "never",
+    ylabel: "transactions in mempool",
+    xlabel: "time",
 
-            highlightSeriesOpts: {
-                strokeWidth: 5,
-                strokeBorderWidth: 2,
-                strokeBorderColor: "#FDD",
-                highlightCircleSize: 1
-            },
-            interactionModel:  {},
-            highlightSeriesBackgroundAlpha: 0.5,
-            highlightSeriesBackgroundColor: "#000",
-            highlightCallback: function(e, x, pts, row) {
-                setCursorText(x,g.getHighlightSeries(),g.rolledSeries_[g.rolledSeries_.length-g.getHighlightSeries()-1][row][1]);
-            },
-            unhighlightCallback: function(e) {
-                $("#cursortext").css("visibility","hidden");
-            },
-            axes: {
-                x: {
-                    axisLabelFormatter: function(d, gran, opts) {
-                        return Dygraph.dateAxisLabelFormatter(new Date((d/60).toFixed(0)*60000), gran, opts);
-                    }
-                },
-                y: {
-                    axisLabelFormatter: function(y) {
-                        if(y>999){
-                            return + y/1000 + 'k';
-                        }else{
-                            return y;
-                        }
-                    },
-                    axisLabelWidth: 50,
-                    includeZero:true
+    highlightSeriesOpts: {
+        strokeWidth: 5,
+        strokeBorderWidth: 2,
+        strokeBorderColor: "#FDD",
+        highlightCircleSize: 1
+    },
+    interactionModel:  {},
+    highlightSeriesBackgroundAlpha: 0.5,
+    highlightSeriesBackgroundColor: "#000",
+    highlightCallback: function(e, x, pts, row) {
+        setCursorTextFeelevel(x,graph.getHighlightSeries(),graph.rolledSeries_[graph.rolledSeries_.length-graph.getHighlightSeries()-1][row][1]);
+    },
+    unhighlightCallback: function(e) {
+        $("#cursortext").css("visibility","hidden");
+    },
+    axes: {
+        x: {
+            axisLabelFormatter: function(d, gran, opts) {
+                return Dygraph.dateAxisLabelFormatter(new Date((d/60).toFixed(0)*60000), gran, opts);
+            }
+        },
+        y: {
+            axisLabelFormatter: function(y) {
+                if(y>999){
+                    return + y/1000 + 'k';
+                }else{
+                    return y;
                 }
             },
-            clickCallback: function(e, x, points){ // TODO FIX: this somehow dosn't work. The callback is never called.
-            if (g.isSeriesLocked()) {
-                g.clearSelection();
-            } else {
-                g.setSelection(g.getSelection(), g.getHighlightSeries(), true);
-            }
+            axisLabelWidth: 50,
+            includeZero:true
         }
-    });
-};
+    }
+}
 
+var options_bucket = {
+    width: 1000,
+    height: 650,
+    colors: colorSet,
+    fillAlpha: 1,
+    strokeWidth: 4,
+    strokeBorderWidth: 0,
+    highlightCircleSize: 0,
+    stackedGraph: true,
+    stackedGraphNaNFill:"none",
+    rightGap: 0,
+
+    legend: "never",
+    ylabel: "transactions in mempool",
+    xlabel: "time",
+
+    highlightSeriesOpts: {
+        strokeWidth: 5,
+        strokeBorderWidth: 2,
+        strokeBorderColor: "#FDD",
+        highlightCircleSize: 1
+    },
+    interactionModel:  {},
+    highlightSeriesBackgroundAlpha: 0.5,
+    highlightSeriesBackgroundColor: "#000",
+    highlightCallback: function(e, x, pts, row) {
+        setCursorTextBucketlevel(
+            x,
+            graph.getHighlightSeries(), // bucket
+            graph.rolledSeries_[graph.rolledSeries_.length-graph.getHighlightSeries()-2][row][1]
+        );
+    },
+    unhighlightCallback: function(e) {
+        $("#cursortext").css("visibility","hidden");
+    },
+    axes: {
+        x: {
+            axisLabelFormatter: function(d, gran, opts) {
+                return Dygraph.dateAxisLabelFormatter(new Date((d/60).toFixed(0)*60000), gran, opts);
+            }
+        },
+        y: {
+            axisLabelFormatter: function(y) {
+                if(y>999){
+                    return + y/1000 + 'k';
+                }else{
+                    return y;
+                }
+            },
+            axisLabelWidth: 50,
+            includeZero:true
+        }
+    }
+}
+
+function calcFeeForBucket(bucket) {
+    var feeForBucket = 1;
+    for(i = 0; i<bucket; i++){
+        feeForBucket = feeForBucket * 1.05;
+    }
+    return feeForBucket;
+}
 
 window.onload = function () {
 
@@ -161,11 +228,10 @@ window.onload = function () {
         loadTXinfo();
     });
 
-    // loads stacked graph with data from https://mempool.observer/data.csv
-    makeGraph('data.csv', true);
+    buildGraph('/dyn/feelevel.csv', options_detailed);
 
-    // if load_txid was defined by the ejs renderer load the tx
-    // load_txid is the permalink txid
+    // if 'load_txid' was defined by the ejs renderer load the tx
+    // 'load_txid' is the permalink txid
     if (typeof load_txid !== 'undefined') {
         $("#input_txid").val(load_txid)
         loadTXinfo();
@@ -180,4 +246,16 @@ window.onload = function () {
             window.clearInterval(tx_unconfirmed_timer) // disables the timer
         }
     });
+
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        switch (e.target.id) {
+            case "nav-detailed-tab":
+                graph.updateOptions($.extend(options_detailed, {file: "/dyn/feelevel.csv"}),false);
+                break;
+            case "nav-bucket-tab":
+                graph.updateOptions($.extend(options_bucket, {file: "/dyn/bucketlevel.csv"}),false);
+                break;
+        }
+    })
+
 }

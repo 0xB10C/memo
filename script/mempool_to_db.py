@@ -7,13 +7,53 @@ import re
 # const
 DATABASE_LOCATION_STRING = './db/memo.sqlite3'
 
+# last bucket with more than 2^14 sat/byte
+BUCKETCOUNT = 200
+
+# exponential increase by 5% per bucket
+# https://github.com/bitcoin/bitcoin/commit/e5007bae35ce22036a816505038277d99c84e3f7#diff-8c0941572d1cdf184d1751f7b7f1db4eR109
+FEE_SPACING = 1.05
 
 # var
 conn = None
 size = None
 fee = None
+bucket = None
 rates = {}
+bucketrates = {}
 
+# stores a list of fee buckets used in core fee estimation
+BUCKETS = []
+
+
+# fills the bucket list
+bucketFillIndex = 0
+BUCKETS.append(1) # initial bucket with 1 sat / byte
+for bucketFillIndex in range(1,BUCKETCOUNT):
+    BUCKETS.append(BUCKETS[bucketFillIndex-1] * FEE_SPACING) # append bucket with 5% more than the previous
+
+
+# binary find bucket by feerate
+def findBucketByFeerate(feerate):
+    posFirst = 0
+    posLast = len(BUCKETS)-1
+
+    if feerate >= BUCKETS[posLast]:
+        return posLast
+    if feerate <= BUCKETS[posFirst]:
+        return posFirst
+
+    while posFirst<=posLast:
+        posMid = (posFirst+posLast)//2
+        if BUCKETS[posMid] <= feerate and BUCKETS[posMid+1] > feerate:
+            return posMid
+        if BUCKETS[posMid] > feerate:
+            posLast = posMid - 1
+        if BUCKETS[posMid] < feerate:
+            posFirst = posMid + 1
+
+
+# reads "getrawmempool true" from stdin
 for line in sys.stdin:
     re_size = re.search('(?<=\"size\": )(.*)(?=,)', line)
     if re_size:
@@ -22,11 +62,19 @@ for line in sys.stdin:
     if re_fee:
         fee = float(re_fee.group(0))
         rate = int((fee*100000000/size)+.5)
-        if rate in rates:
-            rates[rate]=rates[rate]+1
+        bucket = findBucketByFeerate(fee*100000000/size)
+
+        if bucket in bucketrates:
+            bucketrates[bucket] = bucketrates[bucket] + 1                       # increase bucketrate-counter
         else:
+            bucketrates[bucket] = 1                                             # or set to 1 if not existing
+
+        if rate in rates:                                                       # increase rate-counter
+            rates[rate] = rates[rate] + 1
+        else:                                                                   # or set to 1 if not existing
             rates[rate] = 1
 
+# current timestamp for the new state
 statetime_string = str(int(time.time()))
 
 try:
@@ -39,20 +87,28 @@ try:
     enable_foreign_key_support_string  = "PRAGMA foreign_keys = ON"
     cur.execute(enable_foreign_key_support_string)
 
+    # insert new state into db with current timestamp
     insert_state_string = "INSERT INTO State (statetime) VALUES (" + statetime_string + ");"
     cur.execute(insert_state_string)
 
-
+    # get the state_id from the just inserted state
     query_state_string = "SELECT state_id FROM State WHERE statetime = "+statetime_string+";"
     cur.execute(query_state_string)
     state_id = cur.fetchone()[0]
 
-
+    # insert Feelevel data into db
     insert_feelevel_string = "INSERT INTO Feelevel (spb,state_id,tally) VALUES "
     for key, value in rates.iteritems():
         insert_feelevel_string += "(" + str(key) + "," + str(state_id) + "," + str(value) +"),"
     insert_feelevel_string = insert_feelevel_string[:-1] # removes the last ,
     cur.execute(insert_feelevel_string)
+
+    # insert Bucketlevel data into db
+    insert_bucket_string = "INSERT INTO Bucketlevel (bucket,state_id,tally) VALUES "
+    for key, value in bucketrates.iteritems():
+        insert_bucket_string += "(" + str(key) + "," + str(state_id) + "," + str(value) +"),"
+    insert_bucket_string = insert_bucket_string[:-1] # removes the last ,
+    cur.execute(insert_bucket_string)
 
     conn.commit()
 

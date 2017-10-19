@@ -7,21 +7,19 @@ conn = None
 
 CSV_SEPERATOR = ","
 
-dataset = []
-data = []
 states = []
-spb_list = []
+bucket_list = []
 try:
     conn = db.connect('./db/memo.sqlite3')
     cur = conn.cursor()
-    with open('./memo/public/data.csv', 'w') as outfile:
+    with open('./memo/public/dyn/bucketlevel.csv', 'w') as outfile:
 
-        cur.execute('SELECT spb FROM feelevel GROUP BY spb')
-        spb_rows = cur.fetchall()
+        cur.execute('SELECT bucket FROM Bucketlevel GROUP BY bucket')
+        bucket_rows = cur.fetchall()
         outfile.write("x"+CSV_SEPERATOR)
-        for spb in reversed(spb_rows):
-            spb_list.append(spb[0])
-            outfile.write(str(spb[0])+CSV_SEPERATOR)
+        for bucket in reversed(bucket_rows):
+            bucket_list.append(bucket[0])
+            outfile.write(str(bucket[0])+CSV_SEPERATOR)
         outfile.write("\n")
 
         cur.execute('SELECT statetime FROM state')
@@ -34,7 +32,7 @@ try:
 
             outfile.write(str(state)+CSV_SEPERATOR)
 
-            select_string = 'SELECT spb, tally FROM feelevel NATURAL JOIN state WHERE statetime = '+ str(state)+" ORDER BY spb DESC"
+            select_string = 'SELECT bucket, tally FROM Bucketlevel NATURAL JOIN state WHERE statetime = '+ str(state)+" ORDER BY bucket DESC"
             cur.execute(select_string)
             kvpair = cur.fetchall()
 
@@ -42,9 +40,9 @@ try:
             for pair in kvpair:
                 kv_dict[pair[0]] = pair[1]
 
-            for spb in spb_list:
-                if spb in kv_dict:
-                    outfile.write(str(kv_dict[spb])+CSV_SEPERATOR)
+            for bucket in bucket_list:
+                if bucket in kv_dict:
+                    outfile.write(str(kv_dict[bucket])+CSV_SEPERATOR)
                 else:
                     outfile.write(""+CSV_SEPERATOR)
 
@@ -52,7 +50,7 @@ try:
 
 except db.Error, e:
 
-    print "DBError in db_to_dygraph: %s" % e.args[0]
+    print "DBError in bucketlevel_to_dygraph_csv.py: %s" % e.args[0]
     sys.exit(1)
 
 finally:
