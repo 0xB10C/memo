@@ -1,4 +1,5 @@
 var colorSet = ["#373854","#493267","#7bb3ff","#e86af0","#7bb3ff","#9e379f"];
+const FEE_SPACING = 1.05;
 var graph;
 var tx_unconfirmed_timer;
 var tx_unconfirmed_timer_last_block;
@@ -39,12 +40,14 @@ function setCursorTextFeelevel(date,key,value) {
     }
 }
 function setCursorTextBucketlevel(date,key,value) {
+
     date = new Date(date*1000);
     var time = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
     if(value>0){
+        let fee = calcFeeForBucket(key);
         $("#cursortext_bucket").css("visibility","visible");
         $("#cursortext_tally_bucket").text(value);
-        $("#cursortext_buckets_bucket").text(key);
+        $("#cursortext_buckets_bucket").text(key + " (" + fee.toFixed(2) + "s/B - " + (fee * FEE_SPACING).toFixed(2) + "s/B)");
         $("#cursortext_date_bucket").text(time);
     }else{
         $("#cursortext_bucket").css("visibility","hidden");
@@ -210,6 +213,13 @@ var options_bucket = {
     }
 }
 
+function calcFeeForBucket(bucket) {
+    var feeForBucket = 1;
+    for(i = 0; i<bucket; i++){
+        feeForBucket = feeForBucket * 1.05;
+    }
+    return feeForBucket;
+}
 
 window.onload = function () {
 
