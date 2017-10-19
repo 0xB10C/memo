@@ -6,10 +6,26 @@ var tx_unconfirmed_timer_last_block;
 var txid;
 
 function checkConfirmed() {
-    $.ajax({url: "/api/confirmed/"+$("#input_txid").val(), success: function(result){
+    $.ajax({url: "/api/confirmed/"+txid, success: function(result){
         if(result.statusCode=="200"){
-            if(tx_unconfirmed_timer_last_block == null && result.data.tx_confirmed_in_block > 1){ // tx is confirmed
-                new Audio('mp3/attention-seeker.mp3').play();
+            // tx is confirmed
+            if(tx_unconfirmed_timer_last_block == null && result.data.tx_confirmed_in_block > 1){
+
+                if (Notification.permission === "granted") {
+
+                    const title = 'Transaction confirmed!';
+
+                    const options = {
+                      body: txid.substring(0, 8) + "... just confirmed!\nblock: " + result.data.tx_confirmed_in_block,
+                      icon: '/img/og_preview.png',
+                      sound: '/mp3/attention-seeker.mp3' // October 2017: no browser supports sounds in notifications yet
+                    };
+
+                    var notification = new Notification(title,options);
+                }
+
+                new Audio('/mp3/attention-seeker.mp3').play();
+
                 tx_unconfirmed_timer_last_block = result.data.tx_confirmed_in_block;
                 $('#card_info_tx_confirmed_sound_checkbox').prop("checked", false );
                 $("#card_info_tx_confirmed_block").text(result.data.tx_confirmed_in_block);
@@ -241,6 +257,16 @@ window.onload = function () {
     $('#card_info_tx_confirmed_sound_checkbox').change(function(){
         if($(this).is(':checked')) {
             new Audio('mp3/attention-seeker.mp3').play(); // plays audio once
+
+            if (!("Notification" in window)) {
+                alert("This browser does not support desktop notification");
+            }
+
+            if (Notification.permission !== 'denied') {
+                Notification.requestPermission();
+            }
+
+
             tx_unconfirmed_timer = setInterval(checkConfirmed, 60000); // checks with the backend (over ajax) every 60 seconds if the transaction is confirmed
         } else {
             window.clearInterval(tx_unconfirmed_timer) // disables the timer
@@ -250,11 +276,11 @@ window.onload = function () {
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         switch (e.target.id) {
             case "nav-detailed-tab":
-                graph.updateOptions($.extend(options_detailed, {file: "/dyn/feelevel.csv"}),false);
-                break;
+            graph.updateOptions($.extend(options_detailed, {file: "/dyn/feelevel.csv"}),false);
+            break;
             case "nav-bucket-tab":
-                graph.updateOptions($.extend(options_bucket, {file: "/dyn/bucketlevel.csv"}),false);
-                break;
+            graph.updateOptions($.extend(options_bucket, {file: "/dyn/bucketlevel.csv"}),false);
+            break;
         }
     })
 
