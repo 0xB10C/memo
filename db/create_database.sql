@@ -9,7 +9,9 @@ CREATE TABLE State (
 CREATE TABLE Feelevel (
     spb int NOT NULL,
     state_id int NOT NULL,
-    tally int,
+    tally int, -- amount of tx
+    value int, -- fees per sat p byte
+    size int,  -- size per sat p byte
     PRIMARY KEY (spb, state_id),
     FOREIGN KEY (state_id) REFERENCES State(state_id) ON DELETE CASCADE
 );
@@ -44,4 +46,4 @@ CREATE TABLE MemoDBVersion (
     PRIMARY KEY (version)
 )
 -- set DB Version to v1.1.0
-INSERT INTO MEMODBVERSION VALUES("v1.1.0");
+-- INSERT INTO MEMODBVERSION VALUES("v1.1.0");
