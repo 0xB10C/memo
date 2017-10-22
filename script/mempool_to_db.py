@@ -68,7 +68,7 @@ for line in sys.stdin:
         if rate in rates:
             rates[rate] = rates[rate][0] + 1, rates[rate][1] + size, rates[rate][2] + fee
         else:
-            rates[rate] = rate, size, fee
+            rates[rate] = 1, size, fee
 
         # tx per bucket
         if bucket in bucketrates:
