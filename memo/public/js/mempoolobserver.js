@@ -48,25 +48,48 @@ function setCursorTextFeelevel(date,key,value) {
     var time = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
     if(value>0){
         $("#cursortext_detailed").css("visibility","visible");
-        $("#cursortext_tally_detailed").text(value);
-        $("#cursortext_SpB_detailed").text(key);
-        $("#cursortext_date_detailed").text(time);
+        $("#cursortext_detailed_tally").text(value);
+        $("#cursortext_detailed_SpB").text(key);
+        $("#cursortext_detailed_date").text(time);
     }else{
         $("#cursortext_detailed").css("visibility","hidden");
     }
 }
 function setCursorTextBucketlevel(date,key,value) {
-
     date = new Date(date*1000);
     var time = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
     if(value>0){
         let fee = calcFeeForBucket(key);
         $("#cursortext_bucket").css("visibility","visible");
-        $("#cursortext_tally_bucket").text(value);
+        $("#cursortext_buckets_tally").text(value);
         $("#cursortext_buckets_bucket").text(key + " (" + fee.toFixed(2) + "s/B - " + (fee * FEE_SPACING).toFixed(2) + "s/B)");
-        $("#cursortext_date_bucket").text(time);
+        $("#cursortext_buckets_date").text(time);
     }else{
         $("#cursortext_bucket").css("visibility","hidden");
+    }
+}
+function setCursorTextValuelevel(date,key,value) {
+    date = new Date(date*1000);
+    var time = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
+    if(value>0){
+        $("#cursortext_detailed_value").css("visibility","visible");
+        $("#cursortext_detailed_value_value").text(value);
+        $("#cursortext_detailed_value_SpB").text(key);
+        $("#cursortext_detailed_value_date").text(time);
+    }else{
+        $("#cursortext_detailed_value").css("visibility","hidden");
+    }
+}
+function setCursorTextSizelevel(date,key,value) {
+    date = new Date(date*1000);
+    var time = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
+    if(value>0){
+        $("#cursortext_detailed_size").css("visibility","visible");
+        $("#cursortext_detailed_size_size").text((value/1000000).toFixed(6));
+        $("#cursortext_detailed_size_SpB").text(key);
+        $("#cursortext_detailed_size_date").text(time);
+    }else{
+        $("#cursortext_detailed_size").css("visibility","hidden");
     }
 }
 
@@ -167,6 +190,100 @@ var options_detailed = {
                 }else{
                     return y;
                 }
+            },
+            axisLabelWidth: 50,
+            includeZero:true
+        }
+    }
+}
+
+var options_detailed_size = {
+    width: 1000,
+    height: 650,
+    colors: colorSet,
+    fillAlpha: 1,
+    strokeWidth: 4,
+    strokeBorderWidth: 0,
+    highlightCircleSize: 0,
+    stackedGraph: true,
+    stackedGraphNaNFill:"none",
+    rightGap: 0,
+
+    legend: "never",
+    ylabel: "size in mempool [MB]",
+    xlabel: "time",
+
+    highlightSeriesOpts: {
+        strokeWidth: 5,
+        strokeBorderWidth: 2,
+        strokeBorderColor: "#FDD",
+        highlightCircleSize: 1
+    },
+    interactionModel:  {},
+    highlightSeriesBackgroundAlpha: 0.5,
+    highlightSeriesBackgroundColor: "#000",
+    highlightCallback: function(e, x, pts, row) {
+        setCursorTextSizelevel(x,graph.getHighlightSeries(),graph.rolledSeries_[graph.rolledSeries_.length-graph.getHighlightSeries()-1][row][1]);
+    },
+    unhighlightCallback: function(e) {
+        $("#cursortext").css("visibility","hidden");
+    },
+    axes: {
+        x: {
+            axisLabelFormatter: function(d, gran, opts) {
+                return Dygraph.dateAxisLabelFormatter(new Date((d/60).toFixed(0)*60000), gran, opts);
+            }
+        },
+        y: {
+            axisLabelFormatter: function(y) {
+                return + y/1000000;
+            },
+            axisLabelWidth: 50,
+            includeZero:true
+        }
+    }
+}
+
+var options_detailed_value = {
+    width: 1000,
+    height: 650,
+    colors: colorSet,
+    fillAlpha: 1,
+    strokeWidth: 4,
+    strokeBorderWidth: 0,
+    highlightCircleSize: 0,
+    stackedGraph: true,
+    stackedGraphNaNFill:"none",
+    rightGap: 0,
+
+    legend: "never",
+    ylabel: "fees in mempool [BTC]",
+    xlabel: "time",
+
+    highlightSeriesOpts: {
+        strokeWidth: 5,
+        strokeBorderWidth: 2,
+        strokeBorderColor: "#FDD",
+        highlightCircleSize: 1
+    },
+    interactionModel:  {},
+    highlightSeriesBackgroundAlpha: 0.5,
+    highlightSeriesBackgroundColor: "#000",
+    highlightCallback: function(e, x, pts, row) {
+        setCursorTextValuelevel(x,graph.getHighlightSeries(),graph.rolledSeries_[graph.rolledSeries_.length-graph.getHighlightSeries()-1][row][1]);
+    },
+    unhighlightCallback: function(e) {
+        $("#cursortext").css("visibility","hidden");
+    },
+    axes: {
+        x: {
+            axisLabelFormatter: function(d, gran, opts) {
+                return Dygraph.dateAxisLabelFormatter(new Date((d/60).toFixed(0)*60000), gran, opts);
+            }
+        },
+        y: {
+            axisLabelFormatter: function(y) {
+                return y.toFixed(2);
             },
             axisLabelWidth: 50,
             includeZero:true
@@ -281,10 +398,10 @@ window.onload = function () {
                 graph.updateOptions($.extend(options_bucket, {file: "/dyn/bucketlevel.csv"}),false);
             break;
             case "nav-detailed-size-tab":
-                graph.updateOptions($.extend(options_detailed, {file: "/dyn/sizelevel.csv"}),false);
+                graph.updateOptions($.extend(options_detailed_size, {file: "/dyn/sizelevel.csv"}),false);
             break;
             case "nav-detailed-value-tab":
-                graph.updateOptions($.extend(options_detailed, {file: "/dyn/valuelevel.csv"}),false);
+                graph.updateOptions($.extend(options_detailed_value, {file: "/dyn/valuelevel.csv"}),false);
             break;
         }
     })

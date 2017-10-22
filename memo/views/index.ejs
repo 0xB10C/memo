@@ -133,9 +133,9 @@
                             <nav class="nav nav-tabs" id="charts" role="tablist">
 
                                     <div class="nav-item nav-link nav-title">Type</div>
-                                    <a class="nav-item nav-link active" id="nav-detailed-tab" data-toggle="tab" href="#nav-detailed" role="tab" aria-controls="nav-detailed" aria-expanded="true">detailed-amount</a>
-                                    <a class="nav-item nav-link" id="nav-detailed-size-tab" data-toggle="tab" href="#nav-detailed-size" role="tab" aria-controls="nav-detailed-size">detailed-size</a>
-                                    <a class="nav-item nav-link" id="nav-detailed-value-tab" data-toggle="tab" href="#nav-detailed-value" role="tab" aria-controls="nav-detailed-value">detailed-value</a>
+                                    <a class="nav-item nav-link active" id="nav-detailed-tab" data-toggle="tab" href="#nav-detailed" role="tab" aria-controls="nav-detailed" aria-expanded="true">feerate distribution</a>
+                                    <a class="nav-item nav-link" id="nav-detailed-size-tab" data-toggle="tab" href="#nav-detailed-size" role="tab" aria-controls="nav-detailed-size">size distribution</a>
+                                    <a class="nav-item nav-link" id="nav-detailed-value-tab" data-toggle="tab" href="#nav-detailed-value" role="tab" aria-controls="nav-detailed-value">fee distribution</a>
                                     <a class="nav-item nav-link" id="nav-bucket-tab" data-toggle="tab" href="#nav-buckets" role="tab" aria-controls="nav-buckets">buckets</a>
 
                             </nav>
@@ -143,14 +143,43 @@
                             <div id="graphdiv"></div>
 
                             <div class="tab-content" id="nav-tabContent">
-                                <div class="tab-pane fade show active" id="nav-detailed" role="tabpanel" aria-labelledby="nav-home-tab">
+                                <div class="tab-pane fade show active" id="nav-detailed" role="tabpanel" aria-labelledby="nav-detailed-tab">
                                     <p class="card-text text_center cursortext">
-                                        <span id="cursortext_detailed"><span class="red_text" id="cursortext_date_detailed"></span>  - <span class="red_text" id="cursortext_tally_detailed">NaN</span> tx with <span class="red_text" id="cursortext_SpB_detailed">NaN</span> sat/byte</span>
+                                        <span id="cursortext_detailed">
+                                            <span class="red_text" id="cursortext_detailed_date"></span>
+                                              - <span class="red_text" id="cursortext_detailed_tally">NaN</span>
+                                               tx with <span class="red_text" id="cursortext_detailed_SpB">NaN</span> sat/byte
+                                        </span>
                                     </p>
                                 </div>
-                                <div class="tab-pane fade" id="nav-buckets" role="tabpanel" aria-labelledby="nav-profile-tab">
+
+                                <div class="tab-pane fade" id="nav-buckets" role="tabpanel" aria-labelledby="nav-buckets-tab">
                                     <p class="card-text text_center cursortext">
-                                        <span id="cursortext_bucket"><span class="red_text" id="cursortext_date_bucket"></span>  - <span class="red_text" id="cursortext_tally_bucket">NaN</span> tx in bucket <span class="red_text" id="cursortext_buckets_bucket">NaN</span></span>
+                                        <span id="cursortext_bucket">
+                                            <span class="red_text" id="cursortext_buckets_date"></span>
+                                              - <span class="red_text" id="cursortext_buckets_tally">NaN</span>
+                                               tx in bucket <span class="red_text" id="cursortext_buckets_bucket">NaN</span>
+                                        </span>
+                                    </p>
+                                </div>
+
+                                <div class="tab-pane fade" id="nav-detailed-value" role="tabpanel" aria-labelledby="nav-detailed-value-tab">
+                                    <p class="card-text text_center cursortext">
+                                        <span id="cursortext_detailed_value">
+                                            <span class="red_text" id="cursortext_detailed_value_date"></span>
+                                              - <span class="red_text" id="cursortext_detailed_value_value">NaN</span> BTC
+                                              with a feerate of <span class="red_text" id="cursortext_detailed_value_SpB">NaN</span> sat/byte
+                                        </span>
+                                    </p>
+                                </div>
+
+                                <div class="tab-pane fade" id="nav-detailed-size" role="tabpanel" aria-labelledby="nav-detailed-size-tab">
+                                    <p class="card-text text_center cursortext">
+                                        <span id="cursortext_detailed_size">
+                                            <span class="red_text" id="cursortext_detailed_size_date"></span>
+                                              - <span class="red_text" id="cursortext_detailed_size_size">NaN</span> MB
+                                              with a feerate of <span class="red_text" id="cursortext_detailed_size_SpB">NaN</span> sat/byte
+                                        </span>
                                     </p>
                                     <section>
                                         <article class="info_text">
