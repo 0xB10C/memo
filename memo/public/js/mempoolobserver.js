@@ -4,6 +4,8 @@ var graph;
 var tx_unconfirmed_timer;
 var tx_unconfirmed_timer_last_block;
 var txid;
+var isFullscreen = false;
+var setNextStepFullscreenON = false;
 
 function checkConfirmed() {
     $.ajax({url: "/api/confirmed/"+txid, success: function(result){
@@ -16,9 +18,9 @@ function checkConfirmed() {
                     const title = 'Transaction confirmed!';
 
                     const options = {
-                      body: txid.substring(0, 8) + "... just confirmed!\nblock: " + result.data.tx_confirmed_in_block,
-                      icon: '/img/og_preview.png',
-                      sound: '/mp3/attention-seeker.mp3' // October 2017: no browser supports sounds in notifications yet
+                        body: txid.substring(0, 8) + "... just confirmed!\nblock: " + result.data.tx_confirmed_in_block,
+                        icon: '/img/og_preview.png',
+                        sound: '/mp3/attention-seeker.mp3' // October 2017: no browser supports sounds in notifications yet
                     };
 
                     var notification = new Notification(title,options);
@@ -147,7 +149,7 @@ var buildGraph = function(data,options) {
 }
 
 var options_detailed = {
-    width: 1000,
+    width: 1040,
     height: 650,
     colors: colorSet,
     fillAlpha: 1,
@@ -185,7 +187,7 @@ var options_detailed = {
         },
         y: {
             axisLabelFormatter: function(y) {
-                if(y>999){
+                if(y>=1000){
                     return + y/1000 + 'k';
                 }else{
                     return y;
@@ -198,7 +200,7 @@ var options_detailed = {
 }
 
 var options_detailed_size = {
-    width: 1000,
+    width: 1040,
     height: 650,
     colors: colorSet,
     fillAlpha: 1,
@@ -245,7 +247,7 @@ var options_detailed_size = {
 }
 
 var options_detailed_value = {
-    width: 1000,
+    width: 1040,
     height: 650,
     colors: colorSet,
     fillAlpha: 1,
@@ -292,7 +294,7 @@ var options_detailed_value = {
 }
 
 var options_bucket = {
-    width: 1000,
+    width: 1040,
     height: 650,
     colors: colorSet,
     fillAlpha: 1,
@@ -392,18 +394,79 @@ window.onload = function () {
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         switch (e.target.id) {
             case "nav-detailed-tab":
-                graph.updateOptions($.extend(options_detailed, {file: "/dyn/feelevel.csv"}),false);
+            graph.updateOptions($.extend(options_detailed, {file: "/dyn/feelevel.csv"}),false);
             break;
             case "nav-bucket-tab":
-                graph.updateOptions($.extend(options_bucket, {file: "/dyn/bucketlevel.csv"}),false);
+            graph.updateOptions($.extend(options_bucket, {file: "/dyn/bucketlevel.csv"}),false);
             break;
             case "nav-detailed-size-tab":
-                graph.updateOptions($.extend(options_detailed_size, {file: "/dyn/sizelevel.csv"}),false);
+            graph.updateOptions($.extend(options_detailed_size, {file: "/dyn/sizelevel.csv"}),false);
             break;
             case "nav-detailed-value-tab":
-                graph.updateOptions($.extend(options_detailed_value, {file: "/dyn/valuelevel.csv"}),false);
+            graph.updateOptions($.extend(options_detailed_value, {file: "/dyn/valuelevel.csv"}),false);
             break;
         }
-    })
+    });
 
+    // fullscreen listener
+    $(document).on('webkitfullscreenchange mozfullscreenchange fullscreenchange', function(e){
+        if (isFullscreen) {
+            fullscreenOff();
+        }
+
+        if(setNextStepFullscreenON){
+            isFullscreen=true;
+            setNextStepFullscreenON = false;
+        }
+    });
+}
+
+
+function fullscreenOn() {
+    var i = document.getElementById("fullscreen-wrapper");
+    if (i.requestFullscreen) {
+        i.requestFullscreen();
+    } else if (i.msRequestFullscreen) {
+        i.msRequestFullscreen();
+    } else if (i.mozRequestFullScreen) {
+        i.mozRequestFullScreen();
+    } else if (i.webkitRequestFullscreen) {
+        i.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+    }
+    graph.resize($(window).width(),$(window).height());
+    $('#fullscreen-wrapper').addClass("fullscreen");
+    setNextStepFullscreenON = true; //HACK: somewhat dirty hack, because otherwise the listener would fire and direclty close the fullscreen again
+}
+
+function fullscreenOff() {
+    var didRun = false;
+    if (document.exitFullscreen) {
+        document.exitFullscreen();
+        didRun = true;
+    } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+        didRun = true;
+    } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+        didRun = true;
+    } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+        didRun = true;
+    }
+    if(didRun){
+        $('#fullscreen-wrapper').removeClass( "fullscreen" );
+        graph.resize(1040,650);
+        isFullscreen=false;
+    }
+}
+
+
+
+function toggleFullscreen() {
+    var i = document.getElementById("fullscreen-wrapper");
+    if (!i.fullscreenElement && !i.mozFullScreenElement && !i.webkitFullscreenElement && !i.msFullscreenElement && !isFullscreen) {
+        fullscreenOn();
+    } else {
+        fullscreenOff();
+    }
 }

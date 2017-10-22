@@ -129,7 +129,7 @@
                 <div class="col-md-12">
                     <div class="card card_margin" id="card_chart">
                         <div class="card-body">
-
+                            <div id="fullscreen-wrapper">
                             <nav class="nav nav-tabs" id="charts" role="tablist">
 
                                     <div class="nav-item nav-link nav-title">Type</div>
@@ -137,7 +137,7 @@
                                     <a class="nav-item nav-link" id="nav-detailed-size-tab" data-toggle="tab" href="#nav-detailed-size" role="tab" aria-controls="nav-detailed-size">size distribution</a>
                                     <a class="nav-item nav-link" id="nav-detailed-value-tab" data-toggle="tab" href="#nav-detailed-value" role="tab" aria-controls="nav-detailed-value">fee distribution</a>
                                     <a class="nav-item nav-link" id="nav-bucket-tab" data-toggle="tab" href="#nav-buckets" role="tab" aria-controls="nav-buckets">buckets</a>
-
+                                    <div class="nav-item nav-link" onclick="toggleFullscreen()">toggle fullscreen</div>
                             </nav>
 
                             <div id="graphdiv"></div>
@@ -161,6 +161,16 @@
                                                tx in bucket <span class="red_text" id="cursortext_buckets_bucket">NaN</span>
                                         </span>
                                     </p>
+                                    <section>
+                                        <article class="info_text">
+                                            <h3>Buckets?</h3>
+                                            <p>
+                                                Bitcoin Core's fee estimation algorithm groups transactions into feerate 'buckets' to avoid tracking each transaction independently.
+                                                These buckets start at a feerate of 1 sat/byte and <a target="_blank" href="/txt/200buckets.txt">increase 5% each bucket</a>.
+                                                <a target="_blank" href="https://bitcointechtalk.com/an-introduction-to-bitcoin-core-fee-estimation-27920880ad0">This article</a> gives some insight on Core's fee estimation using buckets and targets for v0.14, however there were <a target="_blank" href="https://gist.github.com/morcos/d3637f015bc4e607e1fd10d8351e9f41#proposed-changes-for-015">some improvements</a> in v0.15.
+                                            </p>
+                                        </article>
+                                    </section>
                                 </div>
 
                                 <div class="tab-pane fade" id="nav-detailed-value" role="tabpanel" aria-labelledby="nav-detailed-value-tab">
@@ -181,17 +191,8 @@
                                               with a feerate of <span class="red_text" id="cursortext_detailed_size_SpB">NaN</span> sat/byte
                                         </span>
                                     </p>
-                                    <section>
-                                        <article class="info_text">
-                                            <h3>Buckets?</h3>
-                                            <p>
-                                                Bitcoin Core's fee estimation algorithm groups transactions into feerate 'buckets' to avoid tracking each transaction independently.
-                                                These buckets start at a feerate of 1 sat/byte and <a target="_blank" href="/txt/200buckets.txt">increase 5% each bucket</a>.
-                                                <a target="_blank" href="https://bitcointechtalk.com/an-introduction-to-bitcoin-core-fee-estimation-27920880ad0">This article</a> gives some insight on Core's fee estimation using buckets and targets for v0.14, however there were <a target="_blank" href="https://gist.github.com/morcos/d3637f015bc4e607e1fd10d8351e9f41#proposed-changes-for-015">some improvements</a> in v0.15.
-                                            </p>
-                                        </article>
-                                    </section>
                                 </div>
+                            </div>
                             </div>
                         </div>
                     </div>
