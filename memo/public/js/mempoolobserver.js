@@ -266,7 +266,6 @@ window.onload = function () {
                 Notification.requestPermission();
             }
 
-
             tx_unconfirmed_timer = setInterval(checkConfirmed, 60000); // checks with the backend (over ajax) every 60 seconds if the transaction is confirmed
         } else {
             window.clearInterval(tx_unconfirmed_timer) // disables the timer
@@ -276,10 +275,16 @@ window.onload = function () {
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         switch (e.target.id) {
             case "nav-detailed-tab":
-            graph.updateOptions($.extend(options_detailed, {file: "/dyn/feelevel.csv"}),false);
+                graph.updateOptions($.extend(options_detailed, {file: "/dyn/feelevel.csv"}),false);
             break;
             case "nav-bucket-tab":
-            graph.updateOptions($.extend(options_bucket, {file: "/dyn/bucketlevel.csv"}),false);
+                graph.updateOptions($.extend(options_bucket, {file: "/dyn/bucketlevel.csv"}),false);
+            break;
+            case "nav-detailed-size-tab":
+                graph.updateOptions($.extend(options_detailed, {file: "/dyn/sizelevel.csv"}),false);
+            break;
+            case "nav-detailed-value-tab":
+                graph.updateOptions($.extend(options_detailed, {file: "/dyn/valuelevel.csv"}),false);
             break;
         }
     })
