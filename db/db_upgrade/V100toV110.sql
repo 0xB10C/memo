@@ -17,4 +17,7 @@ CREATE TABLE MemoDBVersion (
 )
 
 -- set DB Version to v1.1.0
-INSERT INTO MemoDBVersion VALUES("v1.1.0");
+-- INSERT INTO MemoDBVersion VALUES("v1.1.0");
+
+ALTER TABLE Feelevel ADD COLUMN value int;
+ALTER TABLE Feelevel ADD COLUMN size int;

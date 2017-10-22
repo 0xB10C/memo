@@ -19,8 +19,8 @@ conn = None
 size = None
 fee = None
 bucket = None
-rates = {}
-bucketrates = {}
+rates = {} # stores a touple: (feerate, size, value)
+bucketrates = {} # counting amount of tx in the specific bucket
 
 # stores a list of fee buckets used in core fee estimation
 BUCKETS = []
@@ -64,15 +64,17 @@ for line in sys.stdin:
         rate = int((fee*100000000/size)+.5)
         bucket = findBucketByFeerate(fee*100000000/size)
 
-        if bucket in bucketrates:
-            bucketrates[bucket] = bucketrates[bucket] + 1                       # increase bucketrate-counter
+        # tx per feerate
+        if rate in rates:
+            rates[rate] = rates[rate][0] + 1, rates[rate][1] + size, rates[rate][2] + fee
         else:
-            bucketrates[bucket] = 1                                             # or set to 1 if not existing
+            rates[rate] = rate, size, fee
 
-        if rate in rates:                                                       # increase rate-counter
-            rates[rate] = rates[rate] + 1
-        else:                                                                   # or set to 1 if not existing
-            rates[rate] = 1
+        # tx per bucket
+        if bucket in bucketrates:
+            bucketrates[bucket] = bucketrates[bucket] + 1
+        else:
+            bucketrates[bucket] = 1
 
 # current timestamp for the new state
 statetime_string = str(int(time.time()))
@@ -97,9 +99,9 @@ try:
     state_id = cur.fetchone()[0]
 
     # insert Feelevel data into db
-    insert_feelevel_string = "INSERT INTO Feelevel (spb,state_id,tally) VALUES "
+    insert_feelevel_string = "INSERT INTO Feelevel (spb,state_id,tally,size,value) VALUES "
     for key, value in rates.iteritems():
-        insert_feelevel_string += "(" + str(key) + "," + str(state_id) + "," + str(value) +"),"
+        insert_feelevel_string += "(" + str(key) + "," + str(state_id) + "," + str(value[0]) + "," + str(value[1]) + "," + str(value[2]) + "),"
     insert_feelevel_string = insert_feelevel_string[:-1] # removes the last ,
     cur.execute(insert_feelevel_string)
 
