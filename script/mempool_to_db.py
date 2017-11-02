@@ -96,11 +96,7 @@ try:
     # get the state_id from the just inserted state
     query_state_string = "SELECT state_id FROM State WHERE statetime = "+statetime_string+";"
     cur.execute(query_state_string)
-    try:
-        state_id = cur.fetchone()[0]
-    except TypeError:
-        print "Database likely to be emtpy using 0 as state_id"
-        state_id = 0
+    state_id = cur.fetchone()[0]
 
     # insert Feelevel data into db
     insert_feelevel_string = "INSERT INTO Feelevel (spb,state_id,tally,size,value) VALUES "
@@ -121,8 +117,6 @@ try:
 except db.Error, e:
 
     print "DBError in mempool_to_db: %s" % e.args[0]
-    if conn:
-        conn.close()
     sys.exit(1)
 
 finally:
