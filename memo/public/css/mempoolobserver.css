@@ -32,36 +32,48 @@ hr {
     margin-top: 40px;
 }
 
-.nav-item.nav-link {
-    padding: 3px 10px 3px 10px;
-    border-radius: 2px;
-    color: #a7c6db;
-    border-color: #0d2738;
-    background-color: #0d2738;
+.nav-link.dropdown-toggle{
+    color: #a7c6db !important;
+    border-color: #0d2738 !important;
+    background-color: #0d2738 !important;
     margin-right: 10px;
-    margin-bottom: 5px;
     margin-top: 5px;
 }
 
-.nav-item.nav-link.nav-title{
-    border-color: transparent;
-    background-color: transparent;
+.nav-link.dropdown-toggle.active{
+    color: #c83737 !important;
 }
 
+.nav-link {
+    color: #a7c6db;
+    border-color: #0d2738 !important;
+    background-color: #0d2738 !important;
+    margin-right: 10px;
+    margin-top: 5px;
+}
 
-.nav-item.nav-link.active {
-    color: #c83737;
+.nav-link.active{
+    color: #c83737 !important;
+}
+
+.dropdown-menu{
+    background-color: #0d2738 !important;
+    color: #a7c6db !important;
+    min-width:  10px !important;
     border-color: #0d2738;
-    background-color: #0d2738;
-    border-bottom-color: #00000000
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
 }
-.nav-item.nav-link:hover {
-    border: 1px solid transparent;
+
+.dropdown-item{
+    background-color: #0d2738 !important;
+    color: #a7c6db !important;
+}
+.dropdown-item.active{
+    color: #c83737 !important;
 }
 
 .nav-tabs {
-    padding-bottom: 10px;
-    margin-bottom: 10px;
     border-color: #0d2738;
 }
 

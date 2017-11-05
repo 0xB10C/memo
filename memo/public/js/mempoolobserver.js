@@ -363,7 +363,7 @@ window.onload = function () {
         loadTXinfo();
     });
 
-    buildGraph('/dyn/feelevel.csv', options_detailed);
+    buildGraph('/dyn/amount4h.csv', options_detailed);
 
     // if 'load_txid' was defined by the ejs renderer load the tx
     // 'load_txid' is the permalink txid
@@ -393,18 +393,35 @@ window.onload = function () {
 
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         switch (e.target.id) {
-            case "nav-detailed-tab":
-            graph.updateOptions($.extend(options_detailed, {file: "/dyn/feelevel.csv"}),false);
-            break;
+
+            case "nav-amount-4h":
+                graph.updateOptions($.extend(options_detailed, {file: "/dyn/amount4h.csv"}),false);break;
+            case "nav-amount-24h":
+                graph.updateOptions($.extend(options_detailed, {file: "/dyn/amount24h.csv"}),false);break;
+            case "nav-amount-7d":
+                graph.updateOptions($.extend(options_detailed, {file: "/dyn/amount7d.csv"}),false);break;
+
+
+            case "nav-size-4h":
+                graph.updateOptions($.extend(options_detailed_size, {file: "/dyn/size4h.csv"}),false);break;
+            case "nav-size-24h":
+                graph.updateOptions($.extend(options_detailed_size, {file: "/dyn/size24h.csv"}),false);break;
+            case "nav-size-7d":
+                graph.updateOptions($.extend(options_detailed_size, {file: "/dyn/size7d.csv"}),false);break;
+
+
+            case "nav-value-4h":
+                graph.updateOptions($.extend(options_detailed_size, {file: "/dyn/value4h.csv"}),false);break;
+            case "nav-value-24h":
+                graph.updateOptions($.extend(options_detailed_size, {file: "/dyn/value24h.csv"}),false);break;
+            case "nav-value-7d":
+                graph.updateOptions($.extend(options_detailed_size, {file: "/dyn/value7d.csv"}),false);break;
+
+
             case "nav-bucket-tab":
-            graph.updateOptions($.extend(options_bucket, {file: "/dyn/bucketlevel.csv"}),false);
+                graph.updateOptions($.extend(options_bucket, {file: "/dyn/bucketlevel.csv"}),false);
             break;
-            case "nav-detailed-size-tab":
-            graph.updateOptions($.extend(options_detailed_size, {file: "/dyn/sizelevel.csv"}),false);
-            break;
-            case "nav-detailed-value-tab":
-            graph.updateOptions($.extend(options_detailed_value, {file: "/dyn/valuelevel.csv"}),false);
-            break;
+
         }
     });
 
