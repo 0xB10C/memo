@@ -16,6 +16,7 @@ CREATE TABLE Feelevel (
     FOREIGN KEY (state_id) REFERENCES State(state_id) ON DELETE CASCADE
 );
 
+
 -- bitcoin core groups transactions buckets to avoid tracking each transaction feerate independently
 -- the smallest bucket has a feerate of 1 sat/byte
 -- the bucketsize is spaced exponentially and increases 5% every bucket
@@ -28,22 +29,38 @@ CREATE TABLE Bucketlevel (
     FOREIGN KEY (state_id) REFERENCES STATE(state_id) ON DELETE CASCADE
 );
 
--- due to performance reasons, the old feelevel data is discarded after 3h for now
--- the main reason beeing the charting libary and the detailed repensentation
--- 3h is a 'just-to-be-safe' value, likely to increase in the future
-CREATE TRIGGER delete_old_fee_data
+
+CREATE VIEW v_4hData AS
+    SELECT * FROM Feelevel INNER JOIN State ON Feelevel.state_id = State.state_id
+    WHERE
+        strftime('%s','now') - State.statetime <= 4*60*60; -- 4 * 60 * 60 seconds = 4h
+
+CREATE VIEW v_24hData AS
+    SELECT * FROM Feelevel INNER JOIN State ON Feelevel.state_id = State.state_id
+    WHERE
+        State.state_id % 6 = 0 -- every 6th to have one value every 12 min and 120 total in 24h
+        AND
+        strftime('%s','now') - State.statetime <= 24*60*60; -- 24 * 60 * 60 seconds = 24h
+
+CREATE VIEW v_7dData AS
+    SELECT * FROM Feelevel INNER JOIN State ON Feelevel.state_id = State.state_id
+    WHERE
+        State.state_id % (6*7) = 0 -- every 42th to have one value every 84 min and 120 total in 7d / 168h
+        AND
+        strftime('%s','now') - State.statetime <= 7*24*60*60; --  7 * 24 * 60 * 60 seconds = 7d
+
+CREATE VIEW v_usedStateIDs AS
+    SELECT state_id FROM v_4hData
+    UNION
+    SELECT state_id FROM v_24hData
+    UNION
+    SELECT state_id FROM v_7dData;
+
+CREATE VIEW v_deleteFromBucketlevel AS
+    SELECT * FROM Bucketlevel INNER JOIN State ON Bucketlevel.state_id = State.state_id WHERE strftime('%s','now') - State.statetime > 4*60*60; --  4h * 60 min * 60 seconds -> 14400 seconds
+
+CREATE TRIGGER delete_old_data
 AFTER INSERT ON State
 BEGIN
--- 24h * 60 min * 60 seconds -> 86400 seconds
---  4h * 60 min * 60 seconds -> 14400 seconds
---  3h * 60 min * 60 seconds -> 10800 seconds
-    DELETE FROM State WHERE strftime('%s','now') - statetime > 10800;
+    DELETE FROM State WHERE state_id NOT IN v_usedStateIDs AND strftime('%s','now') - State.statetime > 4*60*60; -- 4 * 60 * 60 seconds = 4h
 END;
-
--- DB Version
-CREATE TABLE MemoDBVersion (
-    version varchar not NULL,
-    PRIMARY KEY (version)
-)
--- set DB Version to v1.1.0
--- INSERT INTO MEMODBVERSION VALUES("v1.1.0");
