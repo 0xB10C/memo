@@ -45,7 +45,7 @@ CREATE VIEW v_24hData AS
 CREATE VIEW v_7dData AS
     SELECT * FROM Feelevel INNER JOIN State ON Feelevel.state_id = State.state_id
     WHERE
-        State.state_id % 6*7 = 0 -- every 42th to have one value every 84 min and 120 total in 7d / 168h
+        State.state_id % (6*7) = 0 -- every 42th to have one value every 84 min and 120 total in 7d / 168h
         AND
         strftime('%s','now') - State.statetime <= 7*24*60*60; --  7 * 24 * 60 * 60 seconds = 7d
 
