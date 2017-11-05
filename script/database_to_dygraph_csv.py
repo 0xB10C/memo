@@ -8,7 +8,6 @@ conn = None
 
 
 def dbToCSV(cur,filepath,sql_key,sql_view):
-    print "starting: " + filepath + " | " + sql_key + " | " + sql_view
 
     spb_list = []
     states = []
@@ -40,7 +39,6 @@ def dbToCSV(cur,filepath,sql_key,sql_view):
             outfile.write(str(state)+CSV_SEPERATOR)
 
             string_fetch_keyvalue = "SELECT spb, " + sql_key + " FROM " + sql_view + " WHERE statetime = " + str(state) + " ORDER BY spb DESC"
-            print string_fetch_keyvalue
             cur.execute(string_fetch_keyvalue)
             kvpair = cur.fetchall()
 
