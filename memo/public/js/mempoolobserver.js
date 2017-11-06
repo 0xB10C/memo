@@ -411,11 +411,11 @@ window.onload = function () {
 
 
             case "nav-value-4h":
-                graph.updateOptions($.extend(options_detailed_size, {file: "/dyn/value4h.csv"}),false);break;
+                graph.updateOptions($.extend(options_detailed_value, {file: "/dyn/value4h.csv"}),false);break;
             case "nav-value-24h":
-                graph.updateOptions($.extend(options_detailed_size, {file: "/dyn/value24h.csv"}),false);break;
+                graph.updateOptions($.extend(options_detailed_value, {file: "/dyn/value24h.csv"}),false);break;
             case "nav-value-7d":
-                graph.updateOptions($.extend(options_detailed_size, {file: "/dyn/value7d.csv"}),false);break;
+                graph.updateOptions($.extend(options_detailed_value, {file: "/dyn/value7d.csv"}),false);break;
 
 
             case "nav-bucket-tab":
