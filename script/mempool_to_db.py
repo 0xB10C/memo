@@ -2,17 +2,15 @@
 import sys
 import time
 import sqlite3 as db
-import re
+import bitcoin
+import bitcoin.rpc
 
 # const
 DATABASE_LOCATION_STRING = './db/memo.sqlite3'
-
-# last bucket with more than 2^14 sat/byte
-BUCKETCOUNT = 200
-
-# exponential increase by 5% per bucket
-# https://github.com/bitcoin/bitcoin/commit/e5007bae35ce22036a816505038277d99c84e3f7#diff-8c0941572d1cdf184d1751f7b7f1db4eR109
-FEE_SPACING = 1.05
+CONF_FILE_PATH = None
+BUCKETCOUNT = 200 # last bucket with more than 2^14 sat/byte
+FEE_SPACING = 1.05 # exponential increase by 5% per bucket - https://github.com/bitcoin/bitcoin/commit/e5007bae35ce22036a816505038277d99c84e3f7#diff-8c0941572d1cdf184d1751f7b7f1db4eR109
+BUCKETS = [] # stores a list of fee buckets used in core fee estimation
 
 # var
 conn = None
@@ -21,9 +19,7 @@ fee = None
 bucket = None
 rates = {} # stores a touple: (feerate, size, value)
 bucketrates = {} # counting amount of tx in the specific bucket
-
-# stores a list of fee buckets used in core fee estimation
-BUCKETS = []
+rpc = bitcoin.rpc.RawProxy(None,None,CONF_FILE_PATH)
 
 
 # fills the bucket list
@@ -52,29 +48,25 @@ def findBucketByFeerate(feerate):
         if BUCKETS[posMid] < feerate:
             posFirst = posMid + 1
 
+rawmempool = rpc.getrawmempool(True);
 
-# reads "getrawmempool true" from stdin
-for line in sys.stdin:
-    re_size = re.search('(?<=\"size\": )(.*)(?=,)', line)
-    if re_size:
-        size = int(re_size.group(0))
-    re_fee = re.search('(?<=\"fee\": )(.*)(?=,)',line)
-    if re_fee:
-        fee = float(re_fee.group(0))
-        rate = int((fee*100000000/size)+.5)
-        bucket = findBucketByFeerate(fee*100000000/size)
+for tx in rawmempool.items():
+    fee = float(tx[1]["fee"])
+    size = int(tx[1]["size"])
+    rate = int((fee*100000000/size)+.5)
+    bucket = findBucketByFeerate(fee*100000000/size)
 
-        # tx per feerate
-        if rate in rates:
-            rates[rate] = rates[rate][0] + 1, rates[rate][1] + size, rates[rate][2] + fee
-        else:
-            rates[rate] = 1, size, fee
+    # tx per feerate
+    if rate in rates:
+        rates[rate] = rates[rate][0] + 1, rates[rate][1] + size, rates[rate][2] + fee
+    else:
+        rates[rate] = 1, size, fee
 
-        # tx per bucket
-        if bucket in bucketrates:
-            bucketrates[bucket] = bucketrates[bucket] + 1
-        else:
-            bucketrates[bucket] = 1
+    # tx per bucket
+    if bucket in bucketrates:
+        bucketrates[bucket] = bucketrates[bucket] + 1
+    else:
+        bucketrates[bucket] = 1
 
 # current timestamp for the new state
 statetime_string = str(int(time.time()))
