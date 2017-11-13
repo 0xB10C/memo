@@ -55,7 +55,6 @@ def dbToCSV(cur,filepath,sql_key,sql_view):
                     outfile.write(""+CSV_SEPERATOR)
 
             outfile.write("\n")
-
     pass
 
 
@@ -63,17 +62,20 @@ try:
     conn = db.connect('./db/memo.sqlite3')
     cur = conn.cursor()
 
-    dbToCSV(cur,"./memo/public/dyn/amount4h.csv","tally","v_4hData")
-    dbToCSV(cur,"./memo/public/dyn/amount24h.csv","tally","v_24hData")
-    dbToCSV(cur,"./memo/public/dyn/amount7d.csv","tally","v_7dData")
+    if int(sys.argv[1]) >= 4:
+        dbToCSV(cur,"./memo/public/dyn/amount4h.csv","tally","v_4hData")
+        dbToCSV(cur,"./memo/public/dyn/size4h.csv","size","v_4hData")
+        dbToCSV(cur,"./memo/public/dyn/value4h.csv","value","v_4hData")
 
-    dbToCSV(cur,"./memo/public/dyn/size4h.csv","size","v_4hData")
-    dbToCSV(cur,"./memo/public/dyn/size24h.csv","size","v_24hData")
-    dbToCSV(cur,"./memo/public/dyn/size7d.csv","size","v_7dData")
+    if int(sys.argv[1]) >= 24:
+        dbToCSV(cur,"./memo/public/dyn/size24h.csv","size","v_24hData")
+        dbToCSV(cur,"./memo/public/dyn/value24h.csv","value","v_24hData")
+        dbToCSV(cur,"./memo/public/dyn/amount24h.csv","tally","v_24hData")
 
-    dbToCSV(cur,"./memo/public/dyn/value4h.csv","value","v_4hData")
-    dbToCSV(cur,"./memo/public/dyn/value24h.csv","value","v_24hData")
-    dbToCSV(cur,"./memo/public/dyn/value7d.csv","value","v_7dData")
+    if int(sys.argv[1]) >= 168:
+        dbToCSV(cur,"./memo/public/dyn/amount7d.csv","tally","v_7dData")
+        dbToCSV(cur,"./memo/public/dyn/size7d.csv","size","v_7dData")
+        dbToCSV(cur,"./memo/public/dyn/value7d.csv","value","v_7dData")
 
 except db.Error, e:
     print "DBError in database_to_dygraph_csv.py: %s" % e.args[0]
