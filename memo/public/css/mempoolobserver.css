@@ -50,6 +50,8 @@ hr {
     background-color: #0d2738 !important;
     margin-right: 10px;
     margin-top: 5px;
+    margin-bottom: 10px;
+    border-radius: 0px !important;
 }
 
 .nav-link.active{

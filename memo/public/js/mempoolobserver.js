@@ -235,7 +235,7 @@ window.onload = function () {
     $("#button_load_tx_info").click(function(){
         loadTXinfo();
     });
-    console.log(optionBuilder({name:"amount",timespan:4}));
+
     buildGraph('/dyn/amount4h.csv', optionBuilder({name:"amount",timespan:4}));
 
     // if 'load_txid' was defined by the ejs renderer load the tx
