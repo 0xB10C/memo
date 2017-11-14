@@ -7,54 +7,49 @@ CSV_SEPERATOR = ","
 conn = None
 
 
+
+
 def dbToCSV(cur,filepath,sql_key,sql_view):
 
+    csv_buffer = "x" + CSV_SEPERATOR # csv file buffer with X for the x-axis labels and a CSV_SEPERATOR
     spb_list = []
-    states = []
+    view_data = {}
+
+    # fetch reversed spb (satoshi per byte) from  the according view
+    # and write it in the first line of the csv file buffer
+    string_fetch_spb = "SELECT spb FROM " + sql_view + " GROUP BY spb ORDER BY spb DESC"
+    cur.execute(string_fetch_spb)
+    spb_rows = cur.fetchall()
+
+    for spb in spb_rows:
+        spb_list.append(spb[0])
+        csv_buffer += str(spb[0]) + CSV_SEPERATOR
+    csv_buffer += "\n"
+
+    string_fetch_view = "SELECT statetime, spb, " + sql_key + " FROM " + sql_view + " ORDER BY statetime, spb DESC"
+    cur.execute(string_fetch_view)
+    rows = cur.fetchall()
+
+    for row in rows:
+        statetime = row[0]
+        spb = row[1]
+        tally = row[2]
+
+        if statetime not in view_data:
+            view_data[statetime] = {}
+
+        view_data[statetime][spb] = tally
+
+    for key, kvpairs in view_data.iteritems():
+        csv_buffer += str(key) + CSV_SEPERATOR
+        for spb in spb_list:
+            if spb in kvpairs:
+                csv_buffer += str(kvpairs[spb]) + CSV_SEPERATOR
+            else:
+                csv_buffer += CSV_SEPERATOR
 
     with open(filepath, 'w') as outfile:
-
-        # fetch spb (satoshi per byte) from  the arrording view
-        # and write it in the first line of the csv file
-        string_fetch_spb = "SELECT spb FROM " + sql_view + " GROUP BY spb"
-        cur.execute(string_fetch_spb)
-        spb_rows = cur.fetchall()
-        outfile.write("x"+CSV_SEPERATOR)
-        for spb in reversed(spb_rows):
-            spb_list.append(spb[0])
-            outfile.write(str(spb[0])+CSV_SEPERATOR)
-        outfile.write("\n")
-
-        # fetch all states in the view
-        string_fetch_statetimes = "SELECT statetime FROM " + sql_view + " GROUP BY statetime"
-        cur.execute(string_fetch_statetimes)
-        state_rows = cur.fetchall()
-
-        # transform sql rows into list
-        for state in state_rows:
-            states.append(state[0])
-
-        for state in states:
-            # begin the line with the timestamp (statetime)
-            outfile.write(str(state)+CSV_SEPERATOR)
-
-            string_fetch_keyvalue = "SELECT spb, " + sql_key + " FROM " + sql_view + " WHERE statetime = " + str(state) + " ORDER BY spb DESC"
-            cur.execute(string_fetch_keyvalue)
-            kvpair = cur.fetchall()
-
-            # create dictionary with (spb => sql_key)
-            kv_dict = {}
-            for pair in kvpair:
-                kv_dict[pair[0]] = pair[1]
-
-            # write values to file
-            for spb in spb_list:
-                if spb in kv_dict:
-                    outfile.write(str(kv_dict[spb])+CSV_SEPERATOR)
-                else:
-                    outfile.write(""+CSV_SEPERATOR)
-
-            outfile.write("\n")
+            outfile.write(csv_buffer)
     pass
 
 
