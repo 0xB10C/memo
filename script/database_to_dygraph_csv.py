@@ -47,6 +47,7 @@ def dbToCSV(cur,filepath,sql_key,sql_view):
                 csv_buffer += str(kvpairs[spb]) + CSV_SEPERATOR
             else:
                 csv_buffer += CSV_SEPERATOR
+        csv_buffer += "\n"
 
     with open(filepath, 'w') as outfile:
             outfile.write(csv_buffer)
