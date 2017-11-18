@@ -25,39 +25,65 @@ CREATE TABLE Bucketlevel (
     bucket int NOT NULL,
     state_id int not NULL,
     tally int,
+    value int,
+    size int,
     PRIMARY KEY (bucket, state_id),
     FOREIGN KEY (state_id) REFERENCES STATE(state_id) ON DELETE CASCADE
 );
 
 
-CREATE VIEW v_4hData AS
-    SELECT * FROM Feelevel INNER JOIN State ON Feelevel.state_id = State.state_id
+CREATE VIEW v_4hData_feelevel AS
+    SELECT *
+    FROM Feelevel INNER JOIN State ON Feelevel.state_id = State.state_id
     WHERE
         strftime('%s','now') - State.statetime <= 4*60*60; -- 4 * 60 * 60 seconds = 4h
 
-CREATE VIEW v_24hData AS
-    SELECT * FROM Feelevel INNER JOIN State ON Feelevel.state_id = State.state_id
+CREATE VIEW v_24hData_feelevel AS
+    SELECT *
+    FROM Feelevel INNER JOIN State ON Feelevel.state_id = State.state_id
     WHERE
         State.state_id % 6 = 0 -- every 6th to have one value every 12 min and 120 total in 24h
         AND
         strftime('%s','now') - State.statetime <= 24*60*60; -- 24 * 60 * 60 seconds = 24h
 
-CREATE VIEW v_7dData AS
-    SELECT * FROM Feelevel INNER JOIN State ON Feelevel.state_id = State.state_id
+CREATE VIEW v_7dData_feelevel AS
+    SELECT *
+    FROM Feelevel INNER JOIN State ON Feelevel.state_id = State.state_id
+    WHERE
+        State.state_id % (6*7) = 0 -- every 42th to have one value every 84 min and 120 total in 7d / 168h
+        AND
+        strftime('%s','now') - State.statetime <= 7*24*60*60; --  7 * 24 * 60 * 60 seconds = 7d
+
+
+CREATE VIEW v_4hData_bucketlevel AS
+    SELECT *
+    FROM Bucketlevel INNER JOIN State ON Bucketlevel.state_id = State.state_id
+    WHERE
+        strftime('%s','now') - State.statetime <= 4*60*60; -- 4 * 60 * 60 seconds = 4h
+
+CREATE VIEW v_24hData_bucketlevel AS
+    SELECT *
+    FROM Bucketlevel INNER JOIN State ON Bucketlevel.state_id = State.state_id
+    WHERE
+        State.state_id % 6 = 0 -- every 6th to have one value every 12 min and 120 total in 24h
+        AND
+        strftime('%s','now') - State.statetime <= 24*60*60; -- 24 * 60 * 60 seconds = 24h
+
+CREATE VIEW v_7dData_bucketlevel AS
+    SELECT *
+    FROM Bucketlevel INNER JOIN State ON Bucketlevel.state_id = State.state_id
     WHERE
         State.state_id % (6*7) = 0 -- every 42th to have one value every 84 min and 120 total in 7d / 168h
         AND
         strftime('%s','now') - State.statetime <= 7*24*60*60; --  7 * 24 * 60 * 60 seconds = 7d
 
 CREATE VIEW v_usedStateIDs AS
-    SELECT state_id FROM v_4hData
+    SELECT state_id FROM v_4hData_feelevel
     UNION
-    SELECT state_id FROM v_24hData
+    SELECT state_id FROM v_24hData_feelevel
     UNION
-    SELECT state_id FROM v_7dData;
+    SELECT state_id FROM v_7dData_feelevel;
 
-CREATE VIEW v_deleteFromBucketlevel AS
-    SELECT * FROM Bucketlevel INNER JOIN State ON Bucketlevel.state_id = State.state_id WHERE strftime('%s','now') - State.statetime > 4*60*60; --  4h * 60 min * 60 seconds -> 14400 seconds
 
 CREATE TRIGGER delete_old_data
 AFTER INSERT ON State

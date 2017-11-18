@@ -7,7 +7,7 @@ import bitcoin.rpc
 
 # const
 DATABASE_LOCATION_STRING = './db/memo.sqlite3'
-CONF_FILE_PATH = None
+CONF_FILE_PATH = None # path to bitcoin core config file
 BUCKETCOUNT = 200 # last bucket with more than 2^14 sat/byte
 FEE_SPACING = 1.05 # exponential increase by 5% per bucket - https://github.com/bitcoin/bitcoin/commit/e5007bae35ce22036a816505038277d99c84e3f7#diff-8c0941572d1cdf184d1751f7b7f1db4eR109
 BUCKETS = [] # stores a list of fee buckets used in core fee estimation
@@ -56,17 +56,15 @@ for tx in rawmempool.items():
     rate = int((fee*100000000/size)+.5)
     bucket = findBucketByFeerate(fee*100000000/size)
 
-    # tx per feerate
     if rate in rates:
         rates[rate] = rates[rate][0] + 1, rates[rate][1] + size, rates[rate][2] + fee
     else:
         rates[rate] = 1, size, fee
 
-    # tx per bucket
     if bucket in bucketrates:
-        bucketrates[bucket] = bucketrates[bucket] + 1
+        bucketrates[bucket] = bucketrates[bucket][0] + 1, bucketrates[bucket][1] + size, bucketrates[bucket][2] + fee
     else:
-        bucketrates[bucket] = 1
+        bucketrates[bucket] = 1, size, fee
 
 # current timestamp for the new state
 statetime_string = str(int(time.time()))
@@ -91,16 +89,16 @@ try:
     state_id = cur.fetchone()[0]
 
     # insert Feelevel data into db
-    insert_feelevel_string = "INSERT INTO Feelevel (spb,state_id,tally,size,value) VALUES "
+    insert_feelevel_string = "INSERT INTO Feelevel (spb, state_id, tally, size, value) VALUES "
     for key, value in rates.iteritems():
         insert_feelevel_string += "(" + str(key) + "," + str(state_id) + "," + str(value[0]) + "," + str(value[1]) + "," + str(value[2]) + "),"
     insert_feelevel_string = insert_feelevel_string[:-1] # removes the last ,
     cur.execute(insert_feelevel_string)
 
     # insert Bucketlevel data into db
-    insert_bucket_string = "INSERT INTO Bucketlevel (bucket,state_id,tally) VALUES "
+    insert_bucket_string = "INSERT INTO Bucketlevel (bucket, state_id, tally,size, value) VALUES "
     for key, value in bucketrates.iteritems():
-        insert_bucket_string += "(" + str(key) + "," + str(state_id) + "," + str(value) +"),"
+        insert_bucket_string += "(" + str(key) + "," + str(state_id) + "," + str(value[0]) + "," + str(value[1]) + "," + str(value[2]) + "),"
     insert_bucket_string = insert_bucket_string[:-1] # removes the last ,
     cur.execute(insert_bucket_string)
 

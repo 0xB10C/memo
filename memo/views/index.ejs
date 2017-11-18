@@ -167,8 +167,31 @@
                                     </div>
                                 </li>
 
-                                <li class="nav-item">
-                                    <a class="nav-link" id="nav-bucket-tab" data-toggle="tab" href="#nav-buckets" role="tab" aria-controls="nav-buckets">buckets</a>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="true">bucket amount</a>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" id="nav-bucket-amount-4h" data-toggle="tab" href="#nav-bucket-amount" role="tab" aria-controls="nav-bucket-amount" aria-expanded="true">4h</a>
+                                        <a class="dropdown-item" id="nav-bucket-amount-24h" data-toggle="tab" href="#nav-bucket-amount" role="tab" aria-controls="nav-bucket-amount" aria-expanded="true">24h</a>
+                                        <a class="dropdown-item" id="nav-bucket-amount-7d" data-toggle="tab" href="#nav-bucket-amount" role="tab" aria-controls="nav-bucket-amount" aria-expanded="true">7d</a>
+                                    </div>
+                                </li>
+
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="true">bucket size</a>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" id="nav-bucket-size-4h" data-toggle="tab" href="#nav-bucket-size" role="tab" aria-controls="nav-bucket-size">4h</a>
+                                        <a class="dropdown-item" id="nav-bucket-size-24h" data-toggle="tab" href="#nav-bucket-size" role="tab" aria-controls="nav-bucket-size">24h</a>
+                                        <a class="dropdown-item" id="nav-bucket-size-7d" data-toggle="tab" href="#nav-bucket-size" role="tab" aria-controls="nav-bucket-size">7d</a>
+                                    </div>
+                                </li>
+
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">bucket fees</a>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" id="nav-bucket-value-4h" data-toggle="tab" href="#nav-bucket-value" role="tab" aria-controls="nav-bucket-value">4h</a>
+                                        <a class="dropdown-item" id="nav-bucket-value-24h" data-toggle="tab" href="#nav-bucket-value" role="tab" aria-controls="nav-bucket-value">24h</a>
+                                        <a class="dropdown-item" id="nav-bucket-value-7d" data-toggle="tab" href="#nav-bucket-value" role="tab" aria-controls="nav-bucket-value">7d</a>
+                                    </div>
                                 </li>
 
                                 <li class="nav-item">
@@ -190,25 +213,6 @@
                                     </p>
                                 </div>
 
-                                <div class="tab-pane fade" id="nav-buckets" role="tabpanel" aria-labelledby="nav-buckets-tab">
-                                    <p class="card-text text_center cursortext">
-                                        <span id="cursortext_bucket">
-                                            <span class="red_text" id="cursortext_buckets_date"></span>
-                                            - <span class="red_text" id="cursortext_buckets_tally">NaN</span>
-                                            tx in bucket <span class="red_text" id="cursortext_buckets_bucket">NaN</span>
-                                        </span>
-                                    </p>
-                                    <section>
-                                        <article class="info_text">
-                                            <h3>Buckets?</h3>
-                                            <p>
-                                                Bitcoin Core's fee estimation algorithm groups transactions into feerate 'buckets' to avoid tracking each transaction independently.
-                                                These buckets start at a feerate of 1 sat/byte and <a target="_blank" href="/txt/200buckets.txt">increase 5% each bucket</a>.
-                                                <a target="_blank" href="https://bitcointechtalk.com/an-introduction-to-bitcoin-core-fee-estimation-27920880ad0">This article</a> gives some insight on Core's fee estimation using buckets and targets for v0.14, however there were <a target="_blank" href="https://gist.github.com/morcos/d3637f015bc4e607e1fd10d8351e9f41#proposed-changes-for-015">some improvements</a> in v0.15.
-                                            </p>
-                                        </article>
-                                    </section>
-                                </div>
 
                                 <div class="tab-pane fade" id="nav-detailed-value" role="tabpanel" aria-labelledby="nav-detailed-value-tab">
                                     <p class="card-text text_center cursortext">
@@ -226,6 +230,38 @@
                                             <span class="red_text" id="cursortext_detailed_size_date"></span>
                                             - <span class="red_text" id="cursortext_detailed_size_size">NaN</span> MB
                                             with a feerate of <span class="red_text" id="cursortext_detailed_size_SpB">NaN</span> sat/byte
+                                        </span>
+                                    </p>
+                                </div>
+
+
+                                <div class="tab-pane fade" id="nav-bucket-amount" role="tabpanel" aria-labelledby="nav-bucket-amount-tab">
+                                    <p class="card-text text_center cursortext">
+                                        <span id="cursortext_bucket_amount">
+                                            <span class="red_text" id="cursortext_bucket_amount_date"></span>
+                                            - <span class="red_text" id="cursortext_bucket_amount_tally">NaN</span>
+                                            tx in bucket <span class="red_text" id="cursortext_bucket_amount_bucket">NaN</span>
+                                        </span>
+                                    </p>
+                                </div>
+
+
+                                <div class="tab-pane fade" id="nav-bucket-value" role="tabpanel" aria-labelledby="nav-bucket-value-tab">
+                                    <p class="card-text text_center cursortext">
+                                        <span id="cursortext_bucket_value">
+                                            <span class="red_text" id="cursortext_bucket_value_date"></span>
+                                            - <span class="red_text" id="cursortext_bucket_value_value">NaN</span> BTC
+                                            tx in bucket <span class="red_text" id="cursortext_bucket_value_bucket">NaN</span>
+                                        </span>
+                                    </p>
+                                </div>
+
+                                <div class="tab-pane fade" id="nav-bucket-size" role="tabpanel" aria-labelledby="nav-bucket-size-tab">
+                                    <p class="card-text text_center cursortext">
+                                        <span id="cursortext_bucket_size">
+                                            <span class="red_text" id="cursortext_bucket_size_date"></span>
+                                            - <span class="red_text" id="cursortext_bucket_size_size">NaN</span> MB
+                                            tx in bucket <span class="red_text" id="cursortext_bucket_size_bucket">NaN</span>
                                         </span>
                                     </p>
                                 </div>

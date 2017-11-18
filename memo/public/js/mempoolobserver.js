@@ -52,9 +52,9 @@ function changeGraphColor(index) {
 
 
 function setCursorText(date,key,value,chartType) {
-    if(value>0){
-        date = new Date(date*1000);
+    if(value>=0){
 
+        date = new Date(date*1000);
         var time;
 
         switch (chartType.timespan) {
@@ -65,34 +65,49 @@ function setCursorText(date,key,value,chartType) {
                 time = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
         }
 
+        var fee = 0;
         switch (chartType.name) {
-            case "amount":
+            case "feelevel-amount":
                 $("#cursortext_detailed").css("visibility","visible");
                 $("#cursortext_detailed_tally").text(value);
                 $("#cursortext_detailed_SpB").text(key);
                 $("#cursortext_detailed_date").text(time);
                 break;
-            case "size":
+            case "feelevel-size":
                 $("#cursortext_detailed_size").css("visibility","visible");
                 $("#cursortext_detailed_size_size").text((value/1000000).toFixed(6));
                 $("#cursortext_detailed_size_SpB").text(key);
                 $("#cursortext_detailed_size_date").text(time);
                 break;
-            case "fee":
+            case "feelevel-fee":
                 $("#cursortext_detailed_value").css("visibility","visible");
                 $("#cursortext_detailed_value_value").text(value);
                 $("#cursortext_detailed_value_SpB").text(key);
                 $("#cursortext_detailed_value_date").text(time);
                 break;
-            case "bucket":
-                let fee = calcFeeForBucket(key);
-                $("#cursortext_bucket").css("visibility","visible");
-                $("#cursortext_buckets_tally").text(value);
-                $("#cursortext_buckets_bucket").text(key + " (" + fee.toFixed(2) + "s/B - " + (fee * FEE_SPACING).toFixed(2) + "s/B)");
-                $("#cursortext_buckets_date").text(time);
+            case "bucket-amount":
+                fee = calcFeeForBucket(key);
+                $("#cursortext_bucket_amount").css("visibility","visible");
+                $("#cursortext_bucket_amount_tally").text(value);
+                $("#cursortext_bucket_amount_bucket").text(key + " (" + fee.toFixed(2) + "s/B - " + (fee * FEE_SPACING).toFixed(2) + "s/B)");
+                $("#cursortext_bucket_amount_date").text(time);
+                break;
+            case "bucket-size":
+                fee = calcFeeForBucket(key);
+                $("#cursortext_bucket_size").css("visibility","visible");
+                $("#cursortext_bucket_size_size").text((value/1000000).toFixed(6));
+                $("#cursortext_bucket_size_bucket").text(key + " (" + fee.toFixed(2) + "s/B - " + (fee * FEE_SPACING).toFixed(2) + "s/B)");
+                $("#cursortext_bucket_size_date").text(time);
+                break;
+            case "bucket-fee":
+                fee = calcFeeForBucket(key);
+                $("#cursortext_bucket_value").css("visibility","visible");
+                $("#cursortext_bucket_value_value").text(value);
+                $("#cursortext_bucket_value_bucket").text(key + " (" + fee.toFixed(2) + "s/B - " + (fee * FEE_SPACING).toFixed(2) + "s/B)");
+                $("#cursortext_bucket_value_date").text(time);
                 break;
             default:
-                o.ylabel = "no ylabel set in optionBuilder"
+                alert(chartType.name + "is unknown in setCursorText()");
         }
     }else{
         $("#cursortext_detailed").css("visibility","hidden");
@@ -169,6 +184,7 @@ function optionBuilder(chartType) {
         stackedGraph: true,
         stackedGraphNaNFill:"none",
         rightGap: 0,
+        drawGrid: false,
         legend: "never",
         highlightSeriesOpts: {
             strokeWidth: 5,
@@ -180,31 +196,43 @@ function optionBuilder(chartType) {
         highlightSeriesBackgroundAlpha: 0.5,
         highlightSeriesBackgroundColor: "#000",
         axes: {
+            y: {drawGrid: true},
             x: {axisLabelFormatter: function(d, gran, opts) {return Dygraph.dateAxisLabelFormatter(new Date((d/60).toFixed(0)*60000), gran, opts);}}
         }
     }
 
     // set options depending on name
     switch (chartType.name) {
-        case "amount":
-            o.ylabel = "tx count";
-            o.highlightCallback = function(e, x, pts, row) {setCursorText(x,graph.getHighlightSeries(),graph.rolledSeries_[graph.rolledSeries_.length-graph.getHighlightSeries()-1][row][1],chartType);}
+        case "feelevel-amount":
+            o.ylabel = "tx count per sat/byte";
+            o.highlightCallback = function(e, x, pts, row) {setCursorText(x,graph.getHighlightSeries(),graph.rolledSeries_[graph.attributes_.labels_.indexOf(graph.getHighlightSeries())+1][row][1],chartType);
+            }
             o.axes.y = {axisLabelFormatter: function(y) {if(y>=1000){return + y/1000 + 'k';}else{return y;}},axisLabelWidth: 50,includeZero:true}
             break;
-        case "size":
-            o.ylabel =  "mempool size [MB]";
-            o.highlightCallback = function(e, x, pts, row) {setCursorText(x,graph.getHighlightSeries(),graph.rolledSeries_[graph.rolledSeries_.length-graph.getHighlightSeries()-1][row][1],chartType);}
+        case "feelevel-size":
+            o.ylabel =  "tx size per sat/byte ";
+            o.highlightCallback = function(e, x, pts, row) {setCursorText(x,graph.getHighlightSeries(),graph.rolledSeries_[graph.attributes_.labels_.indexOf(graph.getHighlightSeries())+1][row][1],chartType);}
             o.axes.y = {axisLabelFormatter: function(y) {return + y/1000000;},axisLabelWidth: 50,includeZero:true}
             break;
-        case "fee":
-            o.ylabel = "amount in fees [BTC]";
-            o.highlightCallback = function(e, x, pts, row) {setCursorText(x,graph.getHighlightSeries(),graph.rolledSeries_[graph.rolledSeries_.length-graph.getHighlightSeries()-1][row][1],chartType);}
+        case "feelevel-fee":
+            o.ylabel = "fees per sat/byte [BTC]";
+            o.highlightCallback = function(e, x, pts, row) {setCursorText(x,graph.getHighlightSeries(),graph.rolledSeries_[graph.attributes_.labels_.indexOf(graph.getHighlightSeries())+1][row][1],chartType);}
             o.axes.y = {axisLabelFormatter: function(y) {return y.toFixed(2);},axisLabelWidth: 50,includeZero:true}
             break;
-        case "bucket":
+        case "bucket-amount":
             o.ylabel = "tx count per bucket";
-            o.highlightCallback = function(e, x, pts, row) {setCursorText(x, graph.getHighlightSeries(),graph.rolledSeries_[graph.rolledSeries_.length-graph.getHighlightSeries()-2][row][1],chartType);}
+            o.highlightCallback = function(e, x, pts, row) {setCursorText(x, graph.getHighlightSeries(),graph.rolledSeries_[graph.attributes_.labels_.indexOf(graph.getHighlightSeries())+1][row][1],chartType);}
             o.axes.y = {axisLabelFormatter: function(y) {if(y>=1000){return + y/1000 + 'k';}else{return y;}},axisLabelWidth: 50,includeZero:true}
+            break;
+        case "bucket-size":
+            o.ylabel = "tx size per bucket [MB]";
+            o.highlightCallback = function(e, x, pts, row) {setCursorText(x, graph.getHighlightSeries(),graph.rolledSeries_[graph.attributes_.labels_.indexOf(graph.getHighlightSeries())+1][row][1],chartType);}
+            o.axes.y = {axisLabelFormatter: function(y) {return + y/1000000;},axisLabelWidth: 50,includeZero:true}
+            break;
+        case "bucket-fee":
+            o.ylabel = "fees per bucket [BTC]";
+            o.highlightCallback = function(e, x, pts, row) {setCursorText(x, graph.getHighlightSeries(),graph.rolledSeries_[graph.attributes_.labels_.indexOf(graph.getHighlightSeries())+1][row][1],chartType);}
+            o.axes.y = {axisLabelFormatter: function(y) {return y.toFixed(2);},axisLabelWidth: 50,includeZero:true}
             break;
         default:
             o.ylabel = "no ylabel set in optionBuilder"
@@ -236,7 +264,7 @@ window.onload = function () {
         loadTXinfo();
     });
 
-    buildGraph('/dyn/amount4h.csv', optionBuilder({name:"amount",timespan:4}));
+    buildGraph('/dyn/feelevel_amount4h.csv', optionBuilder({name:"feelevel-amount",timespan:4}));
 
     // if 'load_txid' was defined by the ejs renderer load the tx
     // 'load_txid' is the permalink txid
@@ -270,32 +298,50 @@ window.onload = function () {
         switch (e.target.id) {
 
             case "nav-amount-4h":
-                graph.updateOptions($.extend(optionBuilder({name:"amount",timespan:4}), {file: "/dyn/amount4h.csv"}),false);break;
+                graph.updateOptions($.extend(optionBuilder({name:"feelevel-amount",timespan:4}), {file: "/dyn/feelevel_amount4h.csv"}),false);break;
             case "nav-amount-24h":
-                graph.updateOptions($.extend(optionBuilder({name:"amount",timespan:24}), {file: "/dyn/amount24h.csv"}),false);break;
+                graph.updateOptions($.extend(optionBuilder({name:"feelevel-amount",timespan:24}), {file: "/dyn/feelevel_amount24h.csv"}),false);break;
             case "nav-amount-7d":
-                graph.updateOptions($.extend(optionBuilder({name:"amount",timespan:168}), {file: "/dyn/amount7d.csv"}),false);break;
+                graph.updateOptions($.extend(optionBuilder({name:"feelevel-amount",timespan:168}), {file: "/dyn/feelevel_amount7d.csv"}),false);break;
 
 
             case "nav-size-4h":
-                graph.updateOptions($.extend(optionBuilder({name:"size",timespan:4}), {file: "/dyn/size4h.csv"}),false);break;
+                graph.updateOptions($.extend(optionBuilder({name:"feelevel-size",timespan:4}), {file: "/dyn/feelevel_size4h.csv"}),false);break;
             case "nav-size-24h":
-                graph.updateOptions($.extend(optionBuilder({name:"size",timespan:24}), {file: "/dyn/size24h.csv"}),false);break;
+                graph.updateOptions($.extend(optionBuilder({name:"feelevel-size",timespan:24}), {file: "/dyn/feelevel_size24h.csv"}),false);break;
             case "nav-size-7d":
-                graph.updateOptions($.extend(optionBuilder({name:"size",timespan:168}), {file: "/dyn/size7d.csv"}),false);break;
+                graph.updateOptions($.extend(optionBuilder({name:"feelevel-size",timespan:168}), {file: "/dyn/feelevel_size7d.csv"}),false);break;
 
 
             case "nav-value-4h":
-                graph.updateOptions($.extend(optionBuilder({name:"fee",timespan:4}), {file: "/dyn/value4h.csv"}),false);break;
+                graph.updateOptions($.extend(optionBuilder({name:"feelevel-fee",timespan:4}), {file: "/dyn/feelevel_value4h.csv"}),false);break;
             case "nav-value-24h":
-                graph.updateOptions($.extend(optionBuilder({name:"fee",timespan:24}), {file: "/dyn/value24h.csv"}),false);break;
+                graph.updateOptions($.extend(optionBuilder({name:"feelevel-fee",timespan:24}), {file: "/dyn/feelevel_value24h.csv"}),false);break;
             case "nav-value-7d":
-                graph.updateOptions($.extend(optionBuilder({name:"fee",timespan:168}), {file: "/dyn/value7d.csv"}),false);break;
+                graph.updateOptions($.extend(optionBuilder({name:"feelevel-fee",timespan:168}), {file: "/dyn/feelevel_value7d.csv"}),false);break;
+
+            case "nav-bucket-amount-4h":
+                graph.updateOptions($.extend(optionBuilder({name:"bucket-amount",timespan:4}), {file: "/dyn/bucket_amount4h.csv"}),false);break;
+            case "nav-bucket-amount-24h":
+                graph.updateOptions($.extend(optionBuilder({name:"bucket-amount",timespan:24}), {file: "/dyn/bucket_amount24h.csv"}),false);break;
+            case "nav-bucket-amount-7d":
+                graph.updateOptions($.extend(optionBuilder({name:"bucket-amount",timespan:168}), {file: "/dyn/bucket_amount7d.csv"}),false);break;
 
 
-            case "nav-bucket-tab":
-                graph.updateOptions($.extend(optionBuilder({name:"bucket",timespan:0}), {file: "/dyn/bucketlevel.csv"}),false);
-            break;
+            case "nav-bucket-size-4h":
+                graph.updateOptions($.extend(optionBuilder({name:"bucket-size",timespan:4}), {file: "/dyn/bucket_size4h.csv"}),false);break;
+            case "nav-bucket-size-24h":
+                graph.updateOptions($.extend(optionBuilder({name:"bucket-size",timespan:24}), {file: "/dyn/bucket_size24h.csv"}),false);break;
+            case "nav-bucket-size-7d":
+                graph.updateOptions($.extend(optionBuilder({name:"bucket-size",timespan:168}), {file: "/dyn/bucket_size7d.csv"}),false);break;
+
+
+            case "nav-bucket-value-4h":
+                graph.updateOptions($.extend(optionBuilder({name:"bucket-fee",timespan:4}), {file: "/dyn/bucket_value4h.csv"}),false);break;
+            case "nav-bucket-value-24h":
+                graph.updateOptions($.extend(optionBuilder({name:"bucket-fee",timespan:24}), {file: "/dyn/bucket_value24h.csv"}),false);break;
+            case "nav-bucket-value-7d":
+                graph.updateOptions($.extend(optionBuilder({name:"bucket-fee",timespan:168}), {file: "/dyn/bucket_value7d.csv"}),false);break;
 
         }
     });
