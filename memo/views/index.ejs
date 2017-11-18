@@ -195,6 +195,10 @@
                                 </li>
 
                                 <li class="nav-item">
+                                    <a class="nav-link" id="nav-outputs-tab" data-toggle="tab" href="#nav-outputs" role="tab" aria-controls="nav-outputs">output type</a>
+                                <li class="nav-item dropdown">
+
+                                <li class="nav-item">
                                     <a class="nav-link" onclick="toggleFullscreen()" ><img src="img/web_icon_fullscreen.png"></img></a>
                                 </li>
                             </ul>
@@ -264,6 +268,61 @@
                                             tx in bucket <span class="red_text" id="cursortext_bucket_size_bucket">NaN</span>
                                         </span>
                                     </p>
+                                </div>
+
+                                <div class="tab-pane fade" id="nav-outputs" role="tabpanel" aria-labelledby="nav-outputs-tab">
+                                    <p class="card-text text_center cursortext">
+                                        <span id="cursortext_output">
+                                            <span class="red_text" id="cursortext_output_date"></span>
+                                            - <span class="red_text" id="cursortext_output_value">NaN</span>
+                                            <span class="red_text" id="cursortext_output_type">NaN</span> outputs
+                                        </span>
+                                    </p>
+                                    <br>
+                                    <div class="container text_center" >
+                                      <div class="row">
+                                        <div class="col">
+                                            <input type=checkbox id=0 onClick="setOutputsVisibility(this)" checked>
+                                            <label for="0">multisig </label>
+                                        </div>
+                                        <div class="col">
+                                            <input type=checkbox id=1 onClick="setOutputsVisibility(this)" checked>
+                                            <label for="1">nonstandard </label>
+                                        </div>
+                                        <div class="col">
+                                            <input type=checkbox id=2 onClick="setOutputsVisibility(this)" checked>
+                                            <label for="2">nulldata </label>
+                                        </div>
+                                      </div>
+                                      <div class="row">
+                                        <div class="col">
+                                            <input type=checkbox id=3 onClick="setOutputsVisibility(this)" checked>
+                                            <label for="3">pubkey </label>
+                                        </div>
+                                        <div class="col">
+                                            <input type=checkbox id=4 onClick="setOutputsVisibility(this)" checked>
+                                            <label for="4">pubkeyhash </label>
+                                        </div>
+                                        <div class="col">
+                                            <input type=checkbox id=5 onClick="setOutputsVisibility(this)" checked>
+                                            <label for="5">scripthash </label>
+                                        </div>
+                                      </div>
+                                      <div class="row">
+                                        <div class="col">
+                                            <input type=checkbox id=5 onClick="setOutputsVisibility(this)" checked>
+                                            <label for="6">witness_unknown </label>
+                                        </div>
+                                        <div class="col">
+                                            <input type=checkbox id=5 onClick="setOutputsVisibility(this)" checked>
+                                            <label for="7">witness_v0_keyhash </label>
+                                        </div>
+                                        <div class="col">
+                                            <input type=checkbox id=5 onClick="setOutputsVisibility(this)" checked>
+                                            <label for="8">witness_v0_scripthash </label>
+                                        </div>
+                                      </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

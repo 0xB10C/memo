@@ -106,8 +106,14 @@ function setCursorText(date,key,value,chartType) {
                 $("#cursortext_bucket_value_bucket").text(key + " (" + fee.toFixed(2) + "s/B - " + (fee * FEE_SPACING).toFixed(2) + "s/B)");
                 $("#cursortext_bucket_value_date").text(time);
                 break;
+            case "outputs":
+                $("#cursortext_output").css("visibility","visible");
+                $("#cursortext_output_value").text(value);
+                $("#cursortext_output_type").text(key);
+                $("#cursortext_output_date").text(time);
+                break;
             default:
-                alert(chartType.name + "is unknown in setCursorText()");
+                alert("*" + chartType.name + "* is unknown in setCursorText()");
         }
     }else{
         $("#cursortext_detailed").css("visibility","hidden");
@@ -234,8 +240,15 @@ function optionBuilder(chartType) {
             o.highlightCallback = function(e, x, pts, row) {setCursorText(x, graph.getHighlightSeries(),graph.rolledSeries_[graph.attributes_.labels_.indexOf(graph.getHighlightSeries())+1][row][1],chartType);}
             o.axes.y = {axisLabelFormatter: function(y) {return y.toFixed(2);},axisLabelWidth: 50,includeZero:true}
             break;
+        case "outputs":
+            o.ylabel = "count outputs",
+            o.axes.y = {axisLabelFormatter: function(y) {if(y>=1000){return + y/1000 + 'k';}else{return y;}},axisLabelWidth: 50,includeZero:true},
+            o.highlightCallback = function(e, x, pts, row) {setCursorText(x, graph.getHighlightSeries(),graph.rolledSeries_[graph.attributes_.labels_.indexOf(graph.getHighlightSeries())+1][row][1],chartType);},
+            o.visibility =  [true, true, true, true, true, true, true, true, true]
+            break;
         default:
             o.ylabel = "no ylabel set in optionBuilder"
+
     }
 
     // set options depending on timespan
@@ -247,6 +260,10 @@ function optionBuilder(chartType) {
             o.xlabel = "time"
     }
     return o;
+}
+
+function setOutputsVisibility(el) {
+    graph.setVisibility(el.id, el.checked);
 }
 
 function calcFeeForBucket(bucket) {
@@ -342,6 +359,9 @@ window.onload = function () {
                 graph.updateOptions($.extend(optionBuilder({name:"bucket-fee",timespan:24}), {file: "/dyn/bucket_value24h.csv"}),false);break;
             case "nav-bucket-value-7d":
                 graph.updateOptions($.extend(optionBuilder({name:"bucket-fee",timespan:168}), {file: "/dyn/bucket_value7d.csv"}),false);break;
+
+            case "nav-outputs-tab":
+                graph.updateOptions($.extend(optionBuilder({name:"outputs",timespan:0}), {file: "/dyn/stats_output_type.csv"}),false);break;
 
         }
     });

@@ -31,6 +31,20 @@ CREATE TABLE Bucketlevel (
     FOREIGN KEY (state_id) REFERENCES STATE(state_id) ON DELETE CASCADE
 );
 
+CREATE TABLE Stats (
+    measurement_time timestamp NOT NULL,
+    type_multisig int,
+    type_nonstandard int,
+    type_nulldata int,
+    type_pubkey int,
+    type_pubkeyhash int,
+    type_scripthash int,
+    type_witness_unknown int,
+    type_witness_v0_keyhash int,
+    type_witness_v0_scripthash int,
+    PRIMARY KEY (measurement_time)
+);
+
 
 CREATE VIEW v_4hData_feelevel AS
     SELECT *

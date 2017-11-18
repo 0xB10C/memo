@@ -55,6 +55,19 @@ def dbToCSV(cur,s_type,filepath,sql_key,sql_view):
             outfile.write(csv_buffer)
     pass
 
+def statsToCSV():
+    csv_buffer = "x" + CSV_SEPERATOR + "multisig" + CSV_SEPERATOR + "nonstandard" + CSV_SEPERATOR + "nulldata" + CSV_SEPERATOR + "pubkey" + CSV_SEPERATOR + "pubkeyhash" + CSV_SEPERATOR + "scripthash" + CSV_SEPERATOR + "witness_unknown" + CSV_SEPERATOR + "witness_v0_keyhash" + CSV_SEPERATOR + "witness_v0_scripthash" + "\n"
+
+    string_fetch_types = "SELECT measurement_time, type_multisig, type_nonstandard, type_nulldata, type_pubkey, type_pubkeyhash, type_scripthash, type_witness_unknown, type_witness_v0_keyhash, type_witness_v0_scripthash FROM Stats"
+    cur.execute(string_fetch_types)
+    vout_type_rows = cur.fetchall()
+
+    for row in vout_type_rows:
+
+        csv_buffer += str(row[0]) + CSV_SEPERATOR + str(row[1]) + CSV_SEPERATOR + str(row[2]) + CSV_SEPERATOR + str(row[3]) + CSV_SEPERATOR + str(row[4]) + CSV_SEPERATOR + str(row[5]) + CSV_SEPERATOR + str(row[6]) + CSV_SEPERATOR + str(row[7]) + CSV_SEPERATOR + str(row[8]) + CSV_SEPERATOR + str(row[9]) + "\n"
+    with open("./memo/public/dyn/stats_output_type.csv", 'w') as outfile:
+        outfile.write(csv_buffer)
+    pass
 
 try:
     conn = db.connect('./db/memo.sqlite3')
@@ -77,6 +90,8 @@ try:
         dbToCSV(cur,"bucket","./memo/public/dyn/bucket_amount24h.csv","tally","v_24hData_bucketlevel")
         dbToCSV(cur,"bucket","./memo/public/dyn/bucket_size24h.csv","size","v_24hData_bucketlevel")
         dbToCSV(cur,"bucket","./memo/public/dyn/bucket_value24h.csv","value","v_24hData_bucketlevel")
+
+        statsToCSV()
 
     if int(sys.argv[1]) >= 168:
         dbToCSV(cur,"spb","./memo/public/dyn/feelevel_amount7d.csv","tally","v_7dData_feelevel")
