@@ -243,8 +243,7 @@ function optionBuilder(chartType) {
         case "outputs":
             o.ylabel = "count outputs",
             o.axes.y = {axisLabelFormatter: function(y) {if(y>=1000){return + y/1000 + 'k';}else{return y;}},axisLabelWidth: 50,includeZero:true},
-            o.highlightCallback = function(e, x, pts, row) {setCursorText(x, graph.getHighlightSeries(),graph.rolledSeries_[graph.attributes_.labels_.indexOf(graph.getHighlightSeries())+1][row][1],chartType);},
-            o.visibility =  [true, true, true, true, true, true, true, true, true]
+            o.highlightCallback = function(e, x, pts, row) {setCursorText(x, graph.getHighlightSeries(),graph.rolledSeries_[graph.attributes_.labels_.indexOf(graph.getHighlightSeries())+1][row][1],chartType);}
             break;
         default:
             o.ylabel = "no ylabel set in optionBuilder"
