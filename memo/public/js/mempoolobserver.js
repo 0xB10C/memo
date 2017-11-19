@@ -1,6 +1,6 @@
 const colorSet = ["#373854","#493267","#7bb3ff","#e86af0","#7bb3ff","#9e379f"];
 const FEE_SPACING = 1.05;
-const weekdays = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
 
 var graph;
 var tx_unconfirmed_timer;
