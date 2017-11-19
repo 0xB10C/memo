@@ -59,7 +59,7 @@ function setCursorText(date,key,value,chartType) {
 
         switch (chartType.timespan) {
             case 168:
-                time = weekdays[date.getDay()]+" "+("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
+                time = date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear() + " " + ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
                 break;
             default:
                 time = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
@@ -360,7 +360,7 @@ window.onload = function () {
                 graph.updateOptions($.extend(optionBuilder({name:"bucket-fee",timespan:168}), {file: "/dyn/bucket_value7d.csv"}),false);break;
 
             case "nav-outputs-tab":
-                graph.updateOptions($.extend(optionBuilder({name:"outputs",timespan:0}), {file: "/dyn/stats_output_type.csv"}),false);break;
+                graph.updateOptions($.extend(optionBuilder({name:"outputs",timespan:168}), {file: "/dyn/stats_output_type.csv"}),false);break;
 
         }
     });
