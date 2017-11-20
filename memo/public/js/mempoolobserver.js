@@ -112,10 +112,16 @@ function setCursorText(date,key,value,chartType) {
                 $("#cursortext_output_type").text(key);
                 $("#cursortext_output_date").text(time);
                 break;
+            case "segwit":
+                $("#cursortext_segwit").css("visibility","visible");
+                $("#cursortext_segwit_amount").text(value);
+                $("#cursortext_segwit_type").text(key);
+                $("#cursortext_segwit_date").text(time);
+                break;
             default:
                 alert("*" + chartType.name + "* is unknown in setCursorText()");
         }
-    }else{
+    }else{ // TODO
         $("#cursortext_detailed").css("visibility","hidden");
         $("#cursortext_bucket").css("visibility","hidden");
         $("#cursortext_detailed_value").css("visibility","hidden");
@@ -245,6 +251,11 @@ function optionBuilder(chartType) {
             o.axes.y = {axisLabelFormatter: function(y) {if(y>=1000){return + y/1000 + 'k';}else{return y;}},axisLabelWidth: 50,includeZero:true},
             o.highlightCallback = function(e, x, pts, row) {setCursorText(x, graph.getHighlightSeries(),graph.rolledSeries_[graph.attributes_.labels_.indexOf(graph.getHighlightSeries())+1][row][1],chartType);}
             break;
+        case "segwit":
+            o.ylabel = "count segwit tx",
+            o.axes.y = {axisLabelFormatter: function(y) {if(y>=1000){return + y/1000 + 'k';}else{return y;}},axisLabelWidth: 50,includeZero:true},
+            o.highlightCallback = function(e, x, pts, row) {setCursorText(x, graph.getHighlightSeries(),graph.rolledSeries_[graph.attributes_.labels_.indexOf(graph.getHighlightSeries())+1][row][1],chartType);}
+            break;
         default:
             o.ylabel = "no ylabel set in optionBuilder"
 
@@ -361,6 +372,9 @@ window.onload = function () {
 
             case "nav-outputs-tab":
                 graph.updateOptions($.extend(optionBuilder({name:"outputs",timespan:168}), {file: "/dyn/stats_output_type.csv"}),false);break;
+
+            case "nav-segwit-tab":
+                graph.updateOptions($.extend(optionBuilder({name:"segwit",timespan:168}), {file: "/dyn/stats_segwit.csv"}),false);break;
 
         }
     });

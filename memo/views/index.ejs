@@ -203,8 +203,12 @@
                                 </li>
 
                                 <li class="nav-item">
+                                    <a class="nav-link" id="nav-segwit-tab" data-toggle="tab" href="#nav-segwit" role="tab" aria-controls="nav-segwit">segwit</a>
+                                </li>
+
+                                <li class="nav-item">
                                     <a class="nav-link" id="nav-outputs-tab" data-toggle="tab" href="#nav-outputs" role="tab" aria-controls="nav-outputs">output type</a>
-                                <li class="nav-item dropdown">
+                                </li>
 
                                 <li class="nav-item">
                                     <a class="nav-link" onclick="toggleFullscreen()" ><img src="img/web_icon_fullscreen.png"></img></a>
@@ -274,6 +278,16 @@
                                             <span class="red_text" id="cursortext_bucket_size_date"></span>
                                             - <span class="red_text" id="cursortext_bucket_size_size">NaN</span> MB
                                             tx in bucket <span class="red_text" id="cursortext_bucket_size_bucket">NaN</span>
+                                        </span>
+                                    </p>
+                                </div>
+
+                                <div class="tab-pane fade" id="nav-segwit" role="tabpanel" aria-labelledby="nav-segwit-tab">
+                                    <p class="card-text text_center cursortext">
+                                        <span id="cursortext_segwit">
+                                            <span class="red_text" id="cursortext_segwit_date"></span>
+                                            - <span class="red_text" id="cursortext_segwit_amount">NaN</span> MB
+                                            tx in bucket <span class="red_text" id="cursortext_segwit_type">NaN</span>
                                         </span>
                                     </p>
                                 </div>

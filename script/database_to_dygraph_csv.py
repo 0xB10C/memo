@@ -56,6 +56,9 @@ def dbToCSV(cur,s_type,filepath,sql_key,sql_view):
     pass
 
 def statsToCSV():
+
+    # transaction output type stats
+
     csv_buffer = "x" + CSV_SEPERATOR + "multisig" + CSV_SEPERATOR + "nonstandard" + CSV_SEPERATOR + "nulldata" + CSV_SEPERATOR + "pubkey" + CSV_SEPERATOR + "pubkeyhash" + CSV_SEPERATOR + "scripthash" + CSV_SEPERATOR + "witness_unknown" + CSV_SEPERATOR + "witness_v0_keyhash" + CSV_SEPERATOR + "witness_v0_scripthash" + "\n"
 
     string_fetch_types = "SELECT measurement_time, type_multisig, type_nonstandard, type_nulldata, type_pubkey, type_pubkeyhash, type_scripthash, type_witness_unknown, type_witness_v0_keyhash, type_witness_v0_scripthash FROM Stats"
@@ -67,7 +70,22 @@ def statsToCSV():
         csv_buffer += str(row[0]) + CSV_SEPERATOR + str(row[1]) + CSV_SEPERATOR + str(row[2]) + CSV_SEPERATOR + str(row[3]) + CSV_SEPERATOR + str(row[4]) + CSV_SEPERATOR + str(row[5]) + CSV_SEPERATOR + str(row[6]) + CSV_SEPERATOR + str(row[7]) + CSV_SEPERATOR + str(row[8]) + CSV_SEPERATOR + str(row[9]) + "\n"
     with open("./memo/public/dyn/stats_output_type.csv", 'w') as outfile:
         outfile.write(csv_buffer)
+
+    # transaction segwit stats
+
+    csv_buffer = "x" + CSV_SEPERATOR + "non-segwit" + CSV_SEPERATOR + "segwit-mixed" + CSV_SEPERATOR + "segwit" + "\n"
+
+    string_fetch_segwit = "SELECT measurement_time, count_non_segwit, count_segwit_mixed, count_segwit FROM Stats"
+    cur.execute(string_fetch_segwit)
+    segwit_rows = cur.fetchall()
+
+    for row in segwit_rows:
+        csv_buffer += str(row[0]) + CSV_SEPERATOR + str(row[1]) + CSV_SEPERATOR + str(row[2]) + CSV_SEPERATOR + str(row[3]) + "\n"
+    with open("./memo/public/dyn/stats_segwit.csv", 'w') as outfile:
+        outfile.write(csv_buffer)
+
     pass
+
 
 try:
     conn = db.connect('./db/memo.sqlite3')

@@ -42,6 +42,9 @@ CREATE TABLE Stats (
     type_witness_unknown int,
     type_witness_v0_keyhash int,
     type_witness_v0_scripthash int,
+    count_segwit int,
+    count_segwit_mixed int,
+    count_non_segwit int,
     PRIMARY KEY (measurement_time)
 );
 
