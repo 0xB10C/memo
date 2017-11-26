@@ -12,4 +12,4 @@
 2-8/2,12-18/2,22-28/2,32-38/2,42-48/2,52-58/2   * * * * /path/to/memo/script/memo.sh 4
 #
 # independently generates stats every 30 minutes
-15,30                                           * * * * /path/to/memo/script/memo.sh 3
+15,45                                           * * * * /path/to/memo/script/memo.sh 3
