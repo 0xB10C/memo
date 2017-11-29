@@ -247,15 +247,18 @@ function optionBuilder(chartType) {
             o.axes.y = {axisLabelFormatter: function(y) {return y.toFixed(2);},axisLabelWidth: 50,includeZero:true}
             break;
         case "outputs":
-            o.ylabel = "count outputs",
-            o.axes.y = {axisLabelFormatter: function(y) {if(y>=1000){return + y/1000 + 'k';}else{return y;}},axisLabelWidth: 50,includeZero:true},
+            o.colors = ["#db5461","#ffd9ce","#e2c044","#95c623","#02A9C6","#8ef9f3","#efe7da"];
+            o.ylabel = "count outputs";
+            o.fillAlpha = 0.1;
+            o.stackedGraph =  false;
+            o.axes.y = {axisLabelFormatter: function(y) {if(y>=1000){return + y/1000 + 'k';}else{return y;}},axisLabelWidth: 50,includeZero:true};
             o.highlightCallback = function(e, x, pts, row) {setCursorText(x, graph.getHighlightSeries(),graph.rolledSeries_[graph.attributes_.labels_.indexOf(graph.getHighlightSeries())+1][row][1],chartType);}
             break;
         case "segwit":
-            o.colors = ["#7bb3ff","#e86af0","#219B99"];
-            o.stackedGraph =  false,
-            o.fillAlpha = 0.1,
-            o.ylabel = "count segwit tx",
+            o.colors = ["#e86af0","#7bb3ff","#219B99"];
+            o.stackedGraph =  false;
+            o.fillAlpha = 0.1;
+            o.ylabel = "count segwit tx";
             o.axes.x = {axisLabelFormatter: function(d) {date = new Date(d*1000); return date.getDate() + "." + (date.getMonth()+1)}};
             o.axes.y = {axisLabelFormatter: function(y) {if(y>=1000){return + y/1000 + 'k';}else{return y;}},axisLabelWidth: 50,includeZero:true};
             o.highlightCallback = function(e, x, pts, row) {setCursorText(x, graph.getHighlightSeries(),graph.rolledSeries_[graph.attributes_.labels_.indexOf(graph.getHighlightSeries())+1][row][1],chartType);}
