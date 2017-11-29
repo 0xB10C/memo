@@ -252,6 +252,7 @@ function optionBuilder(chartType) {
             o.fillAlpha = 0.1;
             o.stackedGraph =  false;
             o.axes.y = {axisLabelFormatter: function(y) {if(y>=1000){return + y/1000 + 'k';}else{return y;}},axisLabelWidth: 50,includeZero:true};
+            o.axes.x = {axisLabelFormatter: function(d) {date = new Date(d*1000); return date.getDate() + "." + (date.getMonth()+1)}};
             o.highlightCallback = function(e, x, pts, row) {setCursorText(x, graph.getHighlightSeries(),graph.rolledSeries_[graph.attributes_.labels_.indexOf(graph.getHighlightSeries())+1][row][1],chartType);}
             break;
         case "segwit":
