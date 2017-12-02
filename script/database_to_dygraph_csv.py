@@ -41,11 +41,11 @@ def dbToCSV(cur,s_type,filepath,sql_key,sql_view):
 
         view_data[statetime][d_type] = tally
 
-    for key, kvpairs in view_data.iteritems():
+    for key in sorted(view_data):
         csv_buffer += str(key) + CSV_SEPERATOR
         for d_type in type_list:
-            if d_type in kvpairs:
-                csv_buffer += str(kvpairs[d_type]) + CSV_SEPERATOR
+            if d_type in view_data[key]:
+                csv_buffer += str(view_data[key][d_type]) + CSV_SEPERATOR
             else:
                 csv_buffer += CSV_SEPERATOR
         csv_buffer = csv_buffer[:-1]
@@ -66,7 +66,6 @@ def statsToCSV():
     vout_type_rows = cur.fetchall()
 
     for row in vout_type_rows:
-
         csv_buffer += str(row[0]) + CSV_SEPERATOR + str(row[1]) + CSV_SEPERATOR + str(row[2]) + CSV_SEPERATOR + str(row[3]) + CSV_SEPERATOR + str(row[4]) + CSV_SEPERATOR + str(row[5]) + CSV_SEPERATOR + str(row[6]) + CSV_SEPERATOR + str(row[7]) + CSV_SEPERATOR + str(row[8]) + CSV_SEPERATOR + str(row[9]) + "\n"
     with open("./memo/public/dyn/stats_output_type.csv", 'w') as outfile:
         outfile.write(csv_buffer)
