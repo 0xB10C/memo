@@ -68,64 +68,89 @@ function setCursorText(date,key,value,chartType) {
         var fee = 0;
         switch (chartType.name) {
             case "feelevel-amount":
-                $("#cursortext_detailed").css("visibility","visible");
-                $("#cursortext_detailed_tally").text(value);
-                $("#cursortext_detailed_SpB").text(key);
-                $("#cursortext_detailed_date").text(time);
+
+                $("#cursortext_all").css("visibility","visible");
+                $("#cursortext_date").text(time);
+                $("#cursortext_date_post").text(" - ");
+                $("#cursortext_firstvalue").text(value);
+                $("#cursortext_firstvalue_post").text(" tx with ");
+                $("#cursortext_secondvalue").text(key);
+                $("#cursortext_secondvalue_post").text(" sat/byte");
+
                 break;
             case "feelevel-size":
-                $("#cursortext_detailed_size").css("visibility","visible");
-                $("#cursortext_detailed_size_size").text((value/1000000).toFixed(6));
-                $("#cursortext_detailed_size_SpB").text(key);
-                $("#cursortext_detailed_size_date").text(time);
+
+                $("#cursortext_all").css("visibility","visible");
+                $("#cursortext_date").text(time);
+                $("#cursortext_date_post").text(" - ");
+                $("#cursortext_firstvalue").text((value/1000000).toFixed(6));
+                $("#cursortext_firstvalue_post").text(" MB with ");
+                $("#cursortext_secondvalue").text(key);
+                $("#cursortext_secondvalue_post").text(" sat/byte");
+
                 break;
             case "feelevel-fee":
-                $("#cursortext_detailed_value").css("visibility","visible");
-                $("#cursortext_detailed_value_value").text(value);
-                $("#cursortext_detailed_value_SpB").text(key);
-                $("#cursortext_detailed_value_date").text(time);
+                $("#cursortext_all").css("visibility","visible");
+                $("#cursortext_date").text(time);
+                $("#cursortext_date_post").text(" - ");
+                $("#cursortext_firstvalue").text(value);
+                $("#cursortext_firstvalue_post").text(" BTC as fees with ");
+                $("#cursortext_secondvalue").text(key);
+                $("#cursortext_secondvalue_post").text(" sat/byte");
                 break;
             case "bucket-amount":
                 fee = calcFeeForBucket(key);
-                $("#cursortext_bucket_amount").css("visibility","visible");
-                $("#cursortext_bucket_amount_tally").text(value);
-                $("#cursortext_bucket_amount_bucket").text(key + " (" + fee.toFixed(2) + "s/B - " + (fee * FEE_SPACING).toFixed(2) + "s/B)");
-                $("#cursortext_bucket_amount_date").text(time);
+                $("#cursortext_all").css("visibility","visible");
+                $("#cursortext_date").text(time);
+                $("#cursortext_date_post").text(" - ");
+                $("#cursortext_firstvalue").text(value)
+                $("#cursortext_firstvalue_post").text(" tx in bucket ");;
+                $("#cursortext_secondvalue").text(key + " (" + fee.toFixed(2) + "s/B - " + (fee * FEE_SPACING).toFixed(2) + "s/B)");
+                $("#cursortext_secondvalue_post").text("");
                 break;
             case "bucket-size":
                 fee = calcFeeForBucket(key);
-                $("#cursortext_bucket_size").css("visibility","visible");
-                $("#cursortext_bucket_size_size").text((value/1000000).toFixed(6));
-                $("#cursortext_bucket_size_bucket").text(key + " (" + fee.toFixed(2) + "s/B - " + (fee * FEE_SPACING).toFixed(2) + "s/B)");
-                $("#cursortext_bucket_size_date").text(time);
+                $("#cursortext_all").css("visibility","visible");
+                $("#cursortext_date").text(time);
+                $("#cursortext_date_post").text(" - ");
+                $("#cursortext_firstvalue").text((value/1000000).toFixed(6));
+                $("#cursortext_firstvalue_post").text(" MB in bucket ");
+                $("#cursortext_secondvalue").text(key + " (" + fee.toFixed(2) + "s/B - " + (fee * FEE_SPACING).toFixed(2) + "s/B)");
+                $("#cursortext_secondvalue_post").text("");
                 break;
             case "bucket-fee":
                 fee = calcFeeForBucket(key);
-                $("#cursortext_bucket_value").css("visibility","visible");
-                $("#cursortext_bucket_value_value").text(value);
-                $("#cursortext_bucket_value_bucket").text(key + " (" + fee.toFixed(2) + "s/B - " + (fee * FEE_SPACING).toFixed(2) + "s/B)");
-                $("#cursortext_bucket_value_date").text(time);
+                $("#cursortext_all").css("visibility","visible");
+                $("#cursortext_date").text(time);
+                $("#cursortext_date_post").text(" - ");
+                $("#cursortext_firstvalue").text(value);
+                $("#cursortext_firstvalue_post").text(" BTC as fees in bucket ");
+                $("#cursortext_secondvalue").text(key + " (" + fee.toFixed(2) + "s/B - " + (fee * FEE_SPACING).toFixed(2) + "s/B)");
+                $("#cursortext_secondvalue_post").text("");
                 break;
             case "outputs":
-                $("#cursortext_output").css("visibility","visible");
-                $("#cursortext_output_value").text(value);
-                $("#cursortext_output_type").text(key);
-                $("#cursortext_output_date").text(time);
+                $("#cursortext_all").css("visibility","visible");
+                $("#cursortext_date").text(time);
+                $("#cursortext_date_post").text(" - ");
+                $("#cursortext_firstvalue").text(value);
+                $("#cursortext_firstvalue_post").text("");
+                $("#cursortext_secondvalue").text(key);
+                $("#cursortext_secondvalue_post").text(" outputs");
                 break;
             case "segwit":
-                $("#cursortext_segwit").css("visibility","visible");
-                $("#cursortext_segwit_amount").text(value);
-                $("#cursortext_segwit_type").text(key);
-                $("#cursortext_segwit_date").text(time);
+                $("#cursortext_all").css("visibility","visible");
+                $("#cursortext_date").text(time);
+                $("#cursortext_date_post").text(" - ");
+                $("#cursortext_firstvalue").text(value);
+                $("#cursortext_firstvalue_post").text("");
+                $("#cursortext_secondvalue").text(key);
+                $("#cursortext_secondvalue_post").text(" tx");
                 break;
             default:
                 alert("*" + chartType.name + "* is unknown in setCursorText()");
         }
-    }else{ // TODO
-        $("#cursortext_detailed").css("visibility","hidden");
-        $("#cursortext_bucket").css("visibility","hidden");
-        $("#cursortext_detailed_value").css("visibility","hidden");
-        $("#cursortext_detailed_size").css("visibility","hidden");
+    }else{
+        $("#cursortext_all").css("visibility","hidden");
     }
 }
 
@@ -299,6 +324,7 @@ window.onload = function () {
         loadTXinfo();
     });
 
+
     buildGraph('/dyn/feelevel_amount4h.csv', optionBuilder({name:"feelevel-amount",timespan:4}));
 
     // if 'load_txid' was defined by the ejs renderer load the tx
@@ -307,6 +333,14 @@ window.onload = function () {
         $("#input_txid").val(load_txid)
         loadTXinfo();
     }
+
+    $(function(){
+      var hash = window.location.hash;
+      hash && $('ul.nav a[href="' + hash + '"]').tab('show');
+      $('.nav-tabs a').click(function (e) {
+          if(this.hash) window.location.hash = this.hash;
+      });
+    });
 
     // onChangeListener for the confirm sound checkbox
     $('#card_info_tx_confirmed_sound_checkbox').change(function(){

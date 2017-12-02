@@ -22,13 +22,7 @@
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-109541438-2"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
 
-        gtag('config', 'UA-109541438-2');
-    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.0.0/dygraph.min.css" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Slab" rel="stylesheet">
@@ -40,6 +34,16 @@
 <body>
     <% if (load_txid) { %>
         <script>var load_txid ="<%= load_txid %>";</script>
+    <% } %>
+
+    <% if (GAToken) { %>
+        <!-- sets the Google Analytics token defined in config.js if not empty -->
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', "<%= GAToken %>");
+        </script>
     <% } %>
 
     <div class="container" id="main_container">
@@ -146,68 +150,68 @@
                     <div class="card-body">
                         <div id="fullscreen-wrapper">
 
-                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <ul class="nav nav-tabs" id="vizTabList" role="tablist">
 
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle active" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="true">tx amount</a>
                                     <div class="dropdown-menu">
-                                        <a class="dropdown-item active" id="nav-amount-4h" data-toggle="tab" href="#nav-detailed" role="tab" aria-controls="nav-detailed" aria-expanded="true">4h</a>
-                                        <a class="dropdown-item" id="nav-amount-24h" data-toggle="tab" href="#nav-detailed" role="tab" aria-controls="nav-detailed" aria-expanded="true">24h</a>
-                                        <a class="dropdown-item" id="nav-amount-7d" data-toggle="tab" href="#nav-detailed" role="tab" aria-controls="nav-detailed" aria-expanded="true">7d</a>
+                                        <a class="dropdown-item active" id="nav-amount-4h" data-toggle="tab" href="#amount-4h" role="tab" aria-controls="nav-detailed" aria-expanded="true">4h</a>
+                                        <a class="dropdown-item" id="nav-amount-24h" data-toggle="tab" href="#amount-24h" role="tab" aria-controls="nav-detailed" aria-expanded="true">24h</a>
+                                        <a class="dropdown-item" id="nav-amount-7d" data-toggle="tab" href="#amount-7d" role="tab" aria-controls="nav-detailed" aria-expanded="true">7d</a>
                                     </div>
                                 </li>
 
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="true">tx size</a>
                                     <div class="dropdown-menu">
-                                        <a class="dropdown-item" id="nav-size-4h" data-toggle="tab" href="#nav-detailed-size" role="tab" aria-controls="nav-detailed-size">4h</a>
-                                        <a class="dropdown-item" id="nav-size-24h" data-toggle="tab" href="#nav-detailed-size" role="tab" aria-controls="nav-detailed-size">24h</a>
-                                        <a class="dropdown-item" id="nav-size-7d" data-toggle="tab" href="#nav-detailed-size" role="tab" aria-controls="nav-detailed-size">7d</a>
+                                        <a class="dropdown-item" id="nav-size-4h" data-toggle="tab" href="#size-4h" role="tab" aria-controls="nav-detailed-size">4h</a>
+                                        <a class="dropdown-item" id="nav-size-24h" data-toggle="tab" href="#size-24h" role="tab" aria-controls="nav-detailed-size">24h</a>
+                                        <a class="dropdown-item" id="nav-size-7d" data-toggle="tab" href="#size-7d" role="tab" aria-controls="nav-detailed-size">7d</a>
                                     </div>
                                 </li>
 
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">tx fees</a>
                                     <div class="dropdown-menu">
-                                        <a class="dropdown-item" id="nav-value-4h" data-toggle="tab" href="#nav-detailed-value" role="tab" aria-controls="nav-detailed-value">4h</a>
-                                        <a class="dropdown-item" id="nav-value-24h" data-toggle="tab" href="#nav-detailed-value" role="tab" aria-controls="nav-detailed-value">24h</a>
-                                        <a class="dropdown-item" id="nav-value-7d" data-toggle="tab" href="#nav-detailed-value" role="tab" aria-controls="nav-detailed-value">7d</a>
+                                        <a class="dropdown-item" id="nav-value-4h" data-toggle="tab" href="#value-4h" role="tab" aria-controls="nav-detailed-value">4h</a>
+                                        <a class="dropdown-item" id="nav-value-24h" data-toggle="tab" href="#value-24h" role="tab" aria-controls="nav-detailed-value">24h</a>
+                                        <a class="dropdown-item" id="nav-value-7d" data-toggle="tab" href="#value-7d" role="tab" aria-controls="nav-detailed-value">7d</a>
                                     </div>
                                 </li>
 
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="true">bucket amount</a>
                                     <div class="dropdown-menu">
-                                        <a class="dropdown-item" id="nav-bucket-amount-4h" data-toggle="tab" href="#nav-bucket-amount" role="tab" aria-controls="nav-bucket-amount" aria-expanded="true">4h</a>
-                                        <a class="dropdown-item" id="nav-bucket-amount-24h" data-toggle="tab" href="#nav-bucket-amount" role="tab" aria-controls="nav-bucket-amount" aria-expanded="true">24h</a>
-                                        <a class="dropdown-item" id="nav-bucket-amount-7d" data-toggle="tab" href="#nav-bucket-amount" role="tab" aria-controls="nav-bucket-amount" aria-expanded="true">7d</a>
+                                        <a class="dropdown-item" id="nav-bucket-amount-4h" data-toggle="tab" href="#bucket-amount-4h" role="tab" aria-controls="nav-bucket-amount" aria-expanded="true">4h</a>
+                                        <a class="dropdown-item" id="nav-bucket-amount-24h" data-toggle="tab" href="#bucket-amount-24h" role="tab" aria-controls="nav-bucket-amount" aria-expanded="true">24h</a>
+                                        <a class="dropdown-item" id="nav-bucket-amount-7d" data-toggle="tab" href="#bucket-amount-7d" role="tab" aria-controls="nav-bucket-amount" aria-expanded="true">7d</a>
                                     </div>
                                 </li>
 
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="true">bucket size</a>
                                     <div class="dropdown-menu">
-                                        <a class="dropdown-item" id="nav-bucket-size-4h" data-toggle="tab" href="#nav-bucket-size" role="tab" aria-controls="nav-bucket-size">4h</a>
-                                        <a class="dropdown-item" id="nav-bucket-size-24h" data-toggle="tab" href="#nav-bucket-size" role="tab" aria-controls="nav-bucket-size">24h</a>
-                                        <a class="dropdown-item" id="nav-bucket-size-7d" data-toggle="tab" href="#nav-bucket-size" role="tab" aria-controls="nav-bucket-size">7d</a>
+                                        <a class="dropdown-item" id="nav-bucket-size-4h" data-toggle="tab" href="#bucket-size-4h" role="tab" aria-controls="nav-bucket-size">4h</a>
+                                        <a class="dropdown-item" id="nav-bucket-size-24h" data-toggle="tab" href="#bucket-size-24h" role="tab" aria-controls="nav-bucket-size">24h</a>
+                                        <a class="dropdown-item" id="nav-bucket-size-7d" data-toggle="tab" href="#bucket-size-7d" role="tab" aria-controls="nav-bucket-size">7d</a>
                                     </div>
                                 </li>
 
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">bucket fees</a>
                                     <div class="dropdown-menu">
-                                        <a class="dropdown-item" id="nav-bucket-value-4h" data-toggle="tab" href="#nav-bucket-value" role="tab" aria-controls="nav-bucket-value">4h</a>
-                                        <a class="dropdown-item" id="nav-bucket-value-24h" data-toggle="tab" href="#nav-bucket-value" role="tab" aria-controls="nav-bucket-value">24h</a>
-                                        <a class="dropdown-item" id="nav-bucket-value-7d" data-toggle="tab" href="#nav-bucket-value" role="tab" aria-controls="nav-bucket-value">7d</a>
+                                        <a class="dropdown-item" id="nav-bucket-value-4h" data-toggle="tab" href="#bucket-value-4h" role="tab" aria-controls="nav-bucket-value">4h</a>
+                                        <a class="dropdown-item" id="nav-bucket-value-24h" data-toggle="tab" href="#bucket-value-24h" role="tab" aria-controls="nav-bucket-value">24h</a>
+                                        <a class="dropdown-item" id="nav-bucket-value-7d" data-toggle="tab" href="#bucket-value-7d" role="tab" aria-controls="nav-bucket-value">7d</a>
                                     </div>
                                 </li>
 
                                 <li class="nav-item">
-                                    <a class="nav-link" id="nav-segwit-tab" data-toggle="tab" href="#nav-segwit" role="tab" aria-controls="nav-segwit">segwit</a>
+                                    <a class="nav-link" id="nav-segwit-tab" data-toggle="tab" href="#segwit" role="tab" aria-controls="nav-segwit">segwit</a>
                                 </li>
 
                                 <li class="nav-item">
-                                    <a class="nav-link" id="nav-outputs-tab" data-toggle="tab" href="#nav-outputs" role="tab" aria-controls="nav-outputs">output type</a>
+                                    <a class="nav-link" id="nav-outputs-tab" data-toggle="tab" href="#outputs" role="tab" aria-controls="nav-outputs">output type</a>
                                 </li>
 
                                 <li class="nav-item">
@@ -218,89 +222,25 @@
 
                             <div id="graphdiv"></div>
 
+                            <p class="card-text text_center cursortext">
+                                <span id="cursortext_all">
+
+                                    <span id="cursortext_date_pre"></span>
+                                    <span id="cursortext_date" class="red_text"></span>
+                                    <span id="cursortext_date_post"></span>
+
+                                    <span id="cursortext_firstvalue" class="red_text"></span>
+                                    <span id="cursortext_firstvalue_post"></span>
+
+                                    <span id="cursortext_secondvalue" class="red_text"></span>
+                                    <span id="cursortext_secondvalue_post"></span>
+
+                                </span>
+                            </p>
+
+
                             <div class="tab-content" id="nav-tabContent">
-                                <div class="tab-pane fade show active" id="nav-detailed" role="tabpanel" aria-labelledby="nav-detailed-tab">
-                                    <p class="card-text text_center cursortext">
-                                        <span id="cursortext_detailed">
-                                            <span class="red_text" id="cursortext_detailed_date"></span>
-                                            - <span class="red_text" id="cursortext_detailed_tally">NaN</span>
-                                            tx with <span class="red_text" id="cursortext_detailed_SpB">NaN</span> sat/byte
-                                        </span>
-                                    </p>
-                                </div>
-
-
-                                <div class="tab-pane fade" id="nav-detailed-value" role="tabpanel" aria-labelledby="nav-detailed-value-tab">
-                                    <p class="card-text text_center cursortext">
-                                        <span id="cursortext_detailed_value">
-                                            <span class="red_text" id="cursortext_detailed_value_date"></span>
-                                            - <span class="red_text" id="cursortext_detailed_value_value">NaN</span> BTC
-                                            with a feerate of <span class="red_text" id="cursortext_detailed_value_SpB">NaN</span> sat/byte
-                                        </span>
-                                    </p>
-                                </div>
-
-                                <div class="tab-pane fade" id="nav-detailed-size" role="tabpanel" aria-labelledby="nav-detailed-size-tab">
-                                    <p class="card-text text_center cursortext">
-                                        <span id="cursortext_detailed_size">
-                                            <span class="red_text" id="cursortext_detailed_size_date"></span>
-                                            - <span class="red_text" id="cursortext_detailed_size_size">NaN</span> MB
-                                            with a feerate of <span class="red_text" id="cursortext_detailed_size_SpB">NaN</span> sat/byte
-                                        </span>
-                                    </p>
-                                </div>
-
-
-                                <div class="tab-pane fade" id="nav-bucket-amount" role="tabpanel" aria-labelledby="nav-bucket-amount-tab">
-                                    <p class="card-text text_center cursortext">
-                                        <span id="cursortext_bucket_amount">
-                                            <span class="red_text" id="cursortext_bucket_amount_date"></span>
-                                            - <span class="red_text" id="cursortext_bucket_amount_tally">NaN</span>
-                                            tx in bucket <span class="red_text" id="cursortext_bucket_amount_bucket">NaN</span>
-                                        </span>
-                                    </p>
-                                </div>
-
-
-                                <div class="tab-pane fade" id="nav-bucket-value" role="tabpanel" aria-labelledby="nav-bucket-value-tab">
-                                    <p class="card-text text_center cursortext">
-                                        <span id="cursortext_bucket_value">
-                                            <span class="red_text" id="cursortext_bucket_value_date"></span>
-                                            - <span class="red_text" id="cursortext_bucket_value_value">NaN</span> BTC
-                                            tx in bucket <span class="red_text" id="cursortext_bucket_value_bucket">NaN</span>
-                                        </span>
-                                    </p>
-                                </div>
-
-                                <div class="tab-pane fade" id="nav-bucket-size" role="tabpanel" aria-labelledby="nav-bucket-size-tab">
-                                    <p class="card-text text_center cursortext">
-                                        <span id="cursortext_bucket_size">
-                                            <span class="red_text" id="cursortext_bucket_size_date"></span>
-                                            - <span class="red_text" id="cursortext_bucket_size_size">NaN</span> MB
-                                            tx in bucket <span class="red_text" id="cursortext_bucket_size_bucket">NaN</span>
-                                        </span>
-                                    </p>
-                                </div>
-
-                                <div class="tab-pane fade" id="nav-segwit" role="tabpanel" aria-labelledby="nav-segwit-tab">
-                                    <p class="card-text text_center cursortext">
-                                        <span id="cursortext_segwit">
-                                            <span class="red_text" id="cursortext_segwit_date"></span>
-                                            - <span class="red_text" id="cursortext_segwit_amount">NaN</span>
-                                             <span class="red_text" id="cursortext_segwit_type">NaN</span> tx
-                                        </span>
-                                    </p>
-                                </div>
-
-                                <div class="tab-pane fade" id="nav-outputs" role="tabpanel" aria-labelledby="nav-outputs-tab">
-                                    <p class="card-text text_center cursortext">
-                                        <span id="cursortext_output">
-                                            <span class="red_text" id="cursortext_output_date"></span>
-                                            - <span class="red_text" id="cursortext_output_value">NaN</span>
-                                            <span class="red_text" id="cursortext_output_type">NaN</span> outputs
-                                        </span>
-                                    </p>
-                                    <br>
+                                <div class="tab-pane fade" id="outputs" role="tabpanel" aria-labelledby="nav-outputs-tab">
                                     <div class="container text_center" >
                                       <div class="row">
                                         <div class="col">
@@ -319,6 +259,7 @@
                                     </div>
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
