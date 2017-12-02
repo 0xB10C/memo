@@ -334,13 +334,10 @@ window.onload = function () {
         loadTXinfo();
     }
 
-    $(function(){
+
       var hash = window.location.hash;
       hash && $('ul.nav a[href="' + hash + '"]').tab('show');
-      $('.nav-tabs a').click(function (e) {
-          if(this.hash) window.location.hash = this.hash;
-      });
-    });
+
 
     // onChangeListener for the confirm sound checkbox
     $('#card_info_tx_confirmed_sound_checkbox').change(function(){
@@ -364,8 +361,12 @@ window.onload = function () {
 
 
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-        switch (e.target.id) {
 
+        var scrollPos = $(window).scrollTop(); // save current scroll position
+        window.location.hash = e.target.attributes[3].nodeValue;
+        $(window).scrollTop(scrollPos); // keep scroll at current position
+
+        switch (e.target.id) {
             case "nav-amount-4h":
                 graph.updateOptions($.extend(optionBuilder({name:"feelevel-amount",timespan:4}), {file: "/dyn/feelevel_amount4h.csv"}),false);break;
             case "nav-amount-24h":
