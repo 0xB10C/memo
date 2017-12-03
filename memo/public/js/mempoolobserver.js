@@ -352,6 +352,7 @@ window.onload = function () {
 
             default: buildGraph('/dyn/feelevel_amount4h.csv', optionBuilder({name:"feelevel-amount",timespan:4}));
         }
+        scroll(0,0); // keep scroll at top
     }else{
         buildGraph('/dyn/feelevel_amount4h.csv', optionBuilder({name:"feelevel-amount",timespan:4}));
     }
