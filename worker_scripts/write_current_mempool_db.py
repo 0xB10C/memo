@@ -21,11 +21,10 @@ if __name__ == "__main__":
     config.read('config.ini')
     db = connect_to_database(config)
 
-
     mempool = ""
     for line in sys.stdin:
         mempool += line.rstrip()
-        
+
     mempool = json.loads(mempool)
 
     feerates_count = {}
