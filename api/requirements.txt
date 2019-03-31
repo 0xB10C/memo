@@ -1,9 +1,11 @@
 Click==7.0
 Flask==1.0.2
+Flask-MySQL==1.4.0
 itsdangerous==1.1.0
 Jinja2==2.10
 MarkupSafe==1.1.1
 mysql-connector==2.1.6
 pkg-resources==0.0.0
+PyMySQL==0.9.3
 uWSGI==2.0.18
 Werkzeug==0.15.1

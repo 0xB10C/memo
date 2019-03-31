@@ -1,21 +1,25 @@
 import json
 import datetime
 import configparser
-import mysql.connector
+
 
 from flask import Flask, Response, Blueprint, jsonify
-
-app = Flask(__name__)
+from flaskext.mysql import MySQL
 
 config = configparser.ConfigParser()
 config.read('config.ini')
 
-db = mysql.connector.connect(
-    host=config['DATABASE']['DBHOST'],
-    user=config['DATABASE']['DBUSER'],
-    passwd=config['DATABASE']['DBPASSWORD'],
-    database=config['DATABASE']['DBNAME']
-)
+app = Flask(__name__)
+mysql = MySQL()
+
+# MySQL configurations
+app.config['MYSQL_DATABASE_USER'] = config['DATABASE']['DBUSER']
+app.config['MYSQL_DATABASE_PASSWORD'] = config['DATABASE']['DBPASSWORD']
+app.config['MYSQL_DATABASE_DB'] = config['DATABASE']['DBNAME']
+app.config['MYSQL_DATABASE_HOST'] = config['DATABASE']['DBHOST']
+mysql.init_app(app)
+
+conn = mysql.connect()
 
 CORS = "*"
 
@@ -24,11 +28,13 @@ CORS = "*"
 def get_current_mempool(by):
 
     if by == "byCount" or by == "bySize":
-        cursor = db.cursor()
+        cursor = conn.cursor()
         sql = "SELECT timestamp, %s FROM current_mempool WHERE id = 1" % (by)
 
         cursor.execute(sql)
         timestamp, data = cursor.fetchone()
+
+        cursor.close()
 
         a = {'timestamp': (timestamp - datetime.datetime(1970, 1, 1)
                            ).total_seconds(), 'data': json.loads(data)}
