@@ -1,6 +1,6 @@
 body {
-  color: #a7c6db;
-  background-color: #0d2738;
+  /*color: #a7c6db;
+  background-color: #0d2738;*/
 }
 
 .wrapper {
@@ -20,13 +20,18 @@ h1 {
 .c3 .c3-axis-x line,
 .c3 .c3-axis-y path,
 .c3 .c3-axis-y line {
-    stroke: #a7c6db;
+    stroke: black;
 }
+
+.c3 .c3-xgrid-focus line {
+  visibility: hidden !important;
+}
+
 
 .c3 .c3-axis-x g,
 .c3 .c3-axis-y g,
 .c3 .c3-legend-item-data text {
-    fill: #a7c6db;
+    fill: black;
 }
 
 /* https://github.com/c3js/c3/issues/210 */
