@@ -1,20 +1,20 @@
 window.onload = function () {
 
-
-  // Make a request for a user with a given ID
-  axios.get('https://mempool.observer/api/mempool/byCount')
+  axios.get('https://mempool.observer/api/mempool')
     .then(function (response) {
       console.log(response.data.timestamp)
-      draw(response.data.mempoolData)
+      draw(response.data)
     })
 }
 
-function draw(data) {
+function draw(response) {
+
   const sizes = []
+  const lines = []
   const colData = []
   const grpData = []
 
-  for (var feerate in data) {
+  for (var feerate in response.mempoolData) {
     colData.push([feerate.toString(), data[feerate]]);
     sizes.push(Math.log1p(data[feerate]))
     grpData.push(feerate)
@@ -24,6 +24,10 @@ function draw(data) {
   var colorPattern = chroma.bezier(['#0d2738', 'hotpink'])
     .scale().mode('lch').classes(logLimits)
     .correctLightness().colors(colData.length);
+
+  for (var position in response.positionsInGreedyBlocks) {
+    lines.push({ value: position, text: position, position: 'start' })
+  }
 
   var chart = c3.generate({
     data: {
@@ -42,10 +46,7 @@ function draw(data) {
     color: { pattern: colorPattern },
     grid: {
       y: {
-        lines: [
-          { value: 15000, text: 'next Block', position: 'start' },
-          { value: 13000, text: '2nd next Block', position: 'start' },
-        ]
+        lines: lines
       }
     }
   })

@@ -40,19 +40,20 @@ def executeSQL(sql, conn):
 
 
 @app.route("/api/mempool", methods=['GET'])
-def get_current_mempool(by):
+def get_current_mempool():
 
-    sql = "SELECT timestamp, byCount FROM current_mempool WHERE id = 1"
+    sql = "SELECT timestamp, byCount, positionsInGreedyBlocks FROM current_mempool WHERE id = 1"
 
     cursor = executeSQL(sql, conn)
-    timestamp, data = cursor.fetchone()
+    timestamp, data, positionsInGreedyBlocks = cursor.fetchone()
     cursor.close()
 
     resp = jsonify({
         'timestamp': (timestamp - datetime.datetime(1970, 1, 1)).total_seconds(),
-        'mempoolData': json.loads(data)
-        })
-    
+        'mempoolData': json.loads(data),
+        'positionsInGreedyBlocks': json.loads(positionsInGreedyBlocks)
+    })
+
     resp.status_code = 200
     return resp
 
