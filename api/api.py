@@ -39,26 +39,22 @@ def executeSQL(sql, conn):
         return cursor
 
 
-@app.route("/api/mempool/<path:by>", methods=['GET'])
+@app.route("/api/mempool", methods=['GET'])
 def get_current_mempool(by):
 
-    if by == "byCount" or by == "bySize":
+    sql = "SELECT timestamp, byCount FROM current_mempool WHERE id = 1"
 
-        sql = "SELECT timestamp, %s FROM current_mempool WHERE id = 1" % (by)
+    cursor = executeSQL(sql, conn)
+    timestamp, data = cursor.fetchone()
+    cursor.close()
 
-        cursor = executeSQL(sql, conn)
-        timestamp, data = cursor.fetchone()
-        cursor.close()
-
-        resp = jsonify({
-            'timestamp': (timestamp - datetime.datetime(1970, 1, 1)).total_seconds(),
-            'mempoolData': json.loads(data)
-            })
-        
-        resp.status_code = 200
-        return resp
-    else:
-        return Response("500 Internal Server Error" + by, status=500)
+    resp = jsonify({
+        'timestamp': (timestamp - datetime.datetime(1970, 1, 1)).total_seconds(),
+        'mempoolData': json.loads(data)
+        })
+    
+    resp.status_code = 200
+    return resp
 
 
 @app.after_request
