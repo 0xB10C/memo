@@ -48,9 +48,9 @@ if __name__ == "__main__":
 
         memlist.append((feerate, tx['size']))
 
-        if feerate not in feerates_count:
-            feerates_count[feerate] = 0
-        feerates_count[feerate] += 1
+        if feerate_int not in feerates_count:
+            feerates_count[feerate_int] = 0
+        feerates_count[feerate_int] += 1
 
 
     memlist_position = len(memlist)
