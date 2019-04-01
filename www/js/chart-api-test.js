@@ -5,13 +5,11 @@ window.onload = function () {
   axios.get('https://mempool.observer/api/mempool/byCount')
     .then(function (response) {
       console.log(response.data.timestamp)
-      draw(response.data.data)
+      draw(response.data.mempoolData)
     })
 }
 
 function draw(data) {
-
-
   const sizes = []
   const colData = []
   const grpData = []
