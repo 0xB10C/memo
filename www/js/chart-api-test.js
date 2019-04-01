@@ -15,8 +15,8 @@ function draw(response) {
   const grpData = []
 
   for (var feerate in response.mempoolData) {
-    colData.push([feerate.toString(), data[feerate]]);
-    sizes.push(Math.log1p(data[feerate]))
+    colData.push([feerate.toString(), response.mempoolData[feerate]]);
+    sizes.push(Math.log1p(response.mempoolData[feerate]))
     grpData.push(feerate)
   }
 
