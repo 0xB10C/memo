@@ -3,10 +3,9 @@
 
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no" />
-  <!--meta name="viewport" content="width=1200, initial-scale=0.5"-->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="theme-color" content="#0d2738" />
+  <meta name="theme-color" content="#ffffff" />
   <link rel="icon" sizes="256x256" href="img/og_preview.png">
   <meta name="description"
     content="This page visualizes the current mempool of my bitcoin node. You can lookup your unconfirmed transaction enable an alert once it confirms.">
@@ -19,44 +18,122 @@
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:site" content="@mempoolobserver" />
   <meta name="twitter:creator" content="@0xb10c" />
-  <link rel="icon" href="favicon.png">
+  <link rel="icon" href="img/favicon.png">
 
   <title>mempool.observer</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+    integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.14/c3.min.css"
+    integrity="sha256-dXVyk6v2KygjX+OEHMrEQlRtxFPnXBdFKpuNo/c033Q=" crossorigin="anonymous" />
+  <link href="css/main.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://mempool.observer/css/chart-api-test.css">
 
-  <link href="/css/main.css" rel="stylesheet">
 
 </head>
 
 <body>
-  <header role="banner">
-    <h1>mempool.observer</h1>
-    <nav role="navigation">
+  <header>
+    <nav class="navbar navbar-expand-md navbar-white bg-white fixed-top shadow-sm">
+      <div class="container">
+        <a class="navbar-brand" href="#"">
+          <img src=" img/favicon.png" width="30" height="30" class="d-inline-block" alt="">
+        </a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+          aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="  nav-link" href="#">Current<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Historical</a>
+            </li>
+          </ul>
+          <button class="btn my-2 my-sm-0 btn-outline-secondary" onclick="alert('not part of the mvp :)');">
+            <i class="fas fa-adjust"></i>
+          </button>
+        </div>
+
+      </div>
     </nav>
   </header>
 
-  <main role="main">
+  <main role="main" class="container py-4">
 
-    <section>
-      <header>
-        <h2>Heading</h2>
-      </header>
+    <div class="card my-auto shadow-sm bg-white">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-5">
 
-      <article id="introduction">
-        <h3>Sub Heading 1</h3>
-        <p></p>
-      </article>
+            <h3 class="card-title">Current Bitcoin Mempool</h3>
+            <h5 class="card-subtitle mb-2 text-muted">Short but descriptive sub-heading</h5>
 
-      <article id="">
-        <h3>Sub Heading 2</h3>
-      </article>
-    </section>
+            <p class="card-text">
+              Here is place for more detailed text.
+              This is a wider card with supporting text below as a natural lead-in to additional
+              content. This content is a little bit longer.</p>
+
+            <p class="card-text">
+              Here is place for more detailed text.
+              This is a wider card with supporting text below as a natural lead-in to additional
+              content. This content is a little bit longer.</p>
+
+            <p class="card-text">
+              55.000 unconfirmed Transactions (37 MB)</p>
+
+            <label for="input-txid-lookup">Transaction Lookup</label>
+            <div class="input-group mb-3">
+              <input type="text" id="input-lookup-txid" class="form-control"
+                placeholder="4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b" aria-label="txid"
+                aria-describedby="button-lookup-txid">
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" id="button-lookup-txid">
+                  <i class="fas fa-search-location"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-7">
+            <div id="chart" class="my-3"></div>
+          </div>
+
+        </div>
+      </div>
+      <div class="card-footer text-muted text-right">
+        <small class="text-muted">Mempool data last updated 3 minutes ago</small>
+      </div>
+    </div>
   </main>
 
-
-  <footer role="contentinfo">
-
-    <small>Copyright &copy; <time>2019</time></small>
-
+  <footer class="footer bg-white">
+    <div class="container">
+      <span class="text-muted">Copyright 123</span>
+    </div>
   </footer>
 
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+  </script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.min.js"
+    integrity="sha256-k9RyZhvMj2bg0fd8L3IE41t0HpTXnivMoePN/Ksq250=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"
+    integrity="sha256-mpnrJ5DpEZZkwkE1ZgkEQQJW/46CSEh/STrZKOB/qoM=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.14/c3.min.js"
+    integrity="sha256-FSwELgAIM0rd8f7jcw6VH5LlIsVk8/WbssJ2nErPmX0=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.0.3/chroma.min.js"
+    integrity="sha256-CnfzubvVAsthq0pwKJW1NedqCx5NoWbxyyF3of+CzYY=" crossorigin="anonymous"></script>
+  <script src="https://mempool.observer/js/chart-api-test.js">
+  </script>
+
 </body>
+</html>
