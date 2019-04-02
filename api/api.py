@@ -32,7 +32,7 @@ def executeSQL(sql, conn):
         cursor = conn.cursor()
         cursor.execute(sql)
         return cursor
-    except pymysql.err.OperationalError:
+    except (pymysql.err.OperationalError, pymysql.err.InterfaceError) as e:
         conn = mysql.connect()  # reconnect
         cursor = conn.cursor()
         cursor.execute(sql)
