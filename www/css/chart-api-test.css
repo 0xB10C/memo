@@ -1,0 +1,37 @@
+body {
+  /*color: #a7c6db;
+  background-color: #0d2738;*/
+}
+
+.wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+h1 {
+  text-align: center;
+}
+
+#chart {
+  text-align: center;
+}
+
+.c3 .c3-axis-x path,
+.c3 .c3-axis-x line,
+.c3 .c3-axis-y path,
+.c3 .c3-axis-y line {
+    stroke: black;
+}
+
+.c3 .c3-xgrid-focus line {
+  visibility: hidden !important;
+}
+
+
+.c3 .c3-axis-x g,
+.c3 .c3-axis-y g,
+.c3 .c3-legend-item-data text {
+    fill: black;
+}
+
+/* https://github.com/c3js/c3/issues/210 */
