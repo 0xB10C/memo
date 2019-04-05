@@ -1,12 +1,13 @@
 var chart
+var timeSinceLastUpdate = 0
 
 function generateColorPattern(patternAreas) {
 
   const patternColors = [
-    ['darkslateblue', '667eea'],
-    ['ff009f', 'ff9200'],
-    ['red', 'blue'],
-    ['hotpink', 'darkblue'],
+    ['LightGreen', 'YellowGreen'],
+    ['YellowGreen', 'Bisque'],
+    ['Bisque', 'Salmon'],
+    ['Salmon', 'HotPink'],
   ]
 
   var colorPattern = []
@@ -26,7 +27,7 @@ function generateColorPattern(patternAreas) {
 
 
 function processApiMempoolDataForChart(response) {
-  console.log(response.timestamp)
+  console.log('Processed data at timestamp: ', response.timestamp)
 
   const patternAreas = {
     '0to10': [],
@@ -58,11 +59,19 @@ function processApiMempoolDataForChart(response) {
     }
   }
 
+  // Draw lines to show estimated block sizes on the mempool graph
   for (var position in response.positionsInGreedyBlocks) {
-    if (position < 3) {
+    if (position == 0) {
       lines.push({
         value: response.positionsInGreedyBlocks[position],
-        text: Number(position) + 1,
+        text: 'Next block (~1MB)',
+        position: 'start'
+      })
+    }
+    if (position > 0 && position < 3) {
+      lines.push({
+        value: response.positionsInGreedyBlocks[position],
+        text: `${Number(position) + 1} blocks from now`,
         position: 'start'
       })
     }
@@ -80,8 +89,10 @@ function processApiMempoolDataForChart(response) {
 window.onload = function () {
   axios.get('https://mempool.observer/api/mempool')
     .then(function (response) {
+      console.log(response.data)
       processed = processApiMempoolDataForChart(response.data)
       draw(processed)
+      updateMainPage(processed)
       redraw()
     })
 }
@@ -101,11 +112,29 @@ function draw(processed) {
       show: false
     },
     tooltip: {
-      grouped: false
+      grouped: false,
+      format: {
+        title: function (x, index) { return 'Tx: 129...231'; },
+        name: function (name, ratio, id, index) { return name + ' sat/byte'; },
+        value: function (value, ratio, id, index) {
+          if (id <= 10) {
+            return 'low'
+          } else if (id <= 100) {
+            return 'medium'
+          } else if (id <= 1000) {
+            return 'high'
+          } else {
+            return 'super high'
+          }
+        }
+      }
     },
     size: {
       height: 750,
-      width: 350
+      width: 450
+    },
+    bar: {
+      width: 140
     },
     color: {
       pattern: processed.colorPattern
@@ -115,6 +144,23 @@ function draw(processed) {
         lines: processed.lines
       }
     },
+    axis: {
+      x : {
+        padding: {
+          left: 400,
+          right: 400
+        }
+      },
+      y: {
+        label: {
+          text: 'Unconfirmed transactions'
+        },
+        tick: {
+          count: 1,
+          values: [Object.values(processed.rowData[1]).reduce((a, b) => a + b, 0)] // Sum all txs
+        }
+      }
+    }
   })
 }
 
@@ -124,8 +170,21 @@ function redraw() {
       .then(function (response) {
         processed = processApiMempoolDataForChart(response.data)
         draw(processed)
+        updateMainPage(processed)
         redraw()
       });
   }, 60000);
-
 }
+
+function updateMainPage(processed) {
+  const total = [Object.values(processed.rowData[1]).reduce((a, b) => a + b, 0)]
+  document.getElementById('total-transactions').innerHTML = total + ' unconfirmed transasctions (23 MB).' // TODO: get size of mempool from API
+
+  timeSinceLastUpdate = 0
+  document.getElementById('last-update').innerHTML = 'last updated ' + timeSinceLastUpdate + ' minutes ago'
+}
+
+setInterval(function() {
+  timeSinceLastUpdate += 1
+  document.getElementById('last-update').innerHTML = 'last updated ' + timeSinceLastUpdate + ' minutes ago'
+}, 60000);

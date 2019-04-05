@@ -22,11 +22,25 @@ h1 {
 .c3 .c3-axis-y line {
     stroke: black;
 }
+.c3-axis-x .tick {
+  display: none;
+}
 
 .c3 .c3-xgrid-focus line {
   visibility: hidden !important;
 }
 
+.c3 .c3-ygrid-line line {
+  margin-left: 20px;
+}
+
+.c3 .c3-axis-y-label {
+  font-size: 1.2em;
+}
+
+.c3 .tick {
+  font-size: 1.4em;
+}
 
 .c3 .c3-axis-x g,
 .c3 .c3-axis-y g,
