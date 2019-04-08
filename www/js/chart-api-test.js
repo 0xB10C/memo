@@ -1,5 +1,6 @@
 var chart
 var timeSinceLastUpdate = 0
+var focused = false
 
 function generateColorPattern(patternAreas) {
 
@@ -24,7 +25,6 @@ function generateColorPattern(patternAreas) {
 
   return colorPattern
 }
-
 
 function processApiMempoolDataForChart(response) {
   console.log('Processed data at timestamp: ', response.timestamp)
@@ -87,6 +87,19 @@ function processApiMempoolDataForChart(response) {
 }
 
 window.onload = function () {
+  // Add event listener for the search bar
+  document.getElementById('button-lookup-txid').addEventListener('click', handleTxSearch)
+  // Add one more so that we can reset focus of the chart
+  document.body.addEventListener('click', function(e) {
+    var targetElement = event.target || event.srcElement;
+    if (focused && targetElement.tagName !== 'BUTTON' && targetElement.tagName !== 'I') {
+      chart.tooltip.hide()
+      chart.focus()
+      focused = false
+    }
+  })
+
+  // Get the mempool data 
   axios.get('https://mempool.observer/api/mempool')
     .then(function (response) {
       console.log(response.data)
@@ -114,11 +127,11 @@ function draw(processed) {
     tooltip: {
       grouped: false,
       format: {
-        title: function (x, index) { return 'Tx: 129...231'; },
+        title: function (x, index) { return 'Transaction'; },
         name: function (name, ratio, id, index) { return name + ' sat/byte'; },
         value: function (value, ratio, id, index) {
           if (id <= 10) {
-            return 'low'
+            return 'low, ' + 'value: ' + value + ', id: ' + id + ', index: ' + index
           } else if (id <= 100) {
             return 'medium'
           } else if (id <= 1000) {
@@ -184,7 +197,23 @@ function updateMainPage(processed) {
   document.getElementById('last-update').innerHTML = 'last updated ' + timeSinceLastUpdate + ' minutes ago'
 }
 
+// Update the 'Time since last update' text
 setInterval(function() {
   timeSinceLastUpdate += 1
   document.getElementById('last-update').innerHTML = 'last updated ' + timeSinceLastUpdate + ' minutes ago'
 }, 60000);
+
+function handleTxSearch() {
+  txId = document.getElementById('input-lookup-txid').value
+
+  // TODO: Handle invalid transaction ids
+
+  // TODO: Create a real search
+  focused = true
+  chart.focus("1");
+  chart.tooltip.show({x: 0, index: 0, id: '1' })
+}
+
+function randomIntFromInterval(min,max) {
+  return Math.floor(Math.random()*(max-min+1)+min);
+}
