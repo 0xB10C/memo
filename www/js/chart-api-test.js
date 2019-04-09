@@ -175,6 +175,13 @@ function draw(processed) {
       }
     }
   })
+
+  // Refocus the chart if was focused before a 'redraw'
+  if (focused) {
+    // TODO: focus on actual data
+    chart.focus("1");
+    chart.tooltip.show({x: 0, index: 0, id: '1' })
+  }
 }
 
 function redraw() {
@@ -212,8 +219,4 @@ function handleTxSearch() {
   focused = true
   chart.focus("1");
   chart.tooltip.show({x: 0, index: 0, id: '1' })
-}
-
-function randomIntFromInterval(min,max) {
-  return Math.floor(Math.random()*(max-min+1)+min);
 }
