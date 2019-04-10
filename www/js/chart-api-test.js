@@ -211,12 +211,30 @@ setInterval(function() {
 }, 60000);
 
 function handleTxSearch() {
+  clearAlerts()
   txId = document.getElementById('input-lookup-txid').value
-
-  // TODO: Handle invalid transaction ids
+  // TODO: Improve handling of invalid tx ids
+  if (txId === '') {
+    return showAlert()
+  }
 
   // TODO: Create a real search
   focused = true
   chart.focus("1");
   chart.tooltip.show({x: 0, index: 0, id: '1' })
+}
+
+function showAlert() {
+  const alert = `<div class="alert alert-tx alert-warning alert-dismissible fade show shadow-sm border-warning" role="alert">
+                  We could not find your transaction, type something into the input field (CHANGE LATER)
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>`
+  
+  $('#main').prepend(alert)
+}
+
+function clearAlerts() {
+  $('.alert-tx').hide()
 }
