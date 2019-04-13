@@ -84,7 +84,10 @@
               content. This content is a little bit longer.</p>
 
             <p id="total-transactions" class="card-text">
-              0 unconfirmed Transactions (0 MB)</p>
+              <span id="current-mempool-count">0</span>
+              unconfirmed Transactions 
+              (<span id="current-mempool-size">0</span> <span id="current-mempool-unit">MB</span>)
+              </p>
 
             <label for="input-txid-lookup">Transaction Lookup</label>
             <div class="input-group mb-3">
@@ -106,7 +109,10 @@
         </div>
       </div>
       <div class="card-footer text-muted text-right">
-        <small id="last-update" class="text-muted">last updated 0 minutes ago</small>
+        <small id="last-update" class="text-muted">
+          last updated 
+          <span id="current-mempool-last-update">0</span>
+          minutes ago</small>
       </div>
     </div>
 

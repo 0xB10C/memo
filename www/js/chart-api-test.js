@@ -1,5 +1,6 @@
 var chart
 var timeSinceLastUpdate = 0
+var lastMempoolDataUpdate = 0
 var focused = false
 
 function generateColorPattern(patternAreas) {
@@ -27,7 +28,9 @@ function generateColorPattern(patternAreas) {
 }
 
 function processApiMempoolDataForChart(response) {
-  console.log('Processed data at timestamp: ', response.timestamp)
+
+  console.log('Mempool data written to db @ ', response.timestamp)
+  lastMempoolDataUpdate = response.timestamp  
 
   const patternAreas = {
     '0to10': [],
@@ -59,7 +62,7 @@ function processApiMempoolDataForChart(response) {
     }
   }
 
-  // Draw lines to show estimated block sizes on the mempool graph
+  // Draw lines to show estimated next blocks on the mempool graph
   for (var position in response.positionsInGreedyBlocks) {
     if (position == 0) {
       lines.push({
@@ -105,8 +108,7 @@ window.onload = function () {
       console.log(response.data)
       processed = processApiMempoolDataForChart(response.data)
       draw(processed)
-      updateMainPage(processed)
-      redraw()
+      updateCurrentMempoolCard(processed)
     })
 }
 
@@ -166,11 +168,12 @@ function draw(processed) {
       },
       y: {
         label: {
-          text: 'Unconfirmed transactions'
+          text: 'transactions in mempool'
         },
         tick: {
           count: 1,
-          values: [Object.values(processed.rowData[1]).reduce((a, b) => a + b, 0)] // Sum all txs
+          // Sum all txs to get the total number of tx in the mempool
+          values: [Object.values(processed.rowData[1]).reduce((a, b) => a + b, 0)] 
         }
       }
     }
@@ -190,30 +193,52 @@ function redraw() {
       .then(function (response) {
         processed = processApiMempoolDataForChart(response.data)
         draw(processed)
-        updateMainPage(processed)
+        updateCurrentMempoolCard(processed)
         redraw()
       });
   }, 60000);
 }
 
-function updateMainPage(processed) {
-  const total = [Object.values(processed.rowData[1]).reduce((a, b) => a + b, 0)]
-  document.getElementById('total-transactions').innerHTML = total + ' unconfirmed transasctions (23 MB).' // TODO: get size of mempool from API
+function updateCurrentMempoolCard(processed) { //TODO: Change name of function
+
+  const spanTxCount = document.getElementById('current-mempool-count')
+  const spanMempoolSize = document.getElementById('current-mempool-size')
+  const spanMempoolSizeUnit = document.getElementById('current-mempool-unit')
+
+  const txCountInMempool = [Object.values(processed.rowData[1]).reduce((a, b) => a + b, 0)]  // Sum all txs to get the total number of tx in the mempool
+  const txSizeInMempool = 123 //TODO: get size of mempool from API
+  const txSizeInMempoolUnit = "MB" // TODO: determine unit of display
+
+  spanTxCount.innerHTML = txCountInMempool
+  spanMempoolSize.innerHTML = txSizeInMempool
+  spanMempoolSizeUnit.innerHTML = txSizeInMempoolUnit 
 
   timeSinceLastUpdate = 0
-  document.getElementById('last-update').innerHTML = 'last updated ' + timeSinceLastUpdate + ' minutes ago'
+  updateCurrentMempoolCardLastUpdated()
+}
+
+
+function updateCurrentMempoolCardLastUpdated() {
+  // format as milliseconds since 1.1.1970 UTC
+  // -  -3600*2 to remove 2h from GMT+2 TODO: fix that in the database side?
+  // -  *1000 to convert from seconds to milliseconds
+  const millislastMempoolDataUpdate = (lastMempoolDataUpdate - 3600 * 2) * 1000
+
+  const minutes = Math.floor((Date.now() -  millislastMempoolDataUpdate) / 1000 / 60)
+
+  document.getElementById('current-mempool-last-update').innerHTML = (minutes)
 }
 
 // Update the 'Time since last update' text
 setInterval(function() {
-  timeSinceLastUpdate += 1
-  document.getElementById('last-update').innerHTML = 'last updated ' + timeSinceLastUpdate + ' minutes ago'
-}, 60000);
+  updateCurrentMempoolCardLastUpdated()
+}, 10000);
 
 function handleTxSearch() {
   clearAlerts()
   txId = document.getElementById('input-lookup-txid').value
   // TODO: Improve handling of invalid tx ids
+  // ==> check input with regex to be conform to ^[a-fA-F0-9]{64}$
   if (txId === '') {
     return showAlert()
   }
