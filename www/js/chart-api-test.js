@@ -1,12 +1,15 @@
 var chart
+var timeSinceLastUpdate = 0
+var lastMempoolDataUpdate = 0
+var focused = false
 
 function generateColorPattern(patternAreas) {
 
   const patternColors = [
-    ['darkslateblue', '667eea'],
-    ['ff009f', 'ff9200'],
-    ['red', 'blue'],
-    ['hotpink', 'darkblue'],
+    ['LightGreen', 'YellowGreen'],
+    ['YellowGreen', 'Bisque'],
+    ['Bisque', 'Salmon'],
+    ['Salmon', 'HotPink'],
   ]
 
   var colorPattern = []
@@ -24,9 +27,10 @@ function generateColorPattern(patternAreas) {
   return colorPattern
 }
 
-
 function processApiMempoolDataForChart(response) {
-  console.log(response.timestamp)
+
+  console.log('Mempool data written to db @ ', response.timestamp)
+  lastMempoolDataUpdate = response.timestamp  
 
   const patternAreas = {
     '0to10': [],
@@ -58,11 +62,19 @@ function processApiMempoolDataForChart(response) {
     }
   }
 
+  // Draw lines to show estimated next blocks on the mempool graph
   for (var position in response.positionsInGreedyBlocks) {
-    if (position < 3) {
+    if (position == 0) {
       lines.push({
         value: response.positionsInGreedyBlocks[position],
-        text: Number(position) + 1,
+        text: 'Next block (~1MB)',
+        position: 'start'
+      })
+    }
+    if (position > 0 && position < 3) {
+      lines.push({
+        value: response.positionsInGreedyBlocks[position],
+        text: `${Number(position) + 1} blocks from now`,
         position: 'start'
       })
     }
@@ -78,11 +90,25 @@ function processApiMempoolDataForChart(response) {
 }
 
 window.onload = function () {
+  // Add event listener for the search bar
+  document.getElementById('button-lookup-txid').addEventListener('click', handleTxSearch)
+  // Add one more so that we can reset focus of the chart
+  document.body.addEventListener('click', function(e) {
+    var targetElement = event.target || event.srcElement;
+    if (focused && targetElement.tagName !== 'BUTTON' && targetElement.tagName !== 'I') {
+      chart.tooltip.hide()
+      chart.focus()
+      focused = false
+    }
+  })
+
+  // Get the mempool data 
   axios.get('https://mempool.observer/api/mempool')
     .then(function (response) {
+      console.log(response.data)
       processed = processApiMempoolDataForChart(response.data)
       draw(processed)
-      redraw()
+      updateCurrentMempoolCard(processed)
     })
 }
 
@@ -101,11 +127,29 @@ function draw(processed) {
       show: false
     },
     tooltip: {
-      grouped: false
+      grouped: false,
+      format: {
+        title: function (x, index) { return 'Transaction'; },
+        name: function (name, ratio, id, index) { return name + ' sat/byte'; },
+        value: function (value, ratio, id, index) {
+          if (id <= 10) {
+            return 'low, ' + 'value: ' + value + ', id: ' + id + ', index: ' + index
+          } else if (id <= 100) {
+            return 'medium'
+          } else if (id <= 1000) {
+            return 'high'
+          } else {
+            return 'super high'
+          }
+        }
+      }
     },
     size: {
       height: 750,
-      width: 350
+      width: 450
+    },
+    bar: {
+      width: 140
     },
     color: {
       pattern: processed.colorPattern
@@ -115,7 +159,32 @@ function draw(processed) {
         lines: processed.lines
       }
     },
+    axis: {
+      x : {
+        padding: {
+          left: 400,
+          right: 400
+        }
+      },
+      y: {
+        label: {
+          text: 'transactions in mempool'
+        },
+        tick: {
+          count: 1,
+          // Sum all txs to get the total number of tx in the mempool
+          values: [Object.values(processed.rowData[1]).reduce((a, b) => a + b, 0)] 
+        }
+      }
+    }
   })
+
+  // Refocus the chart if was focused before a 'redraw'
+  if (focused) {
+    // TODO: focus on actual data
+    chart.focus("1");
+    chart.tooltip.show({x: 0, index: 0, id: '1' })
+  }
 }
 
 function redraw() {
@@ -124,8 +193,73 @@ function redraw() {
       .then(function (response) {
         processed = processApiMempoolDataForChart(response.data)
         draw(processed)
+        updateCurrentMempoolCard(processed)
         redraw()
       });
   }, 60000);
+}
 
+function updateCurrentMempoolCard(processed) { //TODO: Change name of function
+
+  const spanTxCount = document.getElementById('current-mempool-count')
+  const spanMempoolSize = document.getElementById('current-mempool-size')
+  const spanMempoolSizeUnit = document.getElementById('current-mempool-unit')
+
+  const txCountInMempool = [Object.values(processed.rowData[1]).reduce((a, b) => a + b, 0)]  // Sum all txs to get the total number of tx in the mempool
+  const txSizeInMempool = 123 //TODO: get size of mempool from API
+  const txSizeInMempoolUnit = "MB" // TODO: determine unit of display
+
+  spanTxCount.innerHTML = txCountInMempool
+  spanMempoolSize.innerHTML = txSizeInMempool
+  spanMempoolSizeUnit.innerHTML = txSizeInMempoolUnit 
+
+  timeSinceLastUpdate = 0
+  updateCurrentMempoolCardLastUpdated()
+}
+
+
+function updateCurrentMempoolCardLastUpdated() {
+  // format as milliseconds since 1.1.1970 UTC
+  // -  -3600*2 to remove 2h from GMT+2 TODO: fix that in the database side?
+  // -  *1000 to convert from seconds to milliseconds
+  const millislastMempoolDataUpdate = (lastMempoolDataUpdate - 3600 * 2) * 1000
+
+  const minutes = Math.floor((Date.now() -  millislastMempoolDataUpdate) / 1000 / 60)
+
+  document.getElementById('current-mempool-last-update').innerHTML = (minutes)
+}
+
+// Update the 'Time since last update' text
+setInterval(function() {
+  updateCurrentMempoolCardLastUpdated()
+}, 10000);
+
+function handleTxSearch() {
+  clearAlerts()
+  txId = document.getElementById('input-lookup-txid').value
+  // TODO: Improve handling of invalid tx ids
+  // ==> check input with regex to be conform to ^[a-fA-F0-9]{64}$
+  if (txId === '') {
+    return showAlert()
+  }
+
+  // TODO: Create a real search
+  focused = true
+  chart.focus("1");
+  chart.tooltip.show({x: 0, index: 0, id: '1' })
+}
+
+function showAlert() {
+  const alert = `<div class="alert alert-tx alert-warning alert-dismissible fade show shadow-sm border-warning" role="alert">
+                  We could not find your transaction, type something into the input field (CHANGE LATER)
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>`
+  
+  $('#main').prepend(alert)
+}
+
+function clearAlerts() {
+  $('.alert-tx').hide()
 }

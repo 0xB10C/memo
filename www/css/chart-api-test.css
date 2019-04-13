@@ -1,6 +1,6 @@
 body {
-  /*color: #a7c6db;
-  background-color: #0d2738;*/
+  /* color: #a7c6db;
+  background-color: #0d2738;  */
 }
 
 .wrapper {
@@ -23,10 +23,29 @@ h1 {
     stroke: black;
 }
 
+.c3 .c3-ygrid-line text {
+  transform: translateX(18px);
+}
+
+.c3-axis-x .tick {
+  display: none;
+}
+
 .c3 .c3-xgrid-focus line {
   visibility: hidden !important;
 }
 
+.c3 .c3-ygrid-line line {
+  margin-left: 20px;
+}
+
+.c3 .c3-axis-y-label {
+  font-size: 1.2em;
+}
+
+.c3 .tick {
+  font-size: 1.4em;
+}
 
 .c3 .c3-axis-x g,
 .c3 .c3-axis-y g,

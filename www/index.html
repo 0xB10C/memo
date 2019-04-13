@@ -63,7 +63,7 @@
     </nav>
   </header>
 
-  <main role="main" class="container py-1">
+  <main id="main" role="main" class="container py-1">
 
     <div class="card my-4 shadow-sm bg-white">
       <div class="card-body">
@@ -83,8 +83,11 @@
               This is a wider card with supporting text below as a natural lead-in to additional
               content. This content is a little bit longer.</p>
 
-            <p class="card-text">
-              55.000 unconfirmed Transactions (37 MB)</p>
+            <p id="total-transactions" class="card-text">
+              <span id="current-mempool-count">0</span>
+              unconfirmed Transactions 
+              (<span id="current-mempool-size">0</span> <span id="current-mempool-unit">MB</span>)
+              </p>
 
             <label for="input-txid-lookup">Transaction Lookup</label>
             <div class="input-group mb-3">
@@ -106,13 +109,16 @@
         </div>
       </div>
       <div class="card-footer text-muted text-right">
-        <small class="text-muted">last updated 3 minutes ago</small>
+        <small id="last-update" class="text-muted">
+          last updated 
+          <span id="current-mempool-last-update">0</span>
+          minutes ago</small>
       </div>
     </div>
-  
+
     <div class="alert alert-warning alert-dismissible fade show shadow-sm border-warning" role="alert">
       <strong>Work in progress!</strong>
-      This is an early prototyp of mempool.observer v2.
+      This is an early prototype of mempool.observer v2.
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
