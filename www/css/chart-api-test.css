@@ -3,28 +3,19 @@ body {
   background-color: #0d2738;  */
 }
 
-.wrapper {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-h1 {
-  text-align: center;
-}
-
-#chart {
-  text-align: center;
+.navbar-white {
+  background: #ffffffea !important;
 }
 
 .c3 .c3-axis-x path,
-.c3 .c3-axis-x line,
-.c3 .c3-axis-y path,
-.c3 .c3-axis-y line {
-    stroke: black;
+.c3 .c3-axis-x line{
+  stroke: transparent;
 }
-
-.c3 .c3-ygrid-line text {
-  transform: translateX(18px);
+.c3 .c3-axis-y path,
+.c3 .c3-axis-y line,
+.c3 .c3-axis-y2 path,
+.c3 .c3-axis-y2 line{
+    stroke: gray;
 }
 
 .c3-axis-x .tick {
@@ -39,7 +30,8 @@ h1 {
   margin-left: 20px;
 }
 
-.c3 .c3-axis-y-label {
+.c3 .c3-axis-y-label,
+.c3 .c3-axis-y2-label {
   font-size: 1.2em;
 }
 

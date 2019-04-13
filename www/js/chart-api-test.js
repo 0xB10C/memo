@@ -1,7 +1,12 @@
+
+const NEXT_BLOCK_LABELS = ["next block", "2nd block", "3rd block"]
+
 var chart
 var timeSinceLastUpdate = 0
 var lastMempoolDataUpdate = 0
 var focused = false
+
+
 
 function generateColorPattern(patternAreas) {
 
@@ -29,7 +34,7 @@ function generateColorPattern(patternAreas) {
 
 function processApiMempoolDataForChart(response) {
 
-  console.log('Mempool data written to db @ ', response.timestamp)
+  console.log('Mempool data written to db @', response.timestamp)
   lastMempoolDataUpdate = response.timestamp  
 
   const patternAreas = {
@@ -39,10 +44,11 @@ function processApiMempoolDataForChart(response) {
     'from1001': []
   }
 
+  const ticks = []
   const lines = []
+  const blocks = []
   const rowData = [
-    [],
-    []
+    [],[]
   ]
 
   for (var feerate in response.mempoolData) {
@@ -62,30 +68,28 @@ function processApiMempoolDataForChart(response) {
     }
   }
 
-  // Draw lines to show estimated next blocks on the mempool graph
+  
   for (var position in response.positionsInGreedyBlocks) {
-    if (position == 0) {
+    if (position < 3) {
+      blocks.push(response.positionsInGreedyBlocks[position])
+      // add lines to show estimated next blocks on the mempool graph
       lines.push({
-        value: response.positionsInGreedyBlocks[position],
-        text: 'Next block (~1MB)',
-        position: 'start'
-      })
-    }
-    if (position > 0 && position < 3) {
-      lines.push({
-        value: response.positionsInGreedyBlocks[position],
-        text: `${Number(position) + 1} blocks from now`,
-        position: 'start'
+        value: response.positionsInGreedyBlocks[position]
       })
     }
   }
 
   let colorPattern = generateColorPattern(patternAreas)
 
+  // Sum all txs to get the total number of tx in the mempool
+  const sum = Object.values(rowData[1]).reduce((a, b) => a + b, 0)
+
   return {
-    'colorPattern': colorPattern,
+    "blocks": blocks,
+    "colorPattern": colorPattern,
     "lines": lines,
-    "rowData": rowData
+    "rowData": rowData,
+    "sum": sum
   }
 }
 
@@ -109,6 +113,7 @@ window.onload = function () {
       processed = processApiMempoolDataForChart(response.data)
       draw(processed)
       updateCurrentMempoolCard(processed)
+      redraw() // init redraw loop
     })
 }
 
@@ -118,7 +123,7 @@ function draw(processed) {
       rows: processed.rowData,
       type: 'bar',
       groups: [processed.rowData[0]],
-      order: null
+      order: null,
     },
     point: {
       show: false
@@ -132,24 +137,22 @@ function draw(processed) {
         title: function (x, index) { return 'Transaction'; },
         name: function (name, ratio, id, index) { return name + ' sat/byte'; },
         value: function (value, ratio, id, index) {
-          if (id <= 10) {
-            return 'low, ' + 'value: ' + value + ', id: ' + id + ', index: ' + index
-          } else if (id <= 100) {
-            return 'medium'
-          } else if (id <= 1000) {
-            return 'high'
-          } else {
-            return 'super high'
+          //if (id <= 10) {
+            return 'value: ' + value + ', id: ' + id + ', index: ' + index
+          //} else if (id <= 100) {
+          //  return 'medium'
+          //} else if (id <= 1000) {
+          //  return 'high'
+          //} else {
+          //  return 'super high'
           }
         }
-      }
     },
     size: {
-      height: 750,
-      width: 450
+      height: 750
     },
-    bar: {
-      width: 140
+    padding: {
+      top: 20
     },
     color: {
       pattern: processed.colorPattern
@@ -160,25 +163,29 @@ function draw(processed) {
       }
     },
     axis: {
-      x : {
-        padding: {
-          left: 400,
-          right: 400
-        }
-      },
       y: {
+        padding: {top: 0},
+        show: true,
         label: {
-          text: 'transactions in mempool'
+          text: processed.sum + ' unconfirmed transactions'
         },
+      },
+      y2: {
+        outer: false,
+        padding: {top: 0, bottom:0},
+        default: [0, processed.sum],
+        label: {
+          text: 'estimated blocks'
+        },
+        show: true,
         tick: {
-          count: 1,
-          // Sum all txs to get the total number of tx in the mempool
-          values: [Object.values(processed.rowData[1]).reduce((a, b) => a + b, 0)] 
+          format: function (d) {return NEXT_BLOCK_LABELS[processed.blocks.indexOf(d)]},
+          values: processed.blocks
         }
       }
     }
   })
-
+  
   // Refocus the chart if was focused before a 'redraw'
   if (focused) {
     // TODO: focus on actual data
@@ -205,7 +212,7 @@ function updateCurrentMempoolCard(processed) { //TODO: Change name of function
   const spanMempoolSize = document.getElementById('current-mempool-size')
   const spanMempoolSizeUnit = document.getElementById('current-mempool-unit')
 
-  const txCountInMempool = [Object.values(processed.rowData[1]).reduce((a, b) => a + b, 0)]  // Sum all txs to get the total number of tx in the mempool
+  const txCountInMempool = processed.sum
   const txSizeInMempool = 123 //TODO: get size of mempool from API
   const txSizeInMempoolUnit = "MB" // TODO: determine unit of display
 
@@ -262,4 +269,16 @@ function showAlert() {
 
 function clearAlerts() {
   $('.alert-tx').hide()
+}
+
+function* range(start, stop, step = 1) {
+  if (typeof stop === 'undefined') {
+      // one param defined
+      stop = start;
+      start = 0;
+  }
+
+  for (let i = start; step > 0 ? i < stop : i > stop; i += step) {
+      yield i;
+  }
 }
