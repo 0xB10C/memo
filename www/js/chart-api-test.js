@@ -134,19 +134,9 @@ function draw(processed) {
     tooltip: {
       grouped: false,
       format: {
-        title: function (x, index) { return 'Transaction'; },
-        name: function (name, ratio, id, index) { return name + ' sat/byte'; },
-        value: function (value, ratio, id, index) {
-          //if (id <= 10) {
-            return 'value: ' + value + ', id: ' + id + ', index: ' + index
-          //} else if (id <= 100) {
-          //  return 'medium'
-          //} else if (id <= 1000) {
-          //  return 'high'
-          //} else {
-          //  return 'super high'
-          }
-        }
+        name: function (name) {return name + ' sat/vbyte'},
+        value: function (value) {return value + ' transactions'},
+      }
     },
     size: {
       height: 750
@@ -167,7 +157,7 @@ function draw(processed) {
         padding: {top: 0},
         show: true,
         label: {
-          text: processed.sum + ' unconfirmed transactions'
+          text: 'unconfirmed transactions'
         },
       },
       y2: {
