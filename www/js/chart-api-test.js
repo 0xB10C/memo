@@ -217,9 +217,8 @@ function updateCurrentMempoolCard(processed) { //TODO: Change name of function
 
 function updateCurrentMempoolCardLastUpdated() {
   // format as milliseconds since 1.1.1970 UTC
-  // -  -3600*2 to remove 2h from GMT+2 TODO: fix that in the database side?
-  // -  *1000 to convert from seconds to milliseconds
-  const millislastMempoolDataUpdate = (lastMempoolDataUpdate - 3600 * 2) * 1000
+  // * 1000 to convert from seconds to milliseconds
+  const millislastMempoolDataUpdate = lastMempoolDataUpdate * 1000
 
   const minutes = Math.floor((Date.now() -  millislastMempoolDataUpdate) / 1000 / 60)
 
