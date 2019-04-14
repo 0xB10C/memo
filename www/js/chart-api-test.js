@@ -37,6 +37,8 @@ function processApiMempoolDataForChart(response) {
   console.log('Mempool data written to db @', response.timestamp)
   lastMempoolDataUpdate = response.timestamp  
 
+  const mempoolSize = +(response.mempoolSize / 1000000).toFixed(2)
+
   const patternAreas = {
     '0to10': [],
     '11to100': [],
@@ -85,6 +87,7 @@ function processApiMempoolDataForChart(response) {
   const sum = Object.values(rowData[1]).reduce((a, b) => a + b, 0)
 
   return {
+    "mempoolSize": mempoolSize,
     "blocks": blocks,
     "colorPattern": colorPattern,
     "lines": lines,
@@ -200,15 +203,12 @@ function updateCurrentMempoolCard(processed) { //TODO: Change name of function
 
   const spanTxCount = document.getElementById('current-mempool-count')
   const spanMempoolSize = document.getElementById('current-mempool-size')
-  const spanMempoolSizeUnit = document.getElementById('current-mempool-unit')
 
   const txCountInMempool = processed.sum
-  const txSizeInMempool = 123 //TODO: get size of mempool from API
-  const txSizeInMempoolUnit = "MB" // TODO: determine unit of display
+  const txSizeInMempool = processed.mempoolSize
 
   spanTxCount.innerHTML = txCountInMempool
   spanMempoolSize.innerHTML = txSizeInMempool
-  spanMempoolSizeUnit.innerHTML = txSizeInMempoolUnit 
 
   timeSinceLastUpdate = 0
   updateCurrentMempoolCardLastUpdated()

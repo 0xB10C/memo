@@ -44,12 +44,13 @@ if __name__ == "__main__":
     mempool = json.loads(stdin)
 
     feerates_count = {}
-    feerates_size = {}
+    mempoolSize = 0# mempool size in bytes
     memlist = [] # mempool simplified as list/queue of tx
     position_of_greedy_blocks = []
 
     for txid in mempool:
         tx = mempool[txid]
+        mempoolSize += tx['size']
         feerate = float(tx['fee']) * 100000000 / float(tx['size'])
         feerate_int = int(round(feerate))
 
@@ -70,8 +71,8 @@ if __name__ == "__main__":
             block_size = 0
 
     cursor = db.cursor()
-    sql = "UPDATE current_mempool SET byCount = %s, positionsInGreedyBlocks = %s, timestamp = UTC_TIMESTAMP WHERE id = 1"
-    val = (json.dumps(feerates_count), json.dumps(position_of_greedy_blocks))
+    sql = "UPDATE current_mempool SET byCount = %s, positionsInGreedyBlocks = %s, timestamp = UTC_TIMESTAMP, mempoolSize = %s WHERE id = 1"
+    val = (json.dumps(feerates_count), json.dumps(position_of_greedy_blocks), mempoolSize)
     cursor.execute(sql, val)
     cursor.close()
     db.commit()
