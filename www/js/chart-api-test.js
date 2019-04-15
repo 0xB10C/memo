@@ -259,3 +259,11 @@ function showAlert() {
 function clearAlerts() {
   $('.alert-tx').hide()
 }
+
+$(window).scroll(function() {
+  if ($(".navbar").offset().top > 60) {
+      $(".navbar").addClass("scrolled");
+  } else {
+      $(".navbar").removeClass("scrolled");
+  }   
+});
