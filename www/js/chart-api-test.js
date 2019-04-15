@@ -85,7 +85,6 @@ function processApiMempoolDataForChart(response) {
 
   // Sum all txs to get the total number of tx in the mempool
   const sum = Object.values(rowData[1]).reduce((a, b) => a + b, 0)
-  console.log(rowData)
   return {
     "mempoolSize": mempoolSize,
     "blocks": blocks,
@@ -257,8 +256,8 @@ async function handleTxSearch() {
 }
 
 function getFeeRateFromApi(txId) {
-  return axios.get(`https://api.blockcypher.com/v1/btc/main/txs/${txId}`)
-    .then(res => Math.floor(res.data.fees/res.data.size)) // Round down. TODO: Is size from API == vsize?
+  return axios.get(`https://blockstream.info/api/tx/${txId}`)
+    .then(res => Math.floor(res.data.fee/res.data.size))
     .catch(e => {
       console.log('Error getting data from explorer:', e)
       throw new Error('Could not find your transaction in the bitcoin network. Wait a few minutes before trying again.')
