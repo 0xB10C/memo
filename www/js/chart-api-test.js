@@ -7,7 +7,6 @@ var lastMempoolDataUpdate = 0
 var focused = false
 
 
-
 function generateColorPattern(patternAreas) {
 
   const patternColors = [
@@ -85,7 +84,7 @@ function processApiMempoolDataForChart(response) {
 
   // Sum all txs to get the total number of tx in the mempool
   const sum = Object.values(rowData[1]).reduce((a, b) => a + b, 0)
-
+  console.log(rowData)
   return {
     "mempoolSize": mempoolSize,
     "blocks": blocks,
@@ -230,36 +229,42 @@ setInterval(function() {
   updateCurrentMempoolCardLastUpdated()
 }, 10000);
 
-function handleTxSearch() {
-  clearAlerts()
+async function handleTxSearch() {
+  $('#input-lookup-txid').removeClass("is-invalid" ) // Clear alerts
+
   txId = document.getElementById('input-lookup-txid').value
-  // TODO: Improve handling of invalid tx ids
-  // ==> check input with regex to be conform to ^[a-fA-F0-9]{64}$
-  if (txId === '') {
-    return showAlert()
+
+  // Check if tx id is valid
+  if (/^[a-fA-F0-9]{64}$/.test(txId) == false) {
+    $('#invalid-feedback').html('Invalid Bitcoin Transaction Id.') // Set alert message
+    $('#input-lookup-txid').addClass("is-invalid")  // Show alert
+    return
   }
 
   // TODO: Create a real search
-  focused = true
-  chart.focus("1");
-  chart.tooltip.show({x: 0, index: 0, id: '1' })
+  try {
+    const feeRate = await getFeeRateFromApi(txId) // in sat/vbyte
+    focused = true
+    chart.focus(feeRate) // TODO: Focusing on different parts of the graph doesn't work... 
+    chart.tooltip.show({x: 0, index: 0, id: '1' })
+  }
+  catch (error) {
+    console.log(error)
+    $('#invalid-feedback').html(error)
+    $('#input-lookup-txid').addClass("is-invalid")
+  }
 }
 
-function showAlert() {
-  const alert = `<div class="alert alert-tx alert-warning alert-dismissible fade show shadow-sm border-warning" role="alert">
-                  We could not find your transaction, type something into the input field (CHANGE LATER)
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>`
-  
-  $('#main').prepend(alert)
+function getFeeRateFromApi(txId) {
+  return axios.get(`https://api.blockcypher.com/v1/btc/main/txs/${txId}`)
+    .then(res => Math.floor(res.data.fees/res.data.size)) // Round down. TODO: Is size from API == vsize?
+    .catch(e => {
+      console.log('Error getting data from explorer:', e)
+      throw new Error('Could not find your transaction in the bitcoin network. Wait a few minutes before trying again.')
+    })
 }
 
-function clearAlerts() {
-  $('.alert-tx').hide()
-}
-
+// Is this used anywhere?
 function* range(start, stop, step = 1) {
   if (typeof stop === 'undefined') {
       // one param defined
