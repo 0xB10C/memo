@@ -99,6 +99,15 @@ window.onload = function () {
   // Add event listeners to the search bar
   document.getElementById('button-lookup-txid').addEventListener('click', handleTxSearch)
 
+  // add scroll listener for icon
+  $(window).scroll(function() {
+    if ($(".navbar").offset().top > 60) {
+        $(".navbar").addClass("scrolled");
+    } else {
+        $(".navbar").removeClass("scrolled");
+    }   
+  }); 
+
   // Get the mempool data 
   axios.get('https://mempool.observer/api/mempool')
     .then(function (response) {

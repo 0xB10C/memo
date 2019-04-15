@@ -10,7 +10,6 @@ body {
 }
 
 #brand-icon {
-  content: url(../img/brand-icon.svg);
   height: 40px;
   transition: transform .2s ease-in-out;
   transform: rotate(0deg) translate(0px, 0px) scale(1);
@@ -18,14 +17,14 @@ body {
 
 #brand-icon text {
   -webkit-transition: opacity 0.05s ease-in-out;
-  transition: opacity 0.05s ease-in-out 0.1s;
+  transition: opacity 0.05s ease-in-out 0.18s;
   opacity: 1;
 }
 
 .scrolled #brand-icon {
-  margin-inline-end: -4.5rem;
+  margin-inline-end: -6.5rem;
   transition: transform .2s ease-in-out, margin-inline-end .2s ease-in-out;
-  transform: rotate(90deg) translate(10px, 3.5rem) scale(1.4);
+  transform: rotate(90deg) translate(10px, 3rem) scale(1.4);
 }
 
 .scrolled #brand-icon text {
