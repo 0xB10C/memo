@@ -25,7 +25,7 @@ body {
 .scrolled #brand-icon {
   margin-inline-end: -4.5rem;
   transition: transform .2s ease-in-out, margin-inline-end .2s ease-in-out;
-  transform: rotate(90deg) translate(10px, 2.5rem) scale(1.4);
+  transform: rotate(90deg) translate(10px, 3.5rem) scale(1.4);
 }
 
 .scrolled #brand-icon text {

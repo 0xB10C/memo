@@ -68,20 +68,24 @@
     <div class="card my-4 shadow-sm bg-white">
       <div class="card-body">
         <div class="row">
-          <div class="col-md-5">
+          <div class="col-md-6">
 
             <h3 class="card-title">Current Bitcoin Mempool</h3>
             <h5 class="card-subtitle mb-2 text-muted">Short but descriptive sub-heading</h5>
 
             <p class="card-text">
-              Here is place for more detailed text.
-              This is a wider card with supporting text below as a natural lead-in to additional
-              content. This content is a little bit longer.</p>
+              The chart displays a mempool snapshot from <abbr title="There is no 'the' mempool in the bitcoin peer-to-peer network. Every node's mempool differs based on which transactions arrived and were accepted by that node.">my</abbr> node.
+              The mempool contains unconfirmed transactions - transactions not yet included in a block.
+              Transactions paying a higher feerate (fee per size) are usually included earlier than low feerate transactions.
+            </p>
 
             <p class="card-text">
-              Here is place for more detailed text.
-              This is a wider card with supporting text below as a natural lead-in to additional
-              content. This content is a little bit longer.</p>
+              For the chart the transactions are grouped by their the their feerate.
+              The size of a group corresponds to the amount of transactions in the group.
+              Groups with the highest feerate are at the top of the chart.
+              Lower feerate groups appear at the bottom.
+              The vertical lines show a rough estimates what a greedy miner would include in the next block.               
+            </p>
 
             <p id="total-transactions" class="card-text">
               <span id="current-mempool-count">0</span>
@@ -89,7 +93,7 @@
               (<span id="current-mempool-size">0</span> MB)
               </p>
 
-            <label for="input-txid-lookup">Transaction Lookup</label>
+            <label for="input-txid-lookup">Enter a transaction id to see it's position in the chart</label>
             <div class="input-group mb-3">
               <input type="text" id="input-lookup-txid" class="form-control"
                 placeholder="4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b" aria-label="txid"
@@ -102,7 +106,7 @@
             </div>
           </div>
 
-          <div class="col-md-7">
+          <div class="col-md-6">
             <div id="chart" class="my-3"></div>
           </div>
 
