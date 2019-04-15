@@ -1,11 +1,12 @@
 
+// Constants
 const NEXT_BLOCK_LABELS = ["next block", "2nd block", "3rd block"]
 
+// State 
 var chart
 var timeSinceLastUpdate = 0
 var lastMempoolDataUpdate = 0
 var focused = false
-
 
 function generateColorPattern(patternAreas) {
 
@@ -96,7 +97,7 @@ function processApiMempoolDataForChart(response) {
 }
 
 window.onload = function () {
-  // Add event listener for the search bar
+  // Add event listeners to the search bar
   document.getElementById('button-lookup-txid').addEventListener('click', handleTxSearch)
   // Add one more so that we can reset focus of the chart
   document.body.addEventListener('click', function(e) {

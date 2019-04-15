@@ -3,12 +3,41 @@ body {
   background-color: #0d2738;  */
 }
 
-.c3-tooltip th {
-  display: none;
-}
+/* navbar */
 
 .navbar-white {
-  background: #ffffffea !important;
+  background: #ffffff !important;
+}
+
+#brand-icon {
+  content: url(../img/brand-icon.svg);
+  height: 40px;
+  transition: transform .2s ease-in-out;
+  transform: rotate(0deg) translate(0px, 0px) scale(1);
+}
+
+#brand-icon text {
+  -webkit-transition: opacity 0.05s ease-in-out;
+  transition: opacity 0.05s ease-in-out 0.1s;
+  opacity: 1;
+}
+
+.scrolled #brand-icon {
+  margin-inline-end: -4.5rem;
+  transition: transform .2s ease-in-out, margin-inline-end .2s ease-in-out;
+  transform: rotate(90deg) translate(10px, 2.5rem) scale(1.4);
+}
+
+.scrolled #brand-icon text {
+  -webkit-transition: opacity 0.05s ease-in-out;
+  transition: opacity 0.05s ease-in-out;
+  opacity: 0;
+}
+
+/* chart */
+
+.c3-tooltip th {
+  display: none;
 }
 
 .c3 .c3-axis-x path,
