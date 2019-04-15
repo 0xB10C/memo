@@ -98,17 +98,6 @@ function processApiMempoolDataForChart(response) {
 window.onload = function () {
   // Add event listeners to the search bar
   document.getElementById('button-lookup-txid').addEventListener('click', handleTxSearch)
-  // Add one more so that we can reset focus of the chart
-  /*document.body.addEventListener('click', function(e) {
-    var targetElement = event.target || event.srcElement;
-    if (focused && targetElement.tagName !== 'BUTTON' && targetElement.tagName !== 'I') {
-      chart.tooltip.hide()
-      chart.focus()
-      focused = false
-    }
-  })
-  */
-
 
   // Get the mempool data 
   axios.get('https://mempool.observer/api/mempool')
@@ -214,7 +203,6 @@ function updateCurrentMempoolCard(processed) { //TODO: Change name of function
   updateCurrentMempoolCardLastUpdated()
 }
 
-
 function updateCurrentMempoolCardLastUpdated() {
   // format as milliseconds since 1.1.1970 UTC
   // * 1000 to convert from seconds to milliseconds
@@ -234,22 +222,30 @@ async function handleTxSearch() {
 
   txId = document.getElementById('input-lookup-txid').value
 
-  // Check if tx id is invalid
+  // Check if txid is invalid
   if (/^[a-fA-F0-9]{64}$/.test(txId) == false) {
     $('#invalid-feedback').html('Invalid Bitcoin transaction id.') // Set alert message
     $('#input-lookup-txid').addClass("is-invalid")  // Show alert
   } else {
     try {
       const tx = await getTxFromApi(txId) // in sat/vbyte
-      // TODO: check if tx is unconfirmed
-      
       currentTx = tx
 
-      const feeRate =  Math.floor(tx.fee/tx.size)
-      drawTxIdInChartByFeeRate(tx.txid, feeRate)
+      if (tx.status.confirmed){
+
+        let minutes_since_confirmation = Math.floor((Date.now() -  tx.status.block_time * 1000) / 1000 / 60)
+        error = `The transaction confirmed. (Block ${tx.status.block_height}, ${minutes_since_confirmation} minutes ago)`
+        console.error(error)
+
+        $('#invalid-feedback').html(error)
+        $('#input-lookup-txid').addClass("is-invalid")
+      } else {
+        const feeRate =  Math.floor(tx.fee/tx.size)
+        drawTxIdInChartByFeeRate(tx.txid, feeRate)
+      }
 
     } catch (error) {
-      console.log(error)
+      console.error(error)
       $('#invalid-feedback').html(error)
       $('#input-lookup-txid').addClass("is-invalid")
     }
