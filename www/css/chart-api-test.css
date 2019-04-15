@@ -3,6 +3,12 @@ body {
   background-color: #0d2738;  */
 }
 
+a.href-target{
+  padding-top: 65px;
+  margin-top: -65px;
+}
+
+
 /* navbar */
 
 .navbar-white {
@@ -34,6 +40,8 @@ body {
 }
 
 /* chart */
+
+  /* https://github.com/c3js/c3/issues/210 */
 
 .c3-tooltip th {
   display: none;
@@ -80,5 +88,3 @@ body {
 .c3 .c3-legend-item-data text {
   fill: black;
 }
-
-/* https://github.com/c3js/c3/issues/210 */

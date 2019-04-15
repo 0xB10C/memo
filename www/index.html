@@ -48,10 +48,10 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
           <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-              <a class="nav-link" href="#">Current<span class="sr-only">(current)</span></a>
+              <a class="nav-link" href="#current-mempool">Current<span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Historical</a>
+              <a class="nav-link" href="#historical-mempool">Historical</a>
             </li>
           </ul>
           <button class="btn my-2 my-sm-0 btn-light btn-outline-white" onclick="alert('not part of the mvp :)');">
@@ -65,13 +65,14 @@
 
   <main id="main" role="main" class="container py-1">
 
+    <a id="current-mempool" class="href-target"></a>
     <div class="card my-4 shadow-sm bg-white">
       <div class="card-body">
         <div class="row">
           <div class="col-md-6">
 
             <h3 class="card-title">Current Bitcoin Mempool</h3>
-            <h5 class="card-subtitle mb-2 text-muted">Short but descriptive sub-heading</h5>
+            <h5 class="card-subtitle mb-2 text-muted">Where is my transaction in the mempool?</h5>
 
             <p class="card-text">
               The chart displays a mempool snapshot from <abbr title="There is no 'the' mempool in the bitcoin peer-to-peer network. Every node's mempool differs based on which transactions arrived and were accepted by that node.">my</abbr> node.
@@ -128,6 +129,14 @@
           minutes ago</small>
       </div>
     </div>
+
+    <a id="historical-mempool" class="href-target"></a>
+    <!--div class="card my-4 shadow-sm bg-white">
+      <div class="card-body">
+          <h3 class="card-title">Historical Bitcoin Mempool</h3>
+          <h5 class="card-subtitle mb-2 text-muted">Where is my transaction in the mempool?</h5>
+      </div>
+    </div-->
 
     <div class="alert alert-warning alert-dismissible fade show shadow-sm border-warning" role="alert">
       <strong>Work in progress!</strong>
