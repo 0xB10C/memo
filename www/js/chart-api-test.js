@@ -1,12 +1,12 @@
 
+// Constants
 const NEXT_BLOCK_LABELS = ["next block", "2nd block", "3rd block"]
 
+// State 
 var chart
 var timeSinceLastUpdate = 0
 var lastMempoolDataUpdate = 0
 var focused = false
-
-
 
 function generateColorPattern(patternAreas) {
 
@@ -97,7 +97,7 @@ function processApiMempoolDataForChart(response) {
 }
 
 window.onload = function () {
-  // Add event listener for the search bar
+  // Add event listeners to the search bar
   document.getElementById('button-lookup-txid').addEventListener('click', handleTxSearch)
   // Add one more so that we can reset focus of the chart
   document.body.addEventListener('click', function(e) {
@@ -232,10 +232,10 @@ setInterval(function() {
 
 function handleTxSearch() {
   clearAlerts()
+
+  // Check if tx id is valid
   txId = document.getElementById('input-lookup-txid').value
-  // TODO: Improve handling of invalid tx ids
-  // ==> check input with regex to be conform to ^[a-fA-F0-9]{64}$
-  if (txId === '') {
+  if (/^[a-fA-F0-9]{64}$/.test(txId) == false) {
     return showAlert()
   }
 
@@ -246,18 +246,11 @@ function handleTxSearch() {
 }
 
 function showAlert() {
-  const alert = `<div class="alert alert-tx alert-warning alert-dismissible fade show shadow-sm border-warning" role="alert">
-                  We could not find your transaction, type something into the input field (CHANGE LATER)
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>`
-  
-  $('#main').prepend(alert)
+  $('#input-lookup-txid').addClass("is-invalid")
 }
 
 function clearAlerts() {
-  $('.alert-tx').hide()
+  $('#input-lookup-txid').removeClass("is-invalid")
 }
 
 function* range(start, stop, step = 1) {
