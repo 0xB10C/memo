@@ -4,9 +4,9 @@ const NEXT_BLOCK_LABELS = ["next block", "2nd block", "3rd block"]
 
 // State 
 var chart
-var timeSinceLastUpdate = 0
 var lastMempoolDataUpdate = 0
-var focused = false
+var processedMempool = null
+var currentTx = null
 
 function generateColorPattern(patternAreas) {
 
@@ -85,7 +85,6 @@ function processApiMempoolDataForChart(response) {
 
   // Sum all txs to get the total number of tx in the mempool
   const sum = Object.values(rowData[1]).reduce((a, b) => a + b, 0)
-
   return {
     "mempoolSize": mempoolSize,
     "blocks": blocks,
@@ -99,23 +98,14 @@ function processApiMempoolDataForChart(response) {
 window.onload = function () {
   // Add event listeners to the search bar
   document.getElementById('button-lookup-txid').addEventListener('click', handleTxSearch)
-  // Add one more so that we can reset focus of the chart
-  document.body.addEventListener('click', function(e) {
-    var targetElement = event.target || event.srcElement;
-    if (focused && targetElement.tagName !== 'BUTTON' && targetElement.tagName !== 'I') {
-      chart.tooltip.hide()
-      chart.focus()
-      focused = false
-    }
-  })
 
   // Get the mempool data 
   axios.get('https://mempool.observer/api/mempool')
     .then(function (response) {
       console.log(response.data)
-      processed = processApiMempoolDataForChart(response.data)
-      draw(processed)
-      updateCurrentMempoolCard(processed)
+      processedMempool = processApiMempoolDataForChart(response.data)
+      draw(processedMempool)
+      updateCurrentMempoolCard(processedMempool)
       redraw() // init redraw loop
     })
 }
@@ -178,13 +168,12 @@ function draw(processed) {
       }
     }
   })
-  
-  // Refocus the chart if was focused before a 'redraw'
-  if (focused) {
-    // TODO: focus on actual data
-    chart.focus("1");
-    chart.tooltip.show({x: 0, index: 0, id: '1' })
+
+  if(currentTx != null){
+    const feeRate = Math.floor(currentTx.fee/currentTx.size)
+    drawTxIdInChartByFeeRate(currentTx.txid, feeRate)
   }
+  
 }
 
 function redraw() {
@@ -214,12 +203,10 @@ function updateCurrentMempoolCard(processed) { //TODO: Change name of function
   updateCurrentMempoolCardLastUpdated()
 }
 
-
 function updateCurrentMempoolCardLastUpdated() {
   // format as milliseconds since 1.1.1970 UTC
   // * 1000 to convert from seconds to milliseconds
   const millislastMempoolDataUpdate = lastMempoolDataUpdate * 1000
-
   const minutes = Math.floor((Date.now() -  millislastMempoolDataUpdate) / 1000 / 60)
 
   document.getElementById('current-mempool-last-update').innerHTML = (minutes)
@@ -230,33 +217,79 @@ setInterval(function() {
   updateCurrentMempoolCardLastUpdated()
 }, 10000);
 
-function handleTxSearch() {
-  clearAlerts()
+async function handleTxSearch() {
+  $('#input-lookup-txid').removeClass("is-invalid" ) // Clear alerts
 
-  // Check if tx id is valid
   txId = document.getElementById('input-lookup-txid').value
+
+  // Check if txid is invalid
   if (/^[a-fA-F0-9]{64}$/.test(txId) == false) {
-    return showAlert()
+    $('#invalid-feedback').html('Invalid Bitcoin transaction id.') // Set alert message
+    $('#input-lookup-txid').addClass("is-invalid")  // Show alert
+  } else {
+    try {
+      const tx = await getTxFromApi(txId) // in sat/vbyte
+      currentTx = tx
+
+      if (tx.status.confirmed){
+
+        let minutes_since_confirmation = Math.floor((Date.now() -  tx.status.block_time * 1000) / 1000 / 60)
+        error = `The transaction confirmed. (Block ${tx.status.block_height}, ${minutes_since_confirmation} minutes ago)`
+        console.error(error)
+
+        $('#invalid-feedback').html(error)
+        $('#input-lookup-txid').addClass("is-invalid")
+      } else {
+        const feeRate =  Math.floor(tx.fee/tx.size)
+        drawTxIdInChartByFeeRate(tx.txid, feeRate)
+      }
+
+    } catch (error) {
+      console.error(error)
+      $('#invalid-feedback').html(error)
+      $('#input-lookup-txid').addClass("is-invalid")
+    }
+  }
+}
+
+function drawTxIdInChartByFeeRate(txid,feeRate){
+  const position = getTxPostionInChartByFeeRate(feeRate)
+  chart.ygrids.remove({class:'user-tx'});
+  chart.ygrids.add([{value: position, text: txid.substring(0, 8) + "...", class:'user-tx', position: 'middle'}]);
+  chart.tooltip.show({x: feeRate, index: 0, id: '1' })
+}
+
+function getTxPostionInChartByFeeRate(feeRate){
+  let position = 0
+  for(index in processedMempool.rowData[0]){
+    if(processedMempool.rowData[0][index] <= feeRate){
+      position += processedMempool.rowData[1][index]
+    }else{
+      break;
+    }
+  }
+  return position
+}
+
+
+function getTxFromApi(txId) {
+  return axios.get(`https://blockstream.info/api/tx/${txId}`)
+    .then(res => res.data)
+    .catch(e => {
+      console.log('Error getting data from explorer:', e)
+      throw new Error('Could not find your transaction in the bitcoin network. Wait a few minutes before trying again.')
+    })
+}
+
+// Is this used anywhere?
+function* range(start, stop, step = 1) {
+  if (typeof stop === 'undefined') {
+      // one param defined
+      stop = start;
+      start = 0;
   }
 
-  // TODO: Create a real search
-  focused = true
-  chart.focus("1");
-  chart.tooltip.show({x: 0, index: 0, id: '1' })
+  for (let i = start; step > 0 ? i < stop : i > stop; i += step) {
+      yield i;
+  }
 }
-
-function showAlert() {
-  $('#input-lookup-txid').addClass("is-invalid")
-}
-
-function clearAlerts() {
-  $('#input-lookup-txid').removeClass("is-invalid")
-}
-
-$(window).scroll(function() {
-  if ($(".navbar").offset().top > 60) {
-      $(".navbar").addClass("scrolled");
-  } else {
-      $(".navbar").removeClass("scrolled");
-  }   
-});

@@ -64,6 +64,9 @@ body {
   margin-left: 20px;
 }
 
+.c3-ygrid-line.user-tx > text {fill: red;}
+.c3-ygrid-line.user-tx > line {stroke: red;}
+
 .c3 .c3-axis-y-label,
 .c3 .c3-axis-y2-label {
   font-size: 1.2em;
