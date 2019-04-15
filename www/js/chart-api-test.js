@@ -4,9 +4,9 @@ const NEXT_BLOCK_LABELS = ["next block", "2nd block", "3rd block"]
 
 // State 
 var chart
-var timeSinceLastUpdate = 0
 var lastMempoolDataUpdate = 0
-var focused = false
+var processedMempool = null
+var currentTx = null
 
 function generateColorPattern(patternAreas) {
 
@@ -99,7 +99,7 @@ window.onload = function () {
   // Add event listeners to the search bar
   document.getElementById('button-lookup-txid').addEventListener('click', handleTxSearch)
   // Add one more so that we can reset focus of the chart
-  document.body.addEventListener('click', function(e) {
+  /*document.body.addEventListener('click', function(e) {
     var targetElement = event.target || event.srcElement;
     if (focused && targetElement.tagName !== 'BUTTON' && targetElement.tagName !== 'I') {
       chart.tooltip.hide()
@@ -107,14 +107,16 @@ window.onload = function () {
       focused = false
     }
   })
+  */
+
 
   // Get the mempool data 
   axios.get('https://mempool.observer/api/mempool')
     .then(function (response) {
       console.log(response.data)
-      processed = processApiMempoolDataForChart(response.data)
-      draw(processed)
-      updateCurrentMempoolCard(processed)
+      processedMempool = processApiMempoolDataForChart(response.data)
+      draw(processedMempool)
+      updateCurrentMempoolCard(processedMempool)
       redraw() // init redraw loop
     })
 }
@@ -177,13 +179,12 @@ function draw(processed) {
       }
     }
   })
-  
-  // Refocus the chart if was focused before a 'redraw'
-  if (focused) {
-    // TODO: focus on actual data
-    chart.focus("1");
-    chart.tooltip.show({x: 0, index: 0, id: '1' })
+
+  if(currentTx != null){
+    const feeRate = Math.floor(currentTx.fee/currentTx.size)
+    drawTxIdInChartByFeeRate(currentTx.txid, feeRate)
   }
+  
 }
 
 function redraw() {
@@ -218,7 +219,6 @@ function updateCurrentMempoolCardLastUpdated() {
   // format as milliseconds since 1.1.1970 UTC
   // * 1000 to convert from seconds to milliseconds
   const millislastMempoolDataUpdate = lastMempoolDataUpdate * 1000
-
   const minutes = Math.floor((Date.now() -  millislastMempoolDataUpdate) / 1000 / 60)
 
   document.getElementById('current-mempool-last-update').innerHTML = (minutes)
@@ -234,30 +234,51 @@ async function handleTxSearch() {
 
   txId = document.getElementById('input-lookup-txid').value
 
-  // Check if tx id is valid
+  // Check if tx id is invalid
   if (/^[a-fA-F0-9]{64}$/.test(txId) == false) {
-    $('#invalid-feedback').html('Invalid Bitcoin Transaction Id.') // Set alert message
+    $('#invalid-feedback').html('Invalid Bitcoin transaction id.') // Set alert message
     $('#input-lookup-txid').addClass("is-invalid")  // Show alert
-    return
-  }
+  } else {
+    try {
+      const tx = await getTxFromApi(txId) // in sat/vbyte
+      // TODO: check if tx is unconfirmed
+      
+      currentTx = tx
 
-  // TODO: Create a real search
-  try {
-    const feeRate = await getFeeRateFromApi(txId) // in sat/vbyte
-    focused = true
-    chart.focus(feeRate) // TODO: Focusing on different parts of the graph doesn't work... 
-    chart.tooltip.show({x: 0, index: 0, id: '1' })
-  }
-  catch (error) {
-    console.log(error)
-    $('#invalid-feedback').html(error)
-    $('#input-lookup-txid').addClass("is-invalid")
+      const feeRate =  Math.floor(tx.fee/tx.size)
+      drawTxIdInChartByFeeRate(tx.txid, feeRate)
+
+    } catch (error) {
+      console.log(error)
+      $('#invalid-feedback').html(error)
+      $('#input-lookup-txid').addClass("is-invalid")
+    }
   }
 }
 
-function getFeeRateFromApi(txId) {
+function drawTxIdInChartByFeeRate(txid,feeRate){
+  const position = getTxPostionInChartByFeeRate(feeRate)
+  chart.ygrids.remove({class:'user-tx'});
+  chart.ygrids.add([{value: position, text: txid.substring(0, 8) + "...", class:'user-tx', position: 'middle'}]);
+  chart.tooltip.show({x: feeRate, index: 0, id: '1' })
+}
+
+function getTxPostionInChartByFeeRate(feeRate){
+  let position = 0
+  for(index in processedMempool.rowData[0]){
+    if(processedMempool.rowData[0][index] <= feeRate){
+      position += processedMempool.rowData[1][index]
+    }else{
+      break;
+    }
+  }
+  return position
+}
+
+
+function getTxFromApi(txId) {
   return axios.get(`https://blockstream.info/api/tx/${txId}`)
-    .then(res => Math.floor(res.data.fee/res.data.size))
+    .then(res => res.data)
     .catch(e => {
       console.log('Error getting data from explorer:', e)
       throw new Error('Could not find your transaction in the bitcoin network. Wait a few minutes before trying again.')
