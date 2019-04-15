@@ -271,7 +271,6 @@ function getTxPostionInChartByFeeRate(feeRate){
   return position
 }
 
-
 function getTxFromApi(txId) {
   return axios.get(`https://blockstream.info/api/tx/${txId}`)
     .then(res => res.data)
@@ -281,15 +280,3 @@ function getTxFromApi(txId) {
     })
 }
 
-// Is this used anywhere?
-function* range(start, stop, step = 1) {
-  if (typeof stop === 'undefined') {
-      // one param defined
-      stop = start;
-      start = 0;
-  }
-
-  for (let i = start; step > 0 ? i < stop : i > stop; i += step) {
-      yield i;
-  }
-}
