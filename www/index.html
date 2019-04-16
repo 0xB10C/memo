@@ -76,25 +76,24 @@
 
             <p class="card-text">
               The chart displays a mempool snapshot from <abbr title="There is no 'the' mempool in the bitcoin peer-to-peer network. Every node's mempool differs based on which transactions arrived and were accepted by that node.">my</abbr> node.
-              The mempool contains unconfirmed transactions - transactions not yet included in a block.
-              Transactions paying a higher feerate (fee per size) are usually included earlier than low feerate transactions.
+              The mempool contains unconfirmed transactions.
+              Transactions paying a higher feerate (fee per size) are usually included in the next block earlier than low feerate transactions.
             </p>
 
             <p class="card-text">
-              For the chart the transactions are grouped by their the their feerate.
-              The size of a group corresponds to the amount of transactions in the group.
+              Transactions are grouped by their feerate. The size of each group corresponds to the amount of transactions in the group.
               Groups with the highest feerate are at the top of the chart.
               Lower feerate groups appear at the bottom.
-              The vertical lines show a rough estimates what a greedy miner would include in the next block.               
+              The horizontal lines show a rough estimate of which transactions a greedy miner would include in the next block.               
             </p>
 
             <p id="total-transactions" class="card-text">
               <span id="current-mempool-count">0</span>
               unconfirmed Transactions 
-              (<span id="current-mempool-size">0</span> MB)
+              (<span id="current-mempool-size">0</span> MB).
               </p>
 
-            <label for="input-txid-lookup">Enter a transaction id to see it's position in the chart</label>
+            <label for="input-txid-lookup">Enter a transaction id to see where it ranks in the mempool:</label>
             <div class="input-group mb-3">
               <input 
                 type="text" 
