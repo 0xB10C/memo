@@ -156,7 +156,7 @@ function draw(processed) {
     },
     axis: {
       y: {
-        padding: {top: 0},
+        padding: {top: 20},
         show: true,
         label: {
           text: 'unconfirmed transactions'
