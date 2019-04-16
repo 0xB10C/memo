@@ -243,7 +243,7 @@ async function handleTxSearch() {
       if (tx.status.confirmed){
 
         let minutes_since_confirmation = Math.floor((Date.now() -  tx.status.block_time * 1000) / 1000 / 60)
-        error = `The transaction confirmed. (Block ${tx.status.block_height}, ${minutes_since_confirmation} minutes ago)`
+        let error = `The transaction is already confirmed and therefore not in the mempool. (block ${tx.status.block_height}, ${minutes_since_confirmation} minutes ago)`
         console.error(error)
 
         $('#invalid-feedback').html(error)
