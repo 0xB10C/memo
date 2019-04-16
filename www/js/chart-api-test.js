@@ -263,8 +263,10 @@ async function handleTxSearch() {
 
 function drawTxIdInChartByFeeRate(txid,feeRate){
   const position = getTxPostionInChartByFeeRate(feeRate)
+  // Remove existing line in case
   chart.ygrids.remove({class:'user-tx'});
-  chart.ygrids.add([{value: position, text: txid.substring(0, 8) + "...", class:'user-tx', position: 'middle'}]);
+  // Draw a new line, but wait 500ms for c3.js to not bug out
+  setTimeout(function(){ chart.ygrids.add([{value: position, text: txid.substring(0, 8) + "...", class:'user-tx', position: 'middle'}]); }, 500)
   chart.tooltip.show({x: feeRate, index: 0, id: '1' })
 }
 
