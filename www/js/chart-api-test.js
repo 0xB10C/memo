@@ -11,16 +11,16 @@ var currentTx = null
 function generateColorPattern(patternAreas) {
 
   const patternColors = [
-    ['LightGreen', 'YellowGreen'],
-    ['YellowGreen', 'Bisque'],
-    ['Bisque', 'Salmon'],
-    ['Salmon', 'HotPink'],
+    ["#57e0fb","#55ff00"],
+    ["#55ff00","#febf00"],
+    ["#febf00","#ff339c"],
+    ["#ff339c","#7705ec"]
   ]
 
   var colorPattern = []
   var c_counter = 0
   for (area in patternAreas) {
-    logLimits = chroma.limits(patternAreas[area], 'l', patternAreas[area].length);
+    logLimits = chroma.limits(patternAreas[area], 'e', patternAreas[area].length);
     pattern = chroma.scale(patternColors[c_counter])
       .mode('lch').classes(logLimits)
       .colors(patternAreas[area].length);
