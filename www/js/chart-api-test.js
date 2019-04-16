@@ -267,6 +267,8 @@ function drawTxIdInChartByFeeRate(txid,feeRate){
   chart.ygrids.remove({class:'user-tx'});
   // Draw a new line, but wait 500ms for c3.js to not bug out
   setTimeout(function(){ chart.ygrids.add([{value: position, text: txid.substring(0, 8) + "...", class:'user-tx', position: 'middle'}]); }, 500)
+
+  // TODO: Might be a bug here since the tooltip doesn't show
   chart.tooltip.show({x: feeRate, index: 0, id: '1' })
 }
 

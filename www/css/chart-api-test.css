@@ -71,7 +71,10 @@ a.href-target{
   margin-left: 20px;
 }
 
-.c3-ygrid-line.user-tx > text {fill: red;}
+.c3-ygrid-line.user-tx > text {
+  fill: red;
+  transform: translateY(17px);
+}
 .c3-ygrid-line.user-tx > line {stroke: red;}
 
 .c3 .c3-axis-y-label,
