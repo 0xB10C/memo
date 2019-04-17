@@ -34,7 +34,7 @@ function generateColorPattern(patternAreas) {
 
 function processApiMempoolDataForChart(response) {
 
-  console.log('Mempool data written to db @', response.timestamp)
+  console.log('Processing mempool data from', response.timestamp)
   lastMempoolDataUpdate = response.timestamp  
 
   const mempoolSize = +(response.mempoolSize / 1000000).toFixed(2)
@@ -118,7 +118,6 @@ window.onload = function () {
   axios.get('https://mempool.observer/api/mempool')
     .then(function (response) {
       processedMempool = processApiMempoolDataForChart(response.data)
-      console.log(processedMempool)
       draw(processedMempool)
       updateCurrentMempoolCard(processedMempool)
       redraw() // init redraw loop
@@ -199,14 +198,18 @@ async function draw(processed) {
 
 function redraw() {
   setTimeout(function () {
-    axios.get('https://mempool.observer/api/mempool')
-      .then(function (response) {
-        processed = processApiMempoolDataForChart(response.data)
-        draw(processed)
-        updateCurrentMempoolCard(processed)
-        redraw()
-      });
-  }, 60000);
+      axios.get('https://mempool.observer/api/mempool')
+        .then(function (response) {
+          processed = processApiMempoolDataForChart(response.data)
+          updateCurrentMempoolCard(processed)
+          if (!document.hidden) { // only get new data to redraw if the tab is focused
+            draw(processed)
+          }else{
+            console.warn("Tab is not shown. Skipping chart refresh.")
+          }
+        });
+    redraw()
+  }, 30000);
 }
 
 function updateCurrentMempoolCard(processed) { //TODO: Change name of function
@@ -302,7 +305,7 @@ function getTxFromApi(txId) {
   return axios.get(`https://blockstream.info/api/tx/${txId}`)
     .then(res => res.data)
     .catch(e => {
-      console.log('Error getting data from explorer:', e)
+      console.error('Error getting data from explorer:', e)
       throw new Error('Could not find your transaction in the bitcoin network. Wait a few minutes before trying again.')
     })
 }
