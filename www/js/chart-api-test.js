@@ -98,6 +98,12 @@ function processApiMempoolDataForChart(response) {
 window.onload = function () {
   // Add event listeners to the search bar
   document.getElementById('button-lookup-txid').addEventListener('click', handleTxSearch)
+  document.getElementById('input-lookup-txid').addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) { // Handle enter
+      event.preventDefault()
+      document.getElementById('button-lookup-txid').click()
+    }
+  })
 
   // add scroll listener for icon
   $(window).scroll(function() {
