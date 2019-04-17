@@ -119,7 +119,7 @@ window.onload = function () {
     })
 }
 
-function draw(processed) {
+async function draw(processed) {
   chart = c3.generate({
     data: {
       rows: processed.rowData,
@@ -179,10 +179,16 @@ function draw(processed) {
   })
 
   if(currentTx != null){
-    const feeRate = Math.floor(currentTx.fee/currentTx.size)
-    drawTxIdInChartByFeeRate(currentTx.txid, feeRate)
+    // Check if the transaction has been confirmed 
+    const tx = await getTxFromApi(currentTx.txid) // in sat/vbyte
+    currentTx = tx
+    if (tx.status.confirmed) {
+      $('#tx-eta-data').html(`Confirmed (block ${tx.status.block_height}, ${minutes_since_confirmation} minutes ago)`)
+    } else {
+      const feeRate =  Math.floor(tx.fee / (tx.weight / 4)) 
+      drawTxIdInChartByFeeRate(currentTx.txid, feeRate)
+    }
   }
-  
 }
 
 function redraw() {
