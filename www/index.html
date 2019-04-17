@@ -115,6 +115,31 @@
                 </button>
               </div>
             </div>
+
+            <div class="row py-2" id="current-mempool-tx-data">
+              <div class="col-sm-10 px-1">
+                <div class="row"> <!-- nesting to have the same width as the search bar-->
+                  <div class="col-4 text-center px-2">
+                    <span class="badge badge-light p-2">
+                      <span class="text-muted">fee</span><br style="line-height: 150%;">
+                      <span id="tx-fee-data">0</span>&nbsp;sat
+                    </span>
+                  </div>
+                  <div class="col-4 text-center px-2">
+                    <span class="badge badge-light p-2">
+                      <span class="text-muted">vsize</span><br style="line-height: 150%;">
+                      <span id="tx-size-data">0</span>&nbsp;vbyte
+                    </span>
+                  </div>
+                  <div class="col-4 text-center px-2">
+                    <span class="badge badge-light p-2">
+                      <span class="text-muted">feerate</span><br style="line-height: 150%;">
+                      <span id="tx-feerate-data">0</span>&nbsp;sat/vbyte
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="col-md-6">

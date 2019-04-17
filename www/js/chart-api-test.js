@@ -111,15 +111,15 @@ window.onload = function () {
   // Get the mempool data 
   axios.get('https://mempool.observer/api/mempool')
     .then(function (response) {
-      console.log(response.data)
       processedMempool = processApiMempoolDataForChart(response.data)
+      console.log(processedMempool)
       draw(processedMempool)
       updateCurrentMempoolCard(processedMempool)
       redraw() // init redraw loop
     })
 }
 
-function draw(processed) {
+async function draw(processed) {
   chart = c3.generate({
     data: {
       rows: processed.rowData,
@@ -179,10 +179,16 @@ function draw(processed) {
   })
 
   if(currentTx != null){
-    const feeRate = Math.floor(currentTx.fee/currentTx.size)
-    drawTxIdInChartByFeeRate(currentTx.txid, feeRate)
+    // Check if the transaction has been confirmed 
+    const tx = await getTxFromApi(currentTx.txid) // in sat/vbyte
+    currentTx = tx
+    if (tx.status.confirmed) {
+      $('#tx-eta-data').html(`Confirmed (block ${tx.status.block_height}, ${minutes_since_confirmation} minutes ago)`)
+    } else {
+      const feeRate =  Math.floor(tx.fee / (tx.weight / 4)) 
+      drawTxIdInChartByFeeRate(currentTx.txid, feeRate)
+    }
   }
-  
 }
 
 function redraw() {
@@ -227,17 +233,18 @@ setInterval(function() {
 }, 10000);
 
 async function handleTxSearch() {
-  $('#input-lookup-txid').removeClass("is-invalid" ) // Clear alerts
+  $('#input-lookup-txid').removeClass("is-invalid" ) // remove invalid tx message 
+  $('#current-mempool-tx-data').hide() // hide the current tx data
 
   txId = document.getElementById('input-lookup-txid').value
 
   // Check if txid is invalid
   if (/^[a-fA-F0-9]{64}$/.test(txId) == false) {
-    $('#invalid-feedback').html('Invalid Bitcoin transaction id.') // Set alert message
-    $('#input-lookup-txid').addClass("is-invalid")  // Show alert
+    $('#invalid-feedback').html('Invalid Bitcoin transaction id.') // Set invalidt tx message
+    $('#input-lookup-txid').addClass("is-invalid")  // Show invalid tx message
   } else {
     try {
-      const tx = await getTxFromApi(txId) // in sat/vbyte
+      const tx = await getTxFromApi(txId)
       currentTx = tx
       if (tx.status.confirmed){
         let minutes_since_confirmation = Math.floor((Date.now() -  tx.status.block_time * 1000) / 1000 / 60)
@@ -249,6 +256,7 @@ async function handleTxSearch() {
       } else {
         const feeRate =  Math.floor(tx.fee / (tx.weight / 4)) // see Issue #11  
         drawTxIdInChartByFeeRate(tx.txid, feeRate)
+        renderDataTable(tx.fee, (tx.weight/4), feeRate)
       }
 
     } catch (error) {
@@ -291,3 +299,21 @@ function getTxFromApi(txId) {
     })
 }
 
+function renderDataTable(fee, vsize, feeRate) {
+  $('#current-mempool-tx-data').show()
+  $('#tx-fee-data').html(fee)
+  $('#tx-size-data').html(vsize)
+  $('#tx-feerate-data').html(feeRate)
+}
+
+function getETA(feeRate, estimatedBlocks) {
+  const txPosition = getTxPostionInChartByFeeRate(feeRate)
+
+  for (var i=0; i < estimatedBlocks.length; i++) {
+    if (txPosition > estimatedBlocks[i]) {
+      return NEXT_BLOCK_LABELS[i]
+    }
+  }
+
+  return 'Later than the 3rd next block (good luck)'
+}

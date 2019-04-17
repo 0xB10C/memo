@@ -39,6 +39,17 @@ svg#brand-icon g.text  {
   opacity: 0;
 }
 
+/* current mempool card */
+
+#input-lookup-txid {
+  background-image: none;
+  padding: 0.5em;
+}
+
+#current-mempool-tx-data {
+  display: none;
+}
+
 /* chart */
 
   /* https://github.com/c3js/c3/issues/210 */
