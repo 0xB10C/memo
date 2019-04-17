@@ -102,3 +102,24 @@ svg#brand-icon g.text  {
 .c3 .c3-legend-item-data text {
   fill: black;
 }
+
+/* Footer */
+
+#footer-mobile .container {
+  line-height: 1.5;
+}
+
+#footer-desktop {
+  display: none;
+}
+
+/* media queries */
+@media only screen and (min-width: 768px) {
+  #footer-mobile {
+    display: none;
+  }
+
+  #footer-desktop {
+    display: block;
+  }
+}
