@@ -1,6 +1,6 @@
 
 // Constants
-const NEXT_BLOCK_LABELS = ["next block", "2nd block", "3rd block"]
+const NEXT_BLOCK_LABELS = ["1 vMB", "2 vMB", "3 vMB"]
 
 // State 
 var chart

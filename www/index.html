@@ -75,16 +75,17 @@
             <h5 class="card-subtitle mb-2 text-muted">Where is my transaction in the mempool?</h5>
 
             <p class="card-text">
-              The chart displays a mempool snapshot from <abbr title="There is no 'the' mempool in the bitcoin peer-to-peer network. Every node's mempool differs based on which transactions arrived and were accepted by that node.">my</abbr> node.
-              The mempool contains unconfirmed transactions.
-              Transactions paying a higher feerate (fee per size) are usually included earlier than low feerate transactions.
+              The chart shows a mempool snapshot from <abbr title="There is no 'the' mempool in the bitcoin peer-to-peer network. Every node's mempool differs based on which transactions arrived and were accepted by that node.">my</abbr> node.
+              The mempool contains unconfirmed transactions waiting to be included in a block.
+              Each transaction pays a fee and has a size.
+              Transactions paying a higher fee per size (feerate) are usually included earlier than low feerate transactions.
             </p>
 
             <p class="card-text">
-              Transactions are grouped by their feerate. The size of each group corresponds to the amount of transactions in the group.
-              Groups with the highest feerate are at the top of the chart.
-              Lower feerate groups appear at the bottom.
-              The horizontal lines show a rough estimate of which transactions a greedy miner would include in the next block.               
+              The bars in the chart represent grouped and sorted transactions by their feerate.
+              The bar height of each feerate group corresponds to the amount of transactions in that group.
+              The highest feerate groups appear at the top of the chart descending to lower feerates.
+              Each horizontal line shows <abbr title="one virtual megabyte (vMB) to be precise">one megabyte</abbr> of transactions.               
             </p>
 
             <p id="total-transactions" class="card-text text-center lead">
