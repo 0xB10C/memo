@@ -7,6 +7,10 @@ body {
   margin-bottom: 60px;
   margin-top: 60px;
 }
+.card-body {
+  /* So it doesn't need to resize after chart is rendered */
+  min-height: 822px; 
+}
 .footer {
   position: absolute;
   bottom: 0;
