@@ -21,7 +21,7 @@ a.href-target{
   transform: rotate(0deg) translate(0px, 0px) scale(1);
 }
 
-#brand-icon text {
+svg#brand-icon g.text  {
   -webkit-transition: opacity 0.05s ease-in-out;
   transition: opacity 0.05s ease-in-out 0.18s;
   opacity: 1;
@@ -30,10 +30,10 @@ a.href-target{
 .scrolled #brand-icon {
   margin-inline-end: -6.5rem;
   transition: transform .2s ease-in-out, margin-inline-end .2s ease-in-out;
-  transform: rotate(90deg) translate(10px, 3rem) scale(1.4);
+  transform: rotate(90deg) translate(10px, 2.5rem) scale(1.4);
 }
 
-.scrolled #brand-icon text {
+.scrolled svg#brand-icon g.text {
   -webkit-transition: opacity 0.05s ease-in-out;
   transition: opacity 0.05s ease-in-out;
   opacity: 0;
