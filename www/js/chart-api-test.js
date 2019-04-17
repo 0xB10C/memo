@@ -227,18 +227,18 @@ setInterval(function() {
 }, 10000);
 
 async function handleTxSearch() {
-  $('#input-lookup-txid').removeClass("is-invalid" ) // Clear alerts
-  $('#tx-info-table').hide() // Clear current data table
+  $('#input-lookup-txid').removeClass("is-invalid" ) // remove invalid tx message 
+  $('#current-mempool-tx-data').hide() // hide the current tx data
 
   txId = document.getElementById('input-lookup-txid').value
 
   // Check if txid is invalid
   if (/^[a-fA-F0-9]{64}$/.test(txId) == false) {
-    $('#invalid-feedback').html('Invalid Bitcoin transaction id.') // Set alert message
-    $('#input-lookup-txid').addClass("is-invalid")  // Show alert
+    $('#invalid-feedback').html('Invalid Bitcoin transaction id.') // Set invalidt tx message
+    $('#input-lookup-txid').addClass("is-invalid")  // Show invalid tx message
   } else {
     try {
-      const tx = await getTxFromApi(txId) // in sat/vbyte
+      const tx = await getTxFromApi(txId)
       currentTx = tx
       if (tx.status.confirmed){
         let minutes_since_confirmation = Math.floor((Date.now() -  tx.status.block_time * 1000) / 1000 / 60)
@@ -250,7 +250,7 @@ async function handleTxSearch() {
       } else {
         const feeRate =  Math.floor(tx.fee / (tx.weight / 4)) // see Issue #11  
         drawTxIdInChartByFeeRate(tx.txid, feeRate)
-        renderDataTable(feeRate)
+        renderDataTable(tx.fee, (tx.weight/4), feeRate)
       }
 
     } catch (error) {
@@ -293,10 +293,11 @@ function getTxFromApi(txId) {
     })
 }
 
-function renderDataTable(feeRate) {
-  $('#tx-info-table').show()
-  $('#tx-eta-data').html(getETA(feeRate, processedMempool.blocks))
-  $('#tx-fee-data').html(feeRate + ' sat/vbyte')
+function renderDataTable(fee, vsize, feeRate) {
+  $('#current-mempool-tx-data').show()
+  $('#tx-fee-data').html(fee)
+  $('#tx-size-data').html(vsize)
+  $('#tx-feerate-data').html(feeRate)
 }
 
 function getETA(feeRate, estimatedBlocks) {

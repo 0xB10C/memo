@@ -39,15 +39,14 @@ a.href-target{
   opacity: 0;
 }
 
-/* main card */
+/* current mempool card */
 
 #input-lookup-txid {
   background-image: none;
   padding: 0.5em;
 }
 
-#tx-info-table {
-  margin-top: 1em;
+#current-mempool-tx-data {
   display: none;
 }
 
