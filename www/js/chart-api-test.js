@@ -246,13 +246,14 @@ async function handleTxSearch() {
 
   // Check if txid is invalid
   if (/^[a-fA-F0-9]{64}$/.test(txId) == false) {
+    currentTx = null
     $('#invalid-feedback').html('Invalid Bitcoin transaction id.') // Set invalidt tx message
     $('#input-lookup-txid').addClass("is-invalid")  // Show invalid tx message
   } else {
     try {
       const tx = await getTxFromApi(txId)
-      currentTx = tx
       if (tx.status.confirmed){
+        currentTx = null
         let minutes_since_confirmation = Math.floor((Date.now() -  tx.status.block_time * 1000) / 1000 / 60)
         let error = `The transaction is already confirmed and therefore not in the mempool. (block ${tx.status.block_height}, ${minutes_since_confirmation} minutes ago)`
         console.error(error)
@@ -260,6 +261,7 @@ async function handleTxSearch() {
         $('#invalid-feedback').html(error)
         $('#input-lookup-txid').addClass("is-invalid")
       } else {
+        currentTx = tx
         const feeRate =  Math.floor(tx.fee / (tx.weight / 4)) // see Issue #11  
         drawTxIdInChartByFeeRate(tx.txid, feeRate)
         renderDataTable(tx.fee, (tx.weight/4), feeRate)
