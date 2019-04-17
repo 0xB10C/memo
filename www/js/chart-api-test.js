@@ -305,15 +305,3 @@ function renderDataTable(fee, vsize, feeRate) {
   $('#tx-size-data').html(vsize)
   $('#tx-feerate-data').html(feeRate)
 }
-
-function getETA(feeRate, estimatedBlocks) {
-  const txPosition = getTxPostionInChartByFeeRate(feeRate)
-
-  for (var i=0; i < estimatedBlocks.length; i++) {
-    if (txPosition > estimatedBlocks[i]) {
-      return NEXT_BLOCK_LABELS[i]
-    }
-  }
-
-  return 'Later than the 3rd next block (good luck)'
-}
