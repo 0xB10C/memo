@@ -39,6 +39,18 @@ a.href-target{
   opacity: 0;
 }
 
+/* main card */
+
+#input-lookup-txid {
+  background-image: none;
+  padding: 0.5em;
+}
+
+#tx-info-table {
+  margin-top: 1em;
+  display: none;
+}
+
 /* chart */
 
   /* https://github.com/c3js/c3/issues/210 */

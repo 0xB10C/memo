@@ -111,8 +111,8 @@ window.onload = function () {
   // Get the mempool data 
   axios.get('https://mempool.observer/api/mempool')
     .then(function (response) {
-      console.log(response.data)
       processedMempool = processApiMempoolDataForChart(response.data)
+      console.log(processedMempool)
       draw(processedMempool)
       updateCurrentMempoolCard(processedMempool)
       redraw() // init redraw loop
@@ -228,6 +228,7 @@ setInterval(function() {
 
 async function handleTxSearch() {
   $('#input-lookup-txid').removeClass("is-invalid" ) // Clear alerts
+  $('#tx-info-table').hide() // Clear current data table
 
   txId = document.getElementById('input-lookup-txid').value
 
@@ -249,6 +250,7 @@ async function handleTxSearch() {
       } else {
         const feeRate =  Math.floor(tx.fee / (tx.weight / 4)) // see Issue #11  
         drawTxIdInChartByFeeRate(tx.txid, feeRate)
+        renderDataTable(feeRate)
       }
 
     } catch (error) {
@@ -291,3 +293,20 @@ function getTxFromApi(txId) {
     })
 }
 
+function renderDataTable(feeRate) {
+  $('#tx-info-table').show()
+  $('#tx-eta-data').html(getETA(feeRate, processedMempool.blocks))
+  $('#tx-fee-data').html(feeRate + ' sat/vbyte')
+}
+
+function getETA(feeRate, estimatedBlocks) {
+  const txPosition = getTxPostionInChartByFeeRate(feeRate)
+
+  for (var i=0; i < estimatedBlocks.length; i++) {
+    if (txPosition > estimatedBlocks[i]) {
+      return NEXT_BLOCK_LABELS[i]
+    }
+  }
+
+  return 'Later than the 3rd next block (good luck)'
+}
