@@ -50,11 +50,11 @@ if __name__ == "__main__":
 
     for txid in mempool:
         tx = mempool[txid]
-        mempoolSize += tx['size']
-        feerate = float(tx['fee']) * 100000000 / float(tx['size'])
+        mempoolSize += tx['vsize']
+        feerate = float(tx['fee']) * 100000000 / float(tx['vsize'])
         feerate_int = int(round(feerate))
 
-        memlist.append((feerate, tx['size']))
+        memlist.append((feerate, tx['vssize']))
 
         if feerate_int not in feerates_count:
             feerates_count[feerate_int] = 0
