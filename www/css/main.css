@@ -2,13 +2,14 @@ html {
   position: relative;
   min-height: 100%;
 }
+
 body {
   /* Margin top and bottom by nav and footer height */
   margin-bottom: 60px;
   margin-top: 60px;
 }
 
-a.href-target{
+a.href-target {
   padding-top: 65px;
   margin-top: -65px;
 }
@@ -26,7 +27,7 @@ a.href-target{
   transform: rotate(0deg) translate(0px, 0px) scale(1);
 }
 
-svg#brand-icon g.text  {
+svg#brand-icon g.text {
   -webkit-transition: opacity 0.05s ease-in-out;
   transition: opacity 0.05s ease-in-out 0.18s;
   opacity: 1;
@@ -55,14 +56,15 @@ svg#brand-icon g.text  {
   display: none;
 }
 
-.card-body { /* TODO: FIXME: Only for the current mempool card! */
+/* TODO: FIXME: Only for the current mempool card! */
+.card-body {
   /* So it doesn't need to resize after chart is rendered */
-  min-height: 822px; 
+  min-height: 822px;
 }
 
 /* chart */
 
-  /* https://github.com/c3js/c3/issues/210 */
+/* https://github.com/c3js/c3/issues/210 */
 
 .c3-tooltip th {
   display: none;
@@ -92,11 +94,14 @@ svg#brand-icon g.text  {
   margin-left: 20px;
 }
 
-.c3-ygrid-line.user-tx > text {
+.c3-ygrid-line.user-tx>text {
   fill: red;
   transform: translateY(17px);
 }
-.c3-ygrid-line.user-tx > line {stroke: red;}
+
+.c3-ygrid-line.user-tx>line {
+  stroke: red;
+}
 
 .c3 .c3-axis-y-label,
 .c3 .c3-axis-y2-label {
@@ -121,7 +126,8 @@ svg#brand-icon g.text  {
   width: 100%;
   /* Set the fixed height of the footer here */
   height: 60px;
-  line-height: 60px; /* Vertically center the text there */
+  line-height: 60px;
+  /* Vertically center the text there */
 }
 
 #footer-mobile .container {

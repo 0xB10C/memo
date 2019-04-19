@@ -1,4 +1,3 @@
-
 // Constants
 const NEXT_BLOCK_LABELS = ["1 vMB", "2 vMB", "3 vMB"]
 
@@ -11,10 +10,10 @@ var currentTx = null
 function generateColorPattern(patternAreas) {
 
   const patternColors = [
-    ["#57e0fb","#55ff00"],
-    ["#55ff00","#febf00"],
-    ["#febf00","#ff339c"],
-    ["#ff339c","#7705ec"]
+    ["#57e0fb", "#55ff00"],
+    ["#55ff00", "#febf00"],
+    ["#febf00", "#ff339c"],
+    ["#ff339c", "#7705ec"]
   ]
 
   var colorPattern = []
@@ -35,7 +34,7 @@ function generateColorPattern(patternAreas) {
 function processApiMempoolDataForChart(response) {
 
   console.log('Processing mempool data from', response.timestamp)
-  lastMempoolDataUpdate = response.timestamp  
+  lastMempoolDataUpdate = response.timestamp
 
   const mempoolSize = +(response.mempoolSize / 1000000).toFixed(2)
 
@@ -50,7 +49,8 @@ function processApiMempoolDataForChart(response) {
   const lines = []
   const blocks = []
   const rowData = [
-    [],[]
+    [],
+    []
   ]
 
   for (var feerate in response.mempoolData) {
@@ -70,7 +70,7 @@ function processApiMempoolDataForChart(response) {
     }
   }
 
-  
+
   for (var position in response.positionsInGreedyBlocks) {
     if (position < 3) {
       blocks.push(response.positionsInGreedyBlocks[position])
@@ -98,7 +98,7 @@ function processApiMempoolDataForChart(response) {
 window.onload = function () {
   // Add event listeners to the search bar
   document.getElementById('button-lookup-txid').addEventListener('click', handleTxSearch)
-  document.getElementById('input-lookup-txid').addEventListener("keyup", function(event) {
+  document.getElementById('input-lookup-txid').addEventListener("keyup", function (event) {
     if (event.keyCode === 13) { // Handle enter
       event.preventDefault()
       document.getElementById('button-lookup-txid').click()
@@ -106,13 +106,13 @@ window.onload = function () {
   })
 
   // add scroll listener for icon
-  $(window).scroll(function() {
+  $(window).scroll(function () {
     if ($(".navbar").offset().top > 60) {
-        $(".navbar").addClass("scrolled");
+      $(".navbar").addClass("scrolled");
     } else {
-        $(".navbar").removeClass("scrolled");
-    }   
-  }); 
+      $(".navbar").removeClass("scrolled");
+    }
+  });
 
   // Get the mempool data 
   axios.get('https://mempool.observer/api/mempool')
@@ -141,8 +141,12 @@ async function draw(processed) {
     tooltip: {
       grouped: false,
       format: {
-        name: function (name) {return name + ' sat/vbyte'},
-        value: function (value) {return value + ' transactions'},
+        name: function (name) {
+          return name + ' sat/vbyte'
+        },
+        value: function (value) {
+          return value + ' transactions'
+        },
       }
     },
     size: {
@@ -161,7 +165,9 @@ async function draw(processed) {
     },
     axis: {
       y: {
-        padding: {top: 0},
+        padding: {
+          top: 0
+        },
         show: true,
         label: {
           text: 'unconfirmed transactions'
@@ -169,28 +175,33 @@ async function draw(processed) {
       },
       y2: {
         outer: false,
-        padding: {top: 0, bottom:0},
+        padding: {
+          top: 0,
+          bottom: 0
+        },
         default: [0, processed.sum],
         label: {
           text: 'estimated blocks'
         },
         show: true,
         tick: {
-          format: function (d) {return NEXT_BLOCK_LABELS[processed.blocks.indexOf(d)]},
+          format: function (d) {
+            return NEXT_BLOCK_LABELS[processed.blocks.indexOf(d)]
+          },
           values: processed.blocks
         }
       }
     }
   })
 
-  if(currentTx != null){
+  if (currentTx != null) {
     // Check if the transaction has been confirmed 
     const tx = await getTxFromApi(currentTx.txid) // in sat/vbyte
     currentTx = tx
     if (tx.status.confirmed) {
       $('#tx-eta-data').html(`Confirmed (block ${tx.status.block_height}, ${minutes_since_confirmation} minutes ago)`)
     } else {
-      const feeRate =  Math.floor(tx.fee / (tx.weight / 4)) 
+      const feeRate = Math.floor(tx.fee / (tx.weight / 4))
       drawTxIdInChartByFeeRate(currentTx.txid, feeRate)
     }
   }
@@ -198,16 +209,16 @@ async function draw(processed) {
 
 function redraw() {
   setTimeout(function () {
-      axios.get('https://mempool.observer/api/mempool')
-        .then(function (response) {
-          processed = processApiMempoolDataForChart(response.data)
-          updateCurrentMempoolCard(processed)
-          if (!document.hidden) { // only get new data to redraw if the tab is focused
-            draw(processed)
-          }else{
-            console.warn("Tab is not shown. Skipping chart refresh.")
-          }
-        });
+    axios.get('https://mempool.observer/api/mempool')
+      .then(function (response) {
+        processed = processApiMempoolDataForChart(response.data)
+        updateCurrentMempoolCard(processed)
+        if (!document.hidden) { // only get new data to redraw if the tab is focused
+          draw(processed)
+        } else {
+          console.warn("Tab is not shown. Skipping chart refresh.")
+        }
+      });
     redraw()
   }, 30000);
 }
@@ -231,18 +242,18 @@ function updateCurrentMempoolCardLastUpdated() {
   // format as milliseconds since 1.1.1970 UTC
   // * 1000 to convert from seconds to milliseconds
   const millislastMempoolDataUpdate = lastMempoolDataUpdate * 1000
-  const minutes = Math.floor((Date.now() -  millislastMempoolDataUpdate) / 1000 / 60)
+  const minutes = Math.floor((Date.now() - millislastMempoolDataUpdate) / 1000 / 60)
 
   document.getElementById('current-mempool-last-update').innerHTML = (minutes)
 }
 
 // Update the 'Time since last update' text
-setInterval(function() {
+setInterval(function () {
   updateCurrentMempoolCardLastUpdated()
 }, 10000);
 
 async function handleTxSearch() {
-  $('#input-lookup-txid').removeClass("is-invalid" ) // remove invalid tx message 
+  $('#input-lookup-txid').removeClass("is-invalid") // remove invalid tx message 
   $('#current-mempool-tx-data').hide() // hide the current tx data
 
   txId = document.getElementById('input-lookup-txid').value
@@ -251,13 +262,13 @@ async function handleTxSearch() {
   if (/^[a-fA-F0-9]{64}$/.test(txId) == false) {
     currentTx = null
     $('#invalid-feedback').html('Invalid Bitcoin transaction id.') // Set invalidt tx message
-    $('#input-lookup-txid').addClass("is-invalid")  // Show invalid tx message
+    $('#input-lookup-txid').addClass("is-invalid") // Show invalid tx message
   } else {
     try {
       const tx = await getTxFromApi(txId)
-      if (tx.status.confirmed){
+      if (tx.status.confirmed) {
         currentTx = null
-        let minutes_since_confirmation = Math.floor((Date.now() -  tx.status.block_time * 1000) / 1000 / 60)
+        let minutes_since_confirmation = Math.floor((Date.now() - tx.status.block_time * 1000) / 1000 / 60)
         let error = `The transaction is already confirmed and therefore not in the mempool. (block ${tx.status.block_height}, ${minutes_since_confirmation} minutes ago)`
         console.error(error)
 
@@ -265,9 +276,9 @@ async function handleTxSearch() {
         $('#input-lookup-txid').addClass("is-invalid")
       } else {
         currentTx = tx
-        const feeRate =  Math.floor(tx.fee / (tx.weight / 4)) // see Issue #11  
+        const feeRate = Math.floor(tx.fee / (tx.weight / 4)) // see Issue #11  
         drawTxIdInChartByFeeRate(tx.txid, feeRate)
-        renderDataTable(tx.fee, (tx.weight/4), feeRate)
+        renderDataTable(tx.fee, (tx.weight / 4), feeRate)
       }
 
     } catch (error) {
@@ -278,23 +289,36 @@ async function handleTxSearch() {
   }
 }
 
-function drawTxIdInChartByFeeRate(txid,feeRate){
+function drawTxIdInChartByFeeRate(txid, feeRate) {
   const position = getTxPostionInChartByFeeRate(feeRate)
   // Remove existing line in case
-  chart.ygrids.remove({class:'user-tx'});
+  chart.ygrids.remove({
+    class: 'user-tx'
+  });
   // Draw a new line, but wait 500ms for c3.js to not bug out
-  setTimeout(function(){ chart.ygrids.add([{value: position, text: txid.substring(0, 8) + "...", class:'user-tx', position: 'middle'}]); }, 500)
+  setTimeout(function () {
+    chart.ygrids.add([{
+      value: position,
+      text: txid.substring(0, 8) + "...",
+      class: 'user-tx',
+      position: 'middle'
+    }]);
+  }, 500)
 
   // TODO: Might be a bug here since the tooltip doesn't show
-  chart.tooltip.show({x: feeRate, index: 0, id: '1' })
+  chart.tooltip.show({
+    x: feeRate,
+    index: 0,
+    id: '1'
+  })
 }
 
-function getTxPostionInChartByFeeRate(feeRate){
+function getTxPostionInChartByFeeRate(feeRate) {
   let position = 0
-  for(index in processedMempool.rowData[0]){
-    if(processedMempool.rowData[0][index] <= feeRate){
+  for (index in processedMempool.rowData[0]) {
+    if (processedMempool.rowData[0][index] <= feeRate) {
       position += processedMempool.rowData[1][index]
-    }else{
+    } else {
       break;
     }
   }
