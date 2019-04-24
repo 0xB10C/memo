@@ -47,6 +47,11 @@ svg#brand-icon g.text {
 
 /* current mempool card */
 
+.input-subtitle {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 #input-lookup-txid {
   background-image: none;
   padding: 0.5em;

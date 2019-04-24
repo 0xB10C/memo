@@ -104,6 +104,7 @@ window.onload = function () {
       document.getElementById('button-lookup-txid').click()
     }
   })
+  document.getElementById('random-tx').addEventListener('click', tryRandomTx)
 
   // add scroll listener for icon
   $(window).scroll(function () {
@@ -344,4 +345,16 @@ function renderDataTable(fee, vsize, feeRate) {
   $('#tx-fee-data').html(fee)
   $('#tx-size-data').html(vsize)
   $('#tx-feerate-data').html(feeRate)
+}
+
+async function tryRandomTx() {
+  try {
+    const recentTxs = await axios.get('https://blockstream.info/api/mempool/recent')
+    const feePayingTxs = recentTxs.data.filter(tx => tx.fee > 0).map(tx => tx.txid)
+    var randomTx = feePayingTxs[Math.floor(Math.random() * feePayingTxs.length)];
+    document.getElementById('input-lookup-txid').value = randomTx;
+    handleTxSearch()
+  } catch (e) {
+    console.error(e)
+  }
 }
