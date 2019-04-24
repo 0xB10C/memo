@@ -135,8 +135,11 @@
               (<span id="current-mempool-size">0</span>&nbsp;MB)
             </p>
 
-            <label for="input-txid-lookup">Enter a transaction id to see where it is in the mempool:</label>
-
+            <label for="input-txid-lookup">
+              Enter or
+              <span id="random-tx" class="input-subtitle" href="#">try a random</span>
+              transaction id to see where it is in the mempool:
+            </label>
             <div class="row">
               <div class="col-10 pr-1">
                 <input type="text" id="input-lookup-txid" class="form-control"
@@ -150,9 +153,6 @@
                 <button class="btn btn-outline-primary" type="button" id="button-lookup-txid">
                   <i class="fas fa-search-location"></i>
                 </button>
-              </div>
-              <div class="col-12 input-subtitle">
-                <a id="random-tx" class="input-subtitle">Try with a random transaction from the Mempool</a>
               </div>
             </div>
 

@@ -344,8 +344,8 @@ function renderDataTable(fee, vsize, feeRate) {
 
 async function tryRandomTx() {
   try {
-    const res = await axios.get('https://blockstream.info/api/mempool/recent')
-    const feePayingTxs = res.data.filter(tx => tx.fee > 0).map(tx => tx.txid)
+    const recentTxs = await axios.get('https://blockstream.info/api/mempool/recent')
+    const feePayingTxs = recentTxs.data.filter(tx => tx.fee > 0).map(tx => tx.txid)
     var randomTx = feePayingTxs[Math.floor(Math.random() * feePayingTxs.length)];
     document.getElementById('input-lookup-txid').value = randomTx;
     handleTxSearch()
