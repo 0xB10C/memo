@@ -45,6 +45,15 @@ svg#brand-icon g.text {
   opacity: 0;
 }
 
+/* description and input */
+
+.input-subtitle {
+  margin-top: 0.5em;
+  font-size: 0.9em;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 /* current mempool card */
 
 #input-lookup-txid {
