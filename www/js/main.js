@@ -2,7 +2,7 @@
 const NEXT_BLOCK_LABELS = ["1 vMB", "2 vMB", "3 vMB"]
 
 // State 
-var chart
+var chart = null
 var lastMempoolDataUpdate = 0
 var processedMempool = null
 var currentTx = null
@@ -125,7 +125,7 @@ window.onload = function () {
 }
 
 async function draw(processed) {
-  chart = c3.generate({
+  chartSetting = {
     data: {
       rows: processed.rowData,
       type: 'bar',
@@ -192,8 +192,14 @@ async function draw(processed) {
         }
       }
     }
-  })
+  }
 
+  if(chart){
+    chart = chart.destroy(); // properly destroy chart
+  }
+
+  chart = c3.generate(chartSetting)
+  
   if (currentTx != null) {
     // Check if the transaction has been confirmed 
     const tx = await getTxFromApi(currentTx.txid) // in sat/vbyte
