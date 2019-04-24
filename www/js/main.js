@@ -201,11 +201,10 @@ async function draw(processed) {
   chart = c3.generate(chartSetting)
   
   if (currentTx != null) {
-    // Check if the transaction has been confirmed 
     const tx = await getTxFromApi(currentTx.txid) // in sat/vbyte
     currentTx = tx
     if (tx.status.confirmed) {
-      $('#tx-eta-data').html(`Confirmed (block ${tx.status.block_height}, ${minutes_since_confirmation} minutes ago)`)
+      $('#tx-eta-data').html(`Confirmed (block ${tx.status.block_height}, ${minutes_since_confirmation} minutes ago)`) // FIXME: tx-eta-data is not used anymore
     } else {
       const feeRate = Math.floor(tx.fee / (tx.weight / 4))
       drawTxIdInChartByFeeRate(currentTx.txid, feeRate)
@@ -229,7 +228,7 @@ function redraw() {
   }, 30000);
 }
 
-function updateCurrentMempoolCard(processed) { //TODO: Change name of function
+function updateCurrentMempoolCard(processed) {
 
   const spanTxCount = document.getElementById('current-mempool-count')
   const spanMempoolSize = document.getElementById('current-mempool-size')
