@@ -208,7 +208,7 @@ async function draw(processed) {
       $('#tx-eta-data').html(`Confirmed (block ${tx.status.block_height}, ${minutes_since_confirmation} minutes ago)`) // FIXME: tx-eta-data is not used anymore
     } else {
       const feeRate = Math.floor(tx.fee / (tx.weight / 4))
-      drawTxIdInChartByFeeRate(currentTx.txid, feeRate)
+      drawTxIdInChartByFeeRate(feeRate)
     }
   }
 }
@@ -283,7 +283,7 @@ async function handleTxSearch() {
       } else {
         currentTx = tx
         const feeRate = Math.floor(tx.fee / (tx.weight / 4)) // see Issue #11  
-        drawTxIdInChartByFeeRate(tx.txid, feeRate)
+        drawTxIdInChartByFeeRate(feeRate)
         renderDataTable(tx.fee, (tx.weight / 4), feeRate)
       }
 
@@ -295,7 +295,7 @@ async function handleTxSearch() {
   }
 }
 
-function drawTxIdInChartByFeeRate(txid, feeRate) {
+function drawTxIdInChartByFeeRate(feeRate) {
   const position = getTxPostionInChartByFeeRate(feeRate)
   // Remove existing line in case
   chart.ygrids.remove({
@@ -305,7 +305,7 @@ function drawTxIdInChartByFeeRate(txid, feeRate) {
   setTimeout(function () {
     chart.ygrids.add([{
       value: position,
-      text: txid.substring(0, 8) + "...",
+      text: 'Your transaction',
       class: 'user-tx',
       position: 'middle'
     }]);
