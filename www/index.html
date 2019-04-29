@@ -85,10 +85,13 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
           <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-              <!-- <a class="nav-link" href="#current-mempool">Current<span class="sr-only">(current)</span></a> -->
+              <a class="nav-link" href="#current-mempool">Current<span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
-              <!-- <a class="nav-link" href="#historical-mempool">Historical</a> -->
+              <a class="nav-link" href="#past-blocks">Blocks</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#historical-mempool">Historical</a>
             </li>
           </ul>
           <!-- <button class="btn my-2 my-sm-0 btn-light btn-outline-white" onclick="alert('not part of the mvp :)');"> -->
@@ -197,13 +200,21 @@
       </div>
     </div>
 
-    <a id="historical-mempool" class="href-target"></a>
-    <!--div class="card my-4 shadow-sm bg-white">
+    <a id="past-blocks" class="href-target"></a>
+    <div class="card my-4 shadow-sm bg-white">
       <div class="card-body">
-          <h3 class="card-title">Historical Bitcoin Mempool</h3>
-          <h5 class="card-subtitle mb-2 text-muted">Where is my transaction in the mempool?</h5>
+        <h3 class="card-title">Block stats</h3>
+
+          <p><span>Time since the last block: </span>
+        </p>
       </div>
-    </div-->
+      <div class="card-footer text-muted text-right">
+        <small id="last-update" class="text-muted">
+          last updated
+          <span id="current-mempool-last-update">0</span>
+          minutes ago</small>
+      </div>
+    </div>
 
     <div class="alert alert-warning alert-dismissible fade show shadow-sm border-warning" role="alert">
       <strong>Work in progress!</strong>
@@ -211,6 +222,20 @@
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
+    </div>
+
+    <a id="historical-mempool" class="href-target"></a>
+    <div class="card my-4 shadow-sm bg-white">
+      <div class="card-body">
+        <h3 class="card-title">Historical Bitcoin Mempool</h3>
+        <h5 class="card-subtitle mb-2 text-muted">Where is my transaction in the mempool?</h5>
+      </div>
+      <div class="card-footer text-muted text-right">
+        <small id="last-update" class="text-muted">
+          last updated
+          <span id="current-mempool-last-update">0</span>
+          minutes ago</small>
+      </div>
     </div>
 
   </main>
