@@ -106,7 +106,7 @@
   <main id="main" role="main" class="container py-1">
 
     <a id="current-mempool" class="href-target"></a>
-    <div class="card my-4 shadow-sm bg-white">
+    <div class="card my-4 shadow-sm bg-white" id="card-current-mempool">
       <div class="card-body">
         <div class="row">
           <div class="col-md-6">
@@ -200,8 +200,22 @@
       </div>
     </div>
 
+    <a id="historical-mempool" class="href-target"></a>
+    <div class="card my-4 shadow-sm bg-white" id="card-historical-mempool">
+      <div class="card-body">
+        <h3 class="card-title">Historical Bitcoin Mempool</h3>
+        <h5 class="card-subtitle mb-2 text-muted">Where is my transaction in the mempool?</h5>
+      </div>
+      <div class="card-footer text-muted text-right">
+        <small id="last-update" class="text-muted">
+          last updated
+          <span id="current-mempool-last-update">0</span>
+          minutes ago</small>
+      </div>
+    </div>
+
     <a id="past-blocks" class="href-target"></a>
-    <div class="card my-4 shadow-sm bg-white">
+    <div class="card my-4 shadow-sm bg-white" id="card-past-blocks">
       <div class="card-body">
         <h3 class="card-title">Block stats</h3>
 
@@ -216,26 +230,13 @@
       </div>
     </div>
 
+
     <div class="alert alert-warning alert-dismissible fade show shadow-sm border-warning" role="alert">
       <strong>Work in progress!</strong>
       This is an early prototype of mempool.observer v2.
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
-    </div>
-
-    <a id="historical-mempool" class="href-target"></a>
-    <div class="card my-4 shadow-sm bg-white">
-      <div class="card-body">
-        <h3 class="card-title">Historical Bitcoin Mempool</h3>
-        <h5 class="card-subtitle mb-2 text-muted">Where is my transaction in the mempool?</h5>
-      </div>
-      <div class="card-footer text-muted text-right">
-        <small id="last-update" class="text-muted">
-          last updated
-          <span id="current-mempool-last-update">0</span>
-          minutes ago</small>
-      </div>
     </div>
 
   </main>

@@ -8,6 +8,7 @@ var blockchainTip = null
 var state = {
   currentMempool: {
     chart: null,
+    elementId: "card-current-mempool",
     isScrolledIntoView: true, // TODO: Maybe have everything default to false at start?
     data: {
       processedMempool: null,
@@ -17,16 +18,19 @@ var state = {
   },
   historicalMempool: {
     chart: null,
-    isScrolledIntoView: true, // TODO: Maybe have everything default to false at start?
+    elementId: "card-historical-mempool",
+    isScrolledIntoView: false, // TODO: Maybe have everything default to false at start?
     data: {},
   },
   pastBlocks: {
     chart: null,
-    isScrolledIntoView: true, // TODO: Maybe have everything default to false at start?
+    elementId: "card-past-blocks",
+    isScrolledIntoView: false, // TODO: Maybe have everything default to false at start?
     data: {},
   },
 }
 
+var cards = [state.currentMempool, state.historicalMempool, state.pastBlocks]
 
 window.onload = function () {
   // Add event listeners to the search bar
@@ -55,12 +59,49 @@ function scrollEventHandler(){
     $(".navbar").removeClass("scrolled");
   }
  
+  cards.forEach(card => {
+    let el = document.getElementById(card.elementId)
+    
+    let scrolledIntoView = isScrolledIntoView(el)
+
+    if(card.isScrolledIntoView == false && scrolledIntoView == true) {
+      // redraw chart if card just scrolled into view
+      card.isScrolledIntoView = scrolledIntoView
+      drawChart(card.elementId)
+    } 
+    
+    else if (card.isScrolledIntoView == true && scrolledIntoView == false) {
+      // destroy chart if card just scrolled out of view
+      card.isScrolledIntoView = scrolledIntoView
+      if(card.chart != null){
+        card.chart = card.chart.destroy();
+      }
+      console.error("Destroying", card.elementId)
+    }
+
+
+
+    // debug card is scrolled into View
+    /*
+    console.log(card.elementId, card.isScrolledIntoView)
+    if(card.isScrolledIntoView){
+      el.style.setProperty("background-color", "lime", "important");
+    } else {
+      el.style.setProperty("background-color", "orange", "important");
+    }
+    */
+
+  });
+  
 }
 
 function isScrolledIntoView(el) {
+  const offset = 100
   let elemTop = el.getBoundingClientRect().top;
   let elemBottom = el.getBoundingClientRect().bottom;
-  let isVisible = (elemTop >= 0) && (elemBottom <= window.innerHeight);
+  let elemHeight = elemBottom - elemTop 
+
+  let isVisible = (elemTop + elemHeight + offset >= 0) && (elemBottom - elemHeight - offset <= window.innerHeight);
   return isVisible;
 }
 
@@ -139,7 +180,9 @@ const currentMempoolCard = {
   
     return colorPattern
   },
-  draw: async function(processed) {
+  draw: async function() {
+    let processed = state.currentMempool.data.processedMempool
+
     chartSetting = {
       data: {
         rows: processed.rowData,
@@ -356,18 +399,8 @@ function reloadData() {
   axios.get('https://mempool.observer/api/mempool')
     .then(function (response) {
       state.currentMempool.data.processedMempool = currentMempoolCard.processDataForChart(response.data)
-
-      let processedMempool = state.currentMempool.data.processedMempool
-      currentMempoolCard.updateCard(processedMempool)
-
-      // only redraw if the tab is focused
-      if (!document.hidden) { 
-        currentMempoolCard.draw(processedMempool)
-      } else {
-        console.warn("Tab is not shown. Skipping chart refresh.")
-        // TODO: notify the user that the chart hasn't been redrawn
-      }
-
+      currentMempoolCard.updateCard(state.currentMempool.data.processedMempool)
+      drawChart(state.currentMempool.elementId)
     });
 
   // reload last blocks data
@@ -379,6 +412,32 @@ function reloadData() {
   // reload data again in 30 seconds
   setTimeout(function () {reloadData()}, 30000); 
 }
+
+// draws charts for visible cards
+function drawChart(id) {
+  
+  if (!document.hidden) { 
+
+    if (state.currentMempool.elementId == id && state.currentMempool.isScrolledIntoView){
+      console.log("Drawing currentMempool chart")
+      currentMempoolCard.draw()
+    }
+
+    if (state.historicalMempool.elementId == id && state.historicalMempool.isScrolledIntoView) {
+      console.log("Drawing historicalMempool chart")
+    }
+
+    if (state.pastBlocks.elementId == id && state.pastBlocks.isScrolledIntoView) {
+      console.log("Drawing pastBlocks chart")
+    }
+
+  } else {
+    // TODO: notify the user that the chart hasn't been redrawn
+    console.warn("Tab is not shown. Skipping chart refresh.")
+  }
+
+}
+
 
 setInterval(function () {
   // Update the 'Time since last update' text for the current mempool card
