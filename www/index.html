@@ -166,19 +166,19 @@
                   <div class="col-4 text-center px-2">
                     <span class="badge badge-light p-2">
                       <span class="text-muted">fee</span><br style="line-height: 150%;">
-                      <span id="tx-fee-data">0</span>&nbsp;sat
+                      <span id="current-mempool-tx-data-fee">0</span>&nbsp;sat
                     </span>
                   </div>
                   <div class="col-4 text-center px-2">
                     <span class="badge badge-light p-2">
                       <span class="text-muted">vsize</span><br style="line-height: 150%;">
-                      <span id="tx-size-data">0</span>&nbsp;vbyte
+                      <span id="current-mempool-tx-data-size">0</span>&nbsp;vbyte
                     </span>
                   </div>
                   <div class="col-4 text-center px-2">
                     <span class="badge badge-light p-2">
                       <span class="text-muted">feerate</span><br style="line-height: 150%;">
-                      <span id="tx-feerate-data">0</span>&nbsp;sat/vbyte
+                      <span id="current-mempool-tx-data-feerate">0</span>&nbsp;sat/vbyte
                     </span>
                   </div>
                 </div>
@@ -187,7 +187,7 @@
           </div>
 
           <div class="col-md-6">
-            <div id="chart" class="my-3"></div>
+            <div id="current-mempool-chart" class="my-3"></div>
           </div>
 
         </div>
@@ -204,29 +204,35 @@
     <div class="card my-4 shadow-sm bg-white" id="card-historical-mempool">
       <div class="card-body">
         <h3 class="card-title">Historical Bitcoin Mempool</h3>
-        <h5 class="card-subtitle mb-2 text-muted">Where is my transaction in the mempool?</h5>
+        <h5 class="card-subtitle mb-2 text-muted">Need a subheading here. Maybe a question?</h5>
       </div>
       <div class="card-footer text-muted text-right">
-        <small id="last-update" class="text-muted">
+        <small>
           last updated
-          <span id="current-mempool-last-update">0</span>
-          minutes ago</small>
+          <span id="historical-mempool-last-update">0</span>
+          minutes ago
+        </small>
       </div>
     </div>
 
     <a id="past-blocks" class="href-target"></a>
     <div class="card my-4 shadow-sm bg-white" id="card-past-blocks">
       <div class="card-body">
-        <h3 class="card-title">Block stats</h3>
-
-          <p><span>Time since the last block: </span>
+        <h3 class="card-title">Recent Blocks</h3>
+        <h5 class="card-subtitle mb-2 text-muted">Need a subheading here. Maybe a question?</h5>
+        <div class="row">
+          <div class="col-md-12">
+            <div id="past-blocks-chart"></div>
+          </div>
+        </div>
         </p>
       </div>
       <div class="card-footer text-muted text-right">
-        <small id="last-update" class="text-muted">
+        <small>
           last updated
-          <span id="current-mempool-last-update">0</span>
-          minutes ago</small>
+          <span id="past-blocks-last-update">0</span>
+          minutes ago
+        </small>
       </div>
     </div>
 

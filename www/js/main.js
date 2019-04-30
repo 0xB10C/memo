@@ -182,6 +182,7 @@ const currentMempoolCard = {
     let processed = state.currentMempool.data.processedMempool
 
     chartSetting = {
+      bindto: '#current-mempool-chart',
       data: {
         rows: processed.rowData,
         type: 'bar',
@@ -330,7 +331,7 @@ const currentMempoolCard = {
   
     // Remove existing line(s)
     state.currentMempool.chart.ygrids.remove({
-      class: 'user-tx'
+      class: 'red-line'
     });
   
     // Draw a new line, but wait 20ms for c3.js to not to remove it directly
@@ -338,7 +339,7 @@ const currentMempoolCard = {
       state.currentMempool.chart.ygrids.add([{
         value: position,
         text: 'Your transaction',
-        class: 'user-tx',
+        class: 'red-line',
         position: 'middle'
       }]);
     }, 500)
@@ -363,9 +364,9 @@ const currentMempoolCard = {
   },
   displayTransactionData: function (fee, vsize, feeRate) {
     $('#current-mempool-tx-data').show()
-    $('#tx-fee-data').html(fee)
-    $('#tx-size-data').html(vsize)
-    $('#tx-feerate-data').html(feeRate)
+    $('#current-mempool-tx-data-fee').html(fee)
+    $('#current-mempool-tx-data-size').html(vsize)
+    $('#current-mempool-tx-data-feerate').html(feeRate)
   },
   loadRandomTransactionFromApi: async function() {
     try {
@@ -380,6 +381,134 @@ const currentMempoolCard = {
   }
 }
 
+const pastBlocksCard = {
+  updateTimeSinceLastBlock: function () { 
+    
+  },
+  processDataForChart: function(response) {
+    state.pastBlocks.data.timeLastUpdated = new Date();
+    
+    console.log(response)
+
+    let rows = [["date", "block"]]
+    let lines = []
+    let regions = []
+    
+    for(blockIndex in response.data){
+      let timestamp = response.data[blockIndex].receivedBlockTime * 1000
+      let height = response.data[blockIndex].height
+      
+      rows.push([
+          new Date(timestamp),  height
+      ])
+
+      lines.push({
+        value: new Date(timestamp),
+        text: "Block "+ height,
+      })
+    
+    }
+    
+    lines.push({value: new Date(), text: 'Now', position: 'start' , class: "red-line"})
+    rows.push([new Date(), 1])
+
+    // region from the last block to the current time
+    // last block is here element zero
+    regions.push({axis: 'x', start: response.data[0].receivedBlockTime * 1000, end: new Date(), class: 'time-since-last-block'},)
+
+    return {
+      blocks: response.data,
+      rows: rows,
+      lines: lines,
+      regions: regions,
+      minHeight: response.data[9].height
+    }
+  },
+  draw: async function () {
+
+    let processed = state.pastBlocks.data.processedBlocks
+
+    if(processed == null){return}
+
+    chartSetting = {
+      bindto: '#past-blocks-chart',
+      data: {
+          x: 'date',
+          xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
+          rows: processed.rows
+      },
+      point: {
+        show: true,
+        r: 15,
+        focus: {
+          expand: {
+            enabled: true,
+            r: 20,
+          }
+        }
+      },
+      regions: processed.regions,
+      padding: {
+        top: 20,
+        bottom: 20,
+      },
+      color: {
+        pattern: ['#323232']
+      },
+      legend: {
+        show: false
+      },
+      axis: {
+        x: {
+          type: 'timeseries',
+          padding: {
+            left: 2 * 60 * 1000,
+            right: 2 * 60 * 1000 // 2 min in ms 
+          },
+          tick: {
+            format: '%H:%M',
+            fit: false,
+          },
+        },
+        y: {
+          show: false,
+          max: processed.minHeight + 500,
+          min: processed.minHeight - 300
+        }, 
+      },
+      grid: {
+        x: {
+          lines: processed.lines
+        }
+      },
+      tooltip: {
+        contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
+          let block = state.pastBlocks.data.processedBlocks.blocks[9-d[0].index]
+          let miner = block.miner == null ? "Unknown" : block.miner.name
+          let foundMinAgo = (Date.now() - block.receivedBlockTime * 1000) / 1000 / 60 
+          return `<div class="c3-tooltip"><table><tbody>
+            <tr><td>Height</td><td>${block.height}</td></tr>
+            <tr><td>Transactions</td><td>${block.transactionsCount}</td></tr>
+            <tr><td>Size</td><td>${(block.size / 1000 / 1000).toFixed(2) + " MB"}</td></tr>
+            <tr><td>Miner</td><td>${miner}</td></tr>
+            <tr><td>Found</td><td>${foundMinAgo.toFixed(0) + " min ago"}</td></tr>
+            </tbody></table></div>`
+        }
+      }
+    }
+    
+    // properly destroy chart and generate new chart
+    if(state.pastBlocks.chart){
+      state.pastBlocks.chart = state.pastBlocks.chart.destroy(); 
+    }
+    state.pastBlocks.chart = c3.generate(chartSetting)
+
+  }
+}
+
+
+
+
 
 function reloadData() {
   
@@ -392,9 +521,13 @@ function reloadData() {
     });
 
   // reload last blocks data
-  axios.get('https://blockstream.info/api/blocks')
+  // using bitaps.com here since it's API gives the time first seen
+  // e.g. blockstream.info only gives the miner timestamp, which 
+  // is to flexibile for us here 
+  axios.get('https://api.bitaps.com/btc/v1/blockchain/blocks/last/10')
   .then(function (response) {
-    console.log(response.data)
+    state.pastBlocks.data.processedBlocks = pastBlocksCard.processDataForChart(response.data)
+    drawChart(state.pastBlocks.elementId)
   });
 
   // reload data again in 30 seconds
@@ -416,6 +549,7 @@ function drawChart(id) {
     }
 
     if (state.pastBlocks.elementId == id && state.pastBlocks.isScrolledIntoView) {
+      pastBlocksCard.draw()
       // console.log("Drawing pastBlocks chart")
     }
 
@@ -432,12 +566,9 @@ setInterval(function () {
   currentMempoolCard.updateCardLastUpdated()
 
   // Update the 'Time since last block' 
-  updateTimeSinceLastBlock()
+  pastBlocksCard.updateTimeSinceLastBlock()
 }, 10000);
 
-function updateTimeSinceLastBlock(){ // TODO: move to pastBlocksCard function object
-  
-}
 
 function getLastTenBlocksFromApi() {
   return axios.get(`https://blockstream.info/api/blocks`)
