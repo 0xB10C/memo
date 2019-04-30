@@ -9,7 +9,7 @@ var state = {
   currentMempool: {
     chart: null,
     elementId: "card-current-mempool",
-    isScrolledIntoView: true, // TODO: Maybe have everything default to false at start?
+    isScrolledIntoView: true,
     data: {
       processedMempool: null,
       currentTx: null,
@@ -19,13 +19,13 @@ var state = {
   historicalMempool: {
     chart: null,
     elementId: "card-historical-mempool",
-    isScrolledIntoView: false, // TODO: Maybe have everything default to false at start?
+    isScrolledIntoView: false,
     data: {},
   },
   pastBlocks: {
     chart: null,
     elementId: "card-past-blocks",
-    isScrolledIntoView: false, // TODO: Maybe have everything default to false at start?
+    isScrolledIntoView: false,
     data: {},
   },
 }
@@ -75,11 +75,9 @@ function scrollEventHandler(){
       card.isScrolledIntoView = scrolledIntoView
       if(card.chart != null){
         card.chart = card.chart.destroy();
+        //console.error("Destroying", card.elementId)
       }
-      console.error("Destroying", card.elementId)
     }
-
-
 
     // debug card is scrolled into View
     /*
@@ -258,10 +256,6 @@ const currentMempoolCard = {
     }
     state.currentMempool.chart = c3.generate(chartSetting)
   
-    // TODO: can be removed
-    // const tx = await getTxFromApi(currentTx.txid) // in sat/vbyte
-    // currentTx = tx
-  
     // draw the tx the chart if it's unconfirmed
     let tx = state.currentMempool.data.currentTx;
     if (tx != null) {
@@ -339,7 +333,7 @@ const currentMempoolCard = {
       class: 'user-tx'
     });
   
-    // Draw a new line, but wait 20ms for c3.js to not bug out
+    // Draw a new line, but wait 20ms for c3.js to not to remove it directly
     setTimeout(function () {
       state.currentMempool.chart.ygrids.add([{
         value: position,
@@ -347,14 +341,8 @@ const currentMempoolCard = {
         class: 'user-tx',
         position: 'middle'
       }]);
-    }, 20)
-  
-    // TODO: Might be a bug here since the tooltip doesn't show
-    state.currentMempool.chart.tooltip.show({
-      x: feeRate,
-      index: 0,
-      id: '1'
-    })
+    }, 500)
+
   },
   getUserTxPositionInChartByFeeRate: function (feeRate) {
     let position = 0
@@ -419,16 +407,16 @@ function drawChart(id) {
   if (!document.hidden) { 
 
     if (state.currentMempool.elementId == id && state.currentMempool.isScrolledIntoView){
-      console.log("Drawing currentMempool chart")
+      // console.log("Drawing currentMempool chart")
       currentMempoolCard.draw()
     }
 
     if (state.historicalMempool.elementId == id && state.historicalMempool.isScrolledIntoView) {
-      console.log("Drawing historicalMempool chart")
+      // console.log("Drawing historicalMempool chart")
     }
 
     if (state.pastBlocks.elementId == id && state.pastBlocks.isScrolledIntoView) {
-      console.log("Drawing pastBlocks chart")
+      // console.log("Drawing pastBlocks chart")
     }
 
   } else {
