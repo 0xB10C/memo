@@ -61,7 +61,7 @@ svg#brand-icon g.text {
   display: none;
 }
 
-#card-current-mempool.card-body {
+#card-current-mempool div.card-body {
   /* So it doesn't need to resize after chart is rendered */
   min-height: 822px;
 }
@@ -115,8 +115,8 @@ svg#brand-icon g.text {
 
 /* past blocks card */
 
-#card-past-blocks.card-body {
-  min-height: 688;
+#card-past-blocks div.card-body {
+  min-height: 688px;
 }
 
 .time-since-last-block.c3-region {

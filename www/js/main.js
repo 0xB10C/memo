@@ -388,8 +388,8 @@ const currentMempoolCard = {
 const pastBlocksCard = {
   updateCardLastUpdated: function () { 
     // calc seconds from milliseconds
-    const seconds = Math.floor((Date.now() - (state.pastBlocks.data.timeLastUpdated)) / 1000)
-    document.getElementById('past-blocks-last-update').innerHTML = (seconds)
+    const minutes = Math.floor((Date.now() - (state.pastBlocks.data.timeLastUpdated)) / 1000 / 60) 
+    document.getElementById('past-blocks-last-update').innerHTML = (minutes)
   },
   processDataForChart: function(response) {
     state.pastBlocks.data.timeLastUpdated = new Date();
