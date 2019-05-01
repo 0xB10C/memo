@@ -201,7 +201,7 @@
     </div>
 
     <a id="historical-mempool" class="href-target"></a>
-    <div class="card my-4 shadow-sm bg-white" id="card-historical-mempool">
+    <div class="card my-4 shadow-sm bg-white" id="card-historical-mempool" style="display: none;">
       <div class="card-body">
         <h3 class="card-title">Historical Bitcoin Mempool</h3>
         <h5 class="card-subtitle mb-2 text-muted">Need a subheading here. Maybe a question?</h5>
@@ -219,17 +219,36 @@
     <div class="card my-4 shadow-sm bg-white" id="card-past-blocks">
       <div class="card-body">
         <h3 class="card-title">Recent Blocks</h3>
-        <h5 class="card-subtitle mb-2 text-muted">Need a subheading here. Maybe a question?</h5>
+        <h5 class="card-subtitle mb-2 text-muted">How much time has passed since the last block?</h5>
         <div class="row">
+          <div class="col-md-12">
+            <p class="card-text">
+              The chart below visualizes the time between the last ten blocks.
+              Since finding a valid block (i.e. mining) is a _random_ process, the time between two blocks might be only a few seconds, but can also be more than an hour.  
+              On average a valid block is found every <abbr title="TODO: in theory, but not in practice">ten</abbr> minutes. 
+              Due to mining being a random process there, is no way of estimating when a next block will be found.
+              However the probability of a new being found block in the next e.g. five minutes rises as time goes by. 
+            </p>
+
+            <p class="card-text">
+              The chart displays the time blocks arrived over the 
+              <abbr title="While blocks contain a timestamp field in the block header, this timestamp must not be the time the block was actually mined. Thus the timestamp is not useful for this chart.">P2P network</abbr>.  
+              Hovering over a block shows additional information.
+              The time since the last block is marked red.              
+            </p>
+          </div>
+
           <div class="col-md-12">
             <div id="past-blocks-chart"></div>
           </div>
+
           <div class="col-md-12">
             <p id="total-transactions" class="card-text text-center lead">
               Time since last Block: <wbr>
               <span id="past-blocks-timer" class="shadow-sm">00:00</span>
             </p>
           </div>
+
         </div>
         </p>
       </div>
@@ -242,13 +261,12 @@
       </div>
     </div>
 
-
-    <div class="alert alert-warning alert-dismissible fade show shadow-sm border-warning" role="alert">
-      <strong>Work in progress!</strong>
-      This is an early prototype of mempool.observer v2.
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
+    <div class="alert alert-warning alert-dismissible fade show shadow-sm border-warning mt-3" role="alert">
+        <strong>Work in progress!</strong>
+        This is an early prototype of mempool.observer v2.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
     </div>
 
   </main>

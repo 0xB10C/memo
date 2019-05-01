@@ -432,7 +432,7 @@ const pastBlocksCard = {
   },
   setTimer: function (){
     // clear timer if set
-    if(!state.pastBlocks.data.timer) {
+    if(state.pastBlocks.data.timer != null) {
       clearInterval ( state.pastBlocks.data.timer );
     }
 
@@ -457,6 +457,9 @@ const pastBlocksCard = {
           x: 'date',
           xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
           rows: processed.rows
+      },
+      size: {
+        height: 300
       },
       point: {
         show: true,
@@ -508,13 +511,15 @@ const pastBlocksCard = {
           let block = state.pastBlocks.data.processedBlocks.blocks[9-d[0].index]
           let miner = block.miner == null ? "Unknown" : block.miner.name
           let foundMinAgo = (Date.now() - block.receivedBlockTime * 1000) / 1000 / 60 
-          return `<div class="c3-tooltip"><table><tbody>
-            <tr><td>Height</td><td>${block.height}</td></tr>
-            <tr><td>Transactions</td><td>${block.transactionsCount}</td></tr>
-            <tr><td>Size</td><td>${(block.size / 1000 / 1000).toFixed(2) + " MB"}</td></tr>
-            <tr><td>Miner</td><td>${miner}</td></tr>
-            <tr><td>Found</td><td>${foundMinAgo.toFixed(0) + " min ago"}</td></tr>
-            </tbody></table></div>`
+          return `
+            <div class="c3-tooltip"><table><tbody>
+              <tr><td>Height</td><td>${block.height}</td></tr>
+              <tr><td>Transactions</td><td>${block.transactionsCount}</td></tr>
+              <tr><td>Size</td><td>${(block.size / 1000 / 1000).toFixed(2) + " MB"}</td></tr>
+              <tr><td>Miner</td><td>${miner}</td></tr>
+              <tr><td>Found</td><td>${foundMinAgo.toFixed(0) + " min ago"}</td></tr>
+            </tbody></table></div>
+            `
         }
       }
     }
@@ -527,10 +532,6 @@ const pastBlocksCard = {
 
   }
 }
-
-
-
-
 
 function reloadData() {
   

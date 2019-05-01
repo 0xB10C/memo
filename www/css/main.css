@@ -61,8 +61,7 @@ svg#brand-icon g.text {
   display: none;
 }
 
-/* TODO: FIXME: Only for the current mempool card! */
-.card-body {
+#card-current-mempool.card-body {
   /* So it doesn't need to resize after chart is rendered */
   min-height: 822px;
 }
@@ -114,7 +113,11 @@ svg#brand-icon g.text {
 }
 
 
-/* past blocks chart */
+/* past blocks card */
+
+#card-past-blocks.card-body {
+  min-height: 688;
+}
 
 .time-since-last-block.c3-region {
   fill: red;
@@ -135,16 +138,15 @@ svg#brand-icon g.text {
   fill: #323232 !important;
 }
 
-/* makes the last circle red */
+/* hides the last block */
 #card-past-blocks circle.c3-shape.c3-shape-10.c3-circle.c3-circle-10 {
   display: none;
 }
 
-#card-past-blocks .c3-xgrid-line > line{
+#card-past-blocks .c3-xgrid-line > line {
   stroke: rgb(50, 50, 50);
   stroke-width: 1.5px;
 }
-
 
 /* general chart css*/
 .red-line > line {
