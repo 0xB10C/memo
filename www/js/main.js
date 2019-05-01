@@ -26,7 +26,11 @@ var state = {
     chart: null,
     elementId: "card-past-blocks",
     isScrolledIntoView: false,
-    data: {},
+    data: {
+      processedBlocks: null,
+      timer: null,
+      timeLastUpdated: null,
+    },
   },
 }
 
@@ -382,8 +386,10 @@ const currentMempoolCard = {
 }
 
 const pastBlocksCard = {
-  updateTimeSinceLastBlock: function () { 
-    
+  updateCardLastUpdated: function () { 
+    // calc seconds from milliseconds
+    const seconds = Math.floor((Date.now() - (state.pastBlocks.data.timeLastUpdated)) / 1000)
+    document.getElementById('past-blocks-last-update').innerHTML = (seconds)
   },
   processDataForChart: function(response) {
     state.pastBlocks.data.timeLastUpdated = new Date();
@@ -399,12 +405,12 @@ const pastBlocksCard = {
       let height = response.data[blockIndex].height
       
       rows.push([
-          new Date(timestamp),  height
+          new Date(timestamp),  1
       ])
 
       lines.push({
         value: new Date(timestamp),
-        text: "Block "+ height,
+        text: "Block " + height,
       })
     
     }
@@ -423,6 +429,21 @@ const pastBlocksCard = {
       regions: regions,
       minHeight: response.data[9].height
     }
+  },
+  setTimer: function (){
+    // clear timer if set
+    if(!state.pastBlocks.data.timer) {
+      clearInterval ( state.pastBlocks.data.timer );
+    }
+
+    // set new timer
+    var sec = (new Date() / 1000 - state.pastBlocks.data.processedBlocks.blocks[0].receivedBlockTime).toFixed(0)
+    function pad ( val ) { return val > 9 ? val : "0" + val; }
+    state.pastBlocks.data.timer = setInterval( function(){
+      ++sec
+      $("#past-blocks-timer").html(pad(parseInt(sec/60,10)) + ":" + pad(sec%60));
+    }, 1000);
+
   },
   draw: async function () {
 
@@ -443,7 +464,7 @@ const pastBlocksCard = {
         focus: {
           expand: {
             enabled: true,
-            r: 20,
+            r: 17,
           }
         }
       },
@@ -459,6 +480,7 @@ const pastBlocksCard = {
         show: false
       },
       axis: {
+        rotated: false,
         x: {
           type: 'timeseries',
           padding: {
@@ -472,8 +494,8 @@ const pastBlocksCard = {
         },
         y: {
           show: false,
-          max: processed.minHeight + 500,
-          min: processed.minHeight - 300
+          max: 1.4,
+          min: 0.8
         }, 
       },
       grid: {
@@ -527,6 +549,7 @@ function reloadData() {
   axios.get('https://api.bitaps.com/btc/v1/blockchain/blocks/last/10')
   .then(function (response) {
     state.pastBlocks.data.processedBlocks = pastBlocksCard.processDataForChart(response.data)
+    pastBlocksCard.setTimer()
     drawChart(state.pastBlocks.elementId)
   });
 
@@ -566,7 +589,7 @@ setInterval(function () {
   currentMempoolCard.updateCardLastUpdated()
 
   // Update the 'Time since last block' 
-  pastBlocksCard.updateTimeSinceLastBlock()
+  pastBlocksCard.updateCardLastUpdated()
 }, 10000);
 
 

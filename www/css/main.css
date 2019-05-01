@@ -67,6 +67,17 @@ svg#brand-icon g.text {
   min-height: 822px;
 }
 
+/* past blocks card */
+
+#past-blocks-timer {
+  background-color: #ff000036;
+  /* have a bit less padding on the bottom lets it appear more centered */
+  padding: 0.4rem; 
+  padding-bottom: 0.3rem;
+  border-radius: 0.3rem;
+}
+
+
 /* current mempool card chart */
 
 .c3-tooltip th {
@@ -120,13 +131,18 @@ svg#brand-icon g.text {
 }
 
 #card-past-blocks circle.c3-circle {
-  clip-path: inset(5px 5px 5px 5px);
+  clip-path: inset(3px 3px 3px 3px);
   fill: #323232 !important;
 }
 
 /* makes the last circle red */
 #card-past-blocks circle.c3-shape.c3-shape-10.c3-circle.c3-circle-10 {
   display: none;
+}
+
+#card-past-blocks .c3-xgrid-line > line{
+  stroke: rgb(50, 50, 50);
+  stroke-width: 1.5px;
 }
 
 
@@ -136,13 +152,9 @@ svg#brand-icon g.text {
 }
 
 .red-line > text {
-  fill: red;
+  fill: red !important;
 }
 
-.c3-xgrid-line > line,
-.c3-ygrid-line > line {
-  stroke: rgb(50, 50, 50);
-}
 
 .c3-ygrid-line > text,
 .c3-xgrid-line > text {
