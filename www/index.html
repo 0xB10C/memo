@@ -223,17 +223,20 @@
         <div class="row">
           <div class="col-md-12">
             <p class="card-text">
-              The chart below visualizes the time between the last ten blocks.
-              Since finding a valid block (i.e. mining) is a _random_ process, the time between two blocks might be only a few seconds, but can also be more than an hour.  
-              On average a valid block is found every <abbr title="TODO: in theory, but not in practice">ten</abbr> minutes. 
-              Due to mining being a random process there, is no way of estimating when a next block will be found.
-              However the probability of a new being found block in the next e.g. five minutes rises as time goes by. 
+              The chart below shows the arrival times of the last ten blocks. 
+              Since finding a valid block (mining) is a random process, the time between two blocks is random.
+              Sometimes blocks are found only seconds apart, sometimes it takes over an hour till a new block is found.
+              On average a new block is found roughly every ten minutes.
+              But, due to mining being a random process, there is no way of estimating when the next block will be found.
+              <!--However the probability of a new block being found in, for example, the next five minutes rises as time goes by.-->
+              <!-- leaving this out for now. might add back later once we have a probability estimator ready-->
             </p>
 
             <p class="card-text">
-              The chart displays the time blocks arrived over the 
-              <abbr title="While blocks contain a timestamp field in the block header, this timestamp must not be the time the block was actually mined. Thus the timestamp is not useful for this chart.">P2P network</abbr>.  
-              Hovering over a block shows additional information.
+              The time displayed in the chart is the time the blocks arrived over the
+              <abbr title="While blocks contain a timestamp field in the block header, this timestamp must not be the time the block was actually mined. Thus this timestamp is not useful for this chart.">P2P network</abbr>
+              (data is queried by the bitaps.com blockchain API).
+              Hovering over a block shows additional information like the block size, transaction count or the miner who found the block.
               The time since the last block is marked red.              
             </p>
           </div>

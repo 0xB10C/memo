@@ -211,7 +211,7 @@ const currentMempoolCard = {
         }
       },
       size: {
-        height: 750
+        height: 750 // css #current-mempool-chart min-height: 750px needs to be changed too
       },
       padding: {
         top: 20
@@ -459,7 +459,7 @@ const pastBlocksCard = {
           rows: processed.rows
       },
       size: {
-        height: 300
+        height: 300 // css #past-blocks-chart min-height: 300px needs to be changed too
       },
       point: {
         show: true,

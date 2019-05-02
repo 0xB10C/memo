@@ -61,23 +61,13 @@ svg#brand-icon g.text {
   display: none;
 }
 
-#card-current-mempool div.card-body {
-  /* So it doesn't need to resize after chart is rendered */
-  min-height: 822px;
+
+/* current mempool chart */
+
+#current-mempool-chart {
+   /* So it doesn't need to resize after chart is rendered */
+  min-height: 750px;
 }
-
-/* past blocks card */
-
-#past-blocks-timer {
-  background-color: #ff000036;
-  /* have a bit less padding on the bottom lets it appear more centered */
-  padding: 0.4rem; 
-  padding-bottom: 0.3rem;
-  border-radius: 0.3rem;
-}
-
-
-/* current mempool card chart */
 
 .c3-tooltip th {
   display: none;
@@ -115,8 +105,17 @@ svg#brand-icon g.text {
 
 /* past blocks card */
 
-#card-past-blocks div.card-body {
-  min-height: 688px;
+#past-blocks-timer {
+  background-color: #ff000036;
+  /* have a bit less padding on the bottom lets it appear more centered */
+  padding: 0.4rem; 
+  padding-bottom: 0.3rem;
+  border-radius: 0.3rem;
+}
+
+#past-blocks-chart {
+  /* So it doesn't need to resize after chart is rendered */
+  min-height: 300px;
 }
 
 .time-since-last-block.c3-region {
