@@ -1,8 +1,7 @@
 // Constants
 const NEXT_BLOCK_LABELS = ["1 vMB", "2 vMB", "3 vMB"]
 
-var processedMempool = null
-var blockchainTip = null
+var isTabActive = true;
 
 // State
 var state = {
@@ -47,11 +46,25 @@ window.onload = function () {
   })
   document.getElementById('random-tx').addEventListener('click', currentMempoolCard.loadRandomTransactionFromApi)
 
+  window.onfocus = function () { 
+    drawChart(state.currentMempool.elementId)
+  }; 
+  
+  document.addEventListener("visibilitychange", visibilityChangeHandler, false);
+
   // add scroll listener 
   $(document).scroll(scrollEventHandler);
 
   // init data reload loop
   reloadData() 
+}
+
+function visibilityChangeHandler() {
+  if(!document.hidden) {
+    // the page is now visible 
+    // call scrollEventHandler() which already implements much of the functionality we need
+    scrollEventHandler()
+  }
 }
 
 function scrollEventHandler(){
