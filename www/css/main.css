@@ -61,52 +61,108 @@ svg#brand-icon g.text {
   display: none;
 }
 
-/* TODO: FIXME: Only for the current mempool card! */
-.card-body {
-  /* So it doesn't need to resize after chart is rendered */
-  min-height: 822px;
+
+/* current mempool chart */
+
+#current-mempool-chart {
+   /* So it doesn't need to resize after chart is rendered */
+  min-height: 750px;
 }
-
-/* chart */
-
-/* https://github.com/c3js/c3/issues/210 */
 
 .c3-tooltip th {
   display: none;
 }
 
-.c3 .c3-axis-x path,
-.c3 .c3-axis-x line {
+#current-mempool-chart.c3 .c3-axis-x path,
+#current-mempool-chart.c3 .c3-axis-x line {
   stroke: transparent;
 }
 
-.c3 .c3-axis-y path,
-.c3 .c3-axis-y line,
-.c3 .c3-axis-y2 path,
-.c3 .c3-axis-y2 line {
+#current-mempool-chart.c3-axis-y path,
+#current-mempool-chart.c3-axis-y line,
+#current-mempool-chart.c3-axis-y2 path,
+#current-mempool-chart.c3-axis-y2 line {
   stroke: gray;
 }
 
-.c3-axis-x .tick {
+#current-mempool-chart.c3 g.c3-axis.c3-axis-x g.tick {
   display: none;
 }
 
-.c3 .c3-xgrid-focus line {
+#current-mempool-chart.c3 .c3-xgrid-focus line {
   visibility: hidden !important;
 }
 
-.c3 .c3-ygrid-line line {
+#current-mempool-chart.c3 .c3-ygrid-line line {
   margin-left: 20px;
 }
 
-.c3-ygrid-line.user-tx>text {
+.c3-ygrid-line.red-line > text {
   fill: red;
   transform: translateY(17px);
 }
 
-.c3-ygrid-line.user-tx>line {
-  stroke: red;
+
+/* past blocks card */
+
+#past-blocks-timer {
+  background-color: #ff000036;
+  /* have a bit less padding on the bottom lets it appear more centered */
+  padding: 0.4rem; 
+  padding-bottom: 0.3rem;
+  border-radius: 0.3rem;
 }
+
+#past-blocks-chart {
+  /* So it doesn't need to resize after chart is rendered */
+  min-height: 300px;
+}
+
+.time-since-last-block.c3-region {
+  fill: red;
+  fill-opacity: 0.1;
+}
+
+#card-past-blocks.c3-xgrid-line > line,
+#card-past-blocks.c3-ygrid-line > line {
+  stroke: rgb(50, 50, 50);
+}
+
+#card-past-blocks g.c3-lines-block > path {
+  visibility: hidden;
+}
+
+#card-past-blocks circle.c3-circle {
+  clip-path: inset(3px 3px 3px 3px);
+  fill: #323232 !important;
+}
+
+/* hides the last block */
+#card-past-blocks circle.c3-shape.c3-shape-10.c3-circle.c3-circle-10 {
+  display: none;
+}
+
+#card-past-blocks .c3-xgrid-line > line {
+  stroke: rgb(50, 50, 50);
+  stroke-width: 1.5px;
+}
+
+/* general chart css*/
+.red-line > line {
+  stroke: red !important;
+}
+
+.red-line > text {
+  fill: red !important;
+}
+
+
+.c3-ygrid-line > text,
+.c3-xgrid-line > text {
+  fill: rgb(50, 50, 50);
+  font-size: 1.2em;
+}
+
 
 .c3 .c3-axis-y-label,
 .c3 .c3-axis-y2-label {
@@ -120,7 +176,7 @@ svg#brand-icon g.text {
 .c3 .c3-axis-x g,
 .c3 .c3-axis-y g,
 .c3 .c3-legend-item-data text {
-  fill: black;
+  fill: rgb(50, 50, 50);
 }
 
 /* Footer */
