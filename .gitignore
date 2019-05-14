@@ -3,6 +3,5 @@
 __pycache__/*
 config.ini
 .vscode
-memod/main
+memod/memod
 memod/config.toml
-memod/memod.log
