@@ -21,12 +21,11 @@ func Run() {
 
 	db, err := database.Setup()
 	if err != nil {
-		if err != nil {
-			logger.Error.Printf("Failed to setup database connection: %s", err.Error())
-			shouldExit <- true
-		}
+		logger.Error.Printf("Failed to setup database connection: %s", err.Error())
+		shouldExit <- true
+	} else {
+		defer db.Close()
 	}
-	defer db.Close()
 
 	startWorkers()
 
