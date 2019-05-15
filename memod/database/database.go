@@ -12,7 +12,7 @@ import (
 var Database *sql.DB
 
 // Setup the database connection
-func Setup() *sql.DB {
+func Setup() (*sql.DB, error) {
 
 	dbUser := config.GetString("database.user")
 	dbPasswd := config.GetString("database.passwd")
@@ -23,19 +23,17 @@ func Setup() *sql.DB {
 
 	db, err := sql.Open("mysql", connectionString)
 	if err != nil {
-		logger.Error.Println(err.Error())
-		panic(err.Error())
+		return nil, err
 	}
 
 	// Ping the database once since Open() doesn't open a connection
 	err = db.Ping()
 	if err != nil {
-		logger.Error.Println(err.Error())
-		panic(err.Error())
-	} else {
-		logger.Info.Println("Setup database connection")
+		return nil, err
 	}
 
+	logger.Info.Println("Setup database connection")
+
 	Database = db
-	return Database
+	return Database, nil
 }

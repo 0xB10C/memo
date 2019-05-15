@@ -9,23 +9,32 @@ import (
 	"github.com/0xb10c/memo/memod/logger"
 )
 
-// cMEGABYTE : size of one megabyte in byte
+// cMEGABYTE: size of one megabyte in byte
 const cMEGABYTE = 1000000
 
-// cSATOSHIPERBITCOIN : satoshi per bitcoin
+// cSATOSHIPERBITCOIN: satoshi per bitcoin
 const cSATOSHIPERBITCOIN = 100000000
 
 func processMempool(mempool map[string]PartialTransaction) {
 
-	// start current Mempool stat generation in a goroutine
+	// start _current mempool_ stat generation in a goroutine
 	go currentMempool(mempool)
 
 }
 
 func currentMempool(mempool map[string]PartialTransaction) {
 	feerateMap, mempoolSizeInByte, megabyteMarkers := generateCurrentMempoolStats(mempool)
-	feerateMapJSON, megabyteMarkersJSON := encodeCurrentMempoolStatsToJSON(feerateMap, megabyteMarkers)
-	writeCurrentMempoolData(feerateMapJSON, mempoolSizeInByte, megabyteMarkersJSON)
+	feerateMapJSON, megabyteMarkersJSON, err := encodeCurrentMempoolStatsToJSON(feerateMap, megabyteMarkers)
+	if err != nil {
+		logger.Error.Printf("Failed to encode generated data as JSON: %s", err.Error())
+		return
+	}
+
+	err = writeCurrentMempoolData(feerateMapJSON, mempoolSizeInByte, megabyteMarkersJSON)
+	if err != nil {
+		logger.Error.Printf("Failed to write Current Mempool to database: %s", err.Error())
+		return
+	}
 }
 
 /* generateCurrentMempoolStats()
