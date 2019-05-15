@@ -20,5 +20,5 @@ responseTimeout = 30 # seconds
 fetchInterval = 60 # seconds
 
 [log]
-enableTrace = true
+enableTrace = false
 colorizeOutput = true
