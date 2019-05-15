@@ -10,30 +10,25 @@ import (
 	"github.com/0xb10c/memo/memod/mempool"
 )
 
-// Start starts the memo deamon
-func Start() {
+// Run starts the memo deamon
+func Run() {
 
-	db, err := database.Setup()
-	if err != nil {
-		if err != nil {
-			logger.Error.Printf("Failed to setup database connection: %s", err.Error())
-			return
-		}
-	}
-	defer db.Close()
-
-	// run the mempool fetcher in a goroutine
-	go mempool.SetupMempoolFetcher()
-
-	waitForOSSignal()
-}
-
-func waitForOSSignal() {
 	exitSignals := make(chan os.Signal, 1)
 	shouldExit := make(chan bool, 1)
 
 	signal.Notify(exitSignals, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	go handleExitSig(exitSignals, shouldExit)
+
+	db, err := database.Setup()
+	if err != nil {
+		if err != nil {
+			logger.Error.Printf("Failed to setup database connection: %s", err.Error())
+			shouldExit <- true
+		}
+	}
+	defer db.Close()
+
+	startWorkers()
 
 	<-shouldExit // wait till memod should exit
 	logger.Info.Println("Memod exiting")
@@ -44,4 +39,9 @@ func handleExitSig(exitSignals chan os.Signal, shouldExit chan bool) {
 	sig := <-exitSignals
 	logger.Info.Println("Received signal", sig)
 	shouldExit <- true
+}
+
+func startWorkers() {
+	// run the mempool fetcher in a goroutine
+	go mempool.SetupMempoolFetcher()
 }
