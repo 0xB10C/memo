@@ -1,0 +1,24 @@
+# config.toml
+# This example config contains all avaliable configuration options.
+# Options are assigned their default or left blank with a FIXME: mark.
+
+[database]
+host = ""    # FIXME:
+user = ""    # FIXME:
+passwd = ""  # FIXME:
+name = ""    # FIXME:
+connection = "tcp"
+
+
+[bitcoind.rest]
+protocol = "http"
+host = "localhost"
+port = "18332"
+responseTimeout = 30 # seconds
+
+[mempool]
+fetchInterval = 60 # seconds
+
+[log]
+enableTrace = true
+colorizeOutput = true
