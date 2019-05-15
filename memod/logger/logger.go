@@ -1,9 +1,12 @@
 package logger
 
 import (
+	"io/ioutil"
 	"log"
 	"os"
 	"time"
+
+	"github.com/0xb10c/memo/memod/config"
 )
 
 var (
@@ -18,22 +21,28 @@ var (
 )
 
 func init() {
-	traceHandle := os.Stdout
+
+	traceHandle := ioutil.Discard
+	if config.GetBool("log.enableTrace") {
+		traceHandle = os.Stdout
+	}
+
 	infoHandle := os.Stdout
 	warningHandle := os.Stdout
 	errorHandle := os.Stderr
 
-	logFlags := log.Ldate | log.Ltime | log.Lshortfile
+	logFlags := log.Ldate | log.Ltime //log.Lshortfile
 
-	Trace = log.New(traceHandle, "TRACE: ", logFlags)
-	Info = log.New(infoHandle, "INFO:  ", logFlags)
-	Warning = log.New(warningHandle, "WARN:  ", logFlags)
-	Error = log.New(errorHandle, "ERROR: ", logFlags)
+	Trace = log.New(traceHandle, Dim("TRACE: "), logFlags)
+	Info = log.New(infoHandle, Blue("INFO: "), logFlags)
+	Warning = log.New(warningHandle, Yellow("WARN: "), logFlags)
+	Error = log.New(errorHandle, Red("ERROR: "), logFlags)
 
-	Trace.Println("Setup Logger")
+	Info.Println("Setup logger. Logging Trace:", config.GetBool("log.enableTrace"))
 }
 
-func TrackTime(start time.Time, fname string) {
+// TrackTime tracks the time a function takes till return and logs it to Trace
+func TrackTime(start time.Time, funcname string) {
 	elapsed := time.Since(start)
-	Trace.Println(elapsed.String() + " \t for " + fname)
+	Trace.Println(funcname + " took " + elapsed.String())
 }

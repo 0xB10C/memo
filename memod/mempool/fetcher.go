@@ -7,31 +7,30 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/0xb10c/memo/memod/config"
 	"github.com/0xb10c/memo/memod/logger"
 	"github.com/jasonlvhit/gocron"
 )
 
 // SetupMempoolFetcher sets up a periodic mempool fetch job
 func SetupMempoolFetcher() {
-	mempoolFetchInterval := int(5)
+	mempoolFetchInterval := config.GetInt("mempool.fetchInterval")
 	s := gocron.NewScheduler()
 	s.Every(uint64(mempoolFetchInterval)).Seconds().Do(doWork)
-	logger.Trace.Println("Setup mempool fetcher. First fetch in", mempoolFetchInterval, "seconds")
+	logger.Info.Println("Setup mempool fetcher. First fetch in", mempoolFetchInterval, "seconds")
 	<-s.Start()
 	defer s.Clear()
 }
 
 func doWork() {
 
-	// fetch from REST API
-	body, err := fetchMempoolFromREST()
+	body, err := fetchMempoolFromREST() // fetch from REST API
 	if err != nil {
 		logger.Error.Printf("Could not fetch mempool from REST: %s", err.Error())
 		return
 	}
 
-	// decode fetched response body
-	mempool, err := decodeFetchedMempoolBody(body)
+	mempool, err := decodeFetchedMempoolBody(body) // decode fetched response body
 	if err != nil {
 		logger.Error.Printf("Failed to decode response body as JSON: %s", err.Error())
 		logger.Error.Println("Response body: ", string(body))
@@ -60,16 +59,23 @@ func fetchMempoolFromREST() ([]byte, error) {
 
 // make a HTTP GET Request to the Bitcoin Core REST API
 func getMempoolContents() (*http.Response, error) {
-
-	timeout := time.Duration(30 * time.Second) // TODO: make the timeout configurable
+	timeout := time.Duration(config.GetInt("bitcoind.rest.responseTimeout")) * time.Second
 	client := http.Client{
 		Timeout: timeout,
 	}
 
-	resp, err := client.Get("http://localhost:18332/rest/mempool/contents.json")
+	urlPrefix := config.GetString("bitcoind.rest.protocol") +
+		"://" + config.GetString("bitcoind.rest.host") +
+		":" + config.GetString("bitcoind.rest.port")
+	const urlSuffix = "/rest/mempool/contents.json"
+
+	logger.Trace.Println("Fetching mempool contents from ", urlPrefix+urlSuffix)
+
+	resp, err := client.Get(urlPrefix + urlSuffix)
 	if err != nil {
 		return nil, err
 	}
+
 	return resp, nil
 }
 
@@ -80,5 +86,6 @@ func readResponseBody(resp *http.Response) ([]byte, error) {
 		logger.Error.Println(err.Error())
 	}
 	defer resp.Body.Close()
+
 	return body, nil
 }

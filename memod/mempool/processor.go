@@ -35,6 +35,8 @@ func currentMempool(mempool map[string]PartialTransaction) {
 		logger.Error.Printf("Failed to write Current Mempool to database: %s", err.Error())
 		return
 	}
+
+	logger.Info.Println("Success writing Current Mempool to database.")
 }
 
 /* generateCurrentMempoolStats()
