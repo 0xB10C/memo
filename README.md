@@ -14,7 +14,7 @@ This repository contains the following files:
 - TODO
 - TODO
 
-The wiki cointains two architecture overview's: One of the [whole project](https://github.com/0xB10C/memo/wiki/Infrastructure-memo-v2). And one specifically for [memod](https://404.de/).
+The wiki cointains two architecture overview's: One of the [whole project](https://github.com/0xB10C/memo/wiki/Infrastructure-memo-v2). And one specifically for [memod](https://github.com/0xB10C/memo/wiki/memod-architecture).
 
 
 ## Licencse
