@@ -6,6 +6,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/0xb10c/memo/memod/database"
 	"github.com/0xb10c/memo/memod/logger"
 )
 
@@ -30,7 +31,7 @@ func currentMempool(mempool map[string]PartialTransaction) {
 		return
 	}
 
-	err = writeCurrentMempoolData(feerateMapJSON, mempoolSizeInByte, megabyteMarkersJSON)
+	err = database.WriteCurrentMempoolData(feerateMapJSON, mempoolSizeInByte, megabyteMarkersJSON)
 	if err != nil {
 		logger.Error.Printf("Failed to write Current Mempool to database: %s", err.Error())
 		return
