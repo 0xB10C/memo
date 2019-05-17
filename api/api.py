@@ -59,6 +59,32 @@ def get_current_mempool():
     return resp
 
 
+@app.route("/api/recentBlocks", methods=['GET'])
+def get_past_blocks():
+
+    sql = "SELECT height, timestamp, txCount, size, weight FROM pastBlocks ORDER BY height DESC LIMIT 10;"
+
+    cursor = executeSQL(sql, conn)
+    rows = cursor.fetchall()
+    cursor.close()
+
+    resultList = []
+
+    for row in rows:
+        resultList.append(
+            {
+                "height": row[0],
+                "timestamp": (row[1] - datetime.datetime(1970, 1, 1)).total_seconds(),
+                "txCount": row[2],
+                "size": row[3]
+            }
+        )
+
+    resp = jsonify(resultList)
+
+    resp.status_code = 200
+    return resp
+
 @app.after_request
 def after_request(response):
     header = response.headers
