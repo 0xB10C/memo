@@ -8,6 +8,7 @@ import (
 	"github.com/0xb10c/memo/memod/database"
 	"github.com/0xb10c/memo/memod/logger"
 	"github.com/0xb10c/memo/memod/mempool"
+	"github.com/0xb10c/memo/memod/zmq"
 )
 
 // Run starts the memo deamon
@@ -43,4 +44,6 @@ func handleExitSig(exitSignals chan os.Signal, shouldExit chan bool) {
 func startWorkers() {
 	// run the mempool fetcher in a goroutine
 	go mempool.SetupMempoolFetcher()
+
+	go zmq.Start()
 }
