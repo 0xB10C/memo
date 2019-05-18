@@ -6,8 +6,8 @@ import (
 	"syscall"
 
 	"github.com/0xb10c/memo/memod/database"
+	"github.com/0xb10c/memo/memod/fetcher"
 	"github.com/0xb10c/memo/memod/logger"
-	"github.com/0xb10c/memo/memod/mempool"
 	"github.com/0xb10c/memo/memod/zmq"
 )
 
@@ -43,7 +43,8 @@ func handleExitSig(exitSignals chan os.Signal, shouldExit chan bool) {
 
 func startWorkers() {
 	// run the mempool fetcher in a goroutine
-	go mempool.SetupMempoolFetcher()
+	go fetcher.SetupMempoolFetcher()
 
+	// starts the ZMQ listener
 	go zmq.Start()
 }

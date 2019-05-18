@@ -1,4 +1,4 @@
-package mempool
+package processor
 
 /* processes */
 
@@ -7,7 +7,9 @@ import (
 	"time"
 
 	"github.com/0xb10c/memo/memod/database"
+	"github.com/0xb10c/memo/memod/encoder"
 	"github.com/0xb10c/memo/memod/logger"
+	"github.com/0xb10c/memo/memod/types"
 )
 
 // cMEGABYTE: size of one megabyte in byte
@@ -16,16 +18,17 @@ const cMEGABYTE = 1000000
 // cSATOSHIPERBITCOIN: satoshi per bitcoin
 const cSATOSHIPERBITCOIN = 100000000
 
-func processMempool(mempool map[string]PartialTransaction) {
+// ProcessMempool retives the mempool and starts various processing functions on it
+func ProcessMempool(mempool map[string]types.PartialTransaction) {
 
 	// start _current mempool_ stat generation in a goroutine
 	go currentMempool(mempool)
 
 }
 
-func currentMempool(mempool map[string]PartialTransaction) {
+func currentMempool(mempool map[string]types.PartialTransaction) {
 	feerateMap, mempoolSizeInByte, megabyteMarkers := generateCurrentMempoolStats(mempool)
-	feerateMapJSON, megabyteMarkersJSON, err := encodeCurrentMempoolStatsToJSON(feerateMap, megabyteMarkers)
+	feerateMapJSON, megabyteMarkersJSON, err := encoder.EncodeCurrentMempoolStatsToJSON(feerateMap, megabyteMarkers)
 	if err != nil {
 		logger.Error.Printf("Failed to encode generated data as JSON: %s", err.Error())
 		return
@@ -49,7 +52,7 @@ This function generates the _Current Mempool_ data. Which is:
 		feerate, which each mark one megabyte worth of transactions.
 		Positions starting from the top. Named `megabyteMarkers`.
 */
-func generateCurrentMempoolStats(mempool map[string]PartialTransaction) (map[int]int, int, []int) {
+func generateCurrentMempoolStats(mempool map[string]types.PartialTransaction) (map[int]int, int, []int) {
 	defer logger.TrackTime(time.Now(), "generateCurrentMempoolStats()")
 
 	// this represents a entry in a mempool list (memlist).
