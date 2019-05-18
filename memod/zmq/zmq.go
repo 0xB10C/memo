@@ -72,12 +72,12 @@ func handleRawBlock(payload string) {
 	sizeWithWitness := block.SerializeSize()
 	sizeWithoutWitness := block.SerializeSizeStripped()
 	weight := sizeWithWitness + sizeWithoutWitness*3
-	logger.Trace.Printf("New block %d with %d transactions. vsize %d, size %d, weight %d", height, numTx, sizeWithoutWitness, sizeWithWitness, weight)
 
 	err = database.WriteNewBlockData(height, numTx, sizeWithWitness, weight)
 	if err != nil {
 		logger.Error.Printf("Error writing block to database: %v", err)
 	}
+	logger.Info.Printf("Success writing new block %d with %d transactions, size %d, weight %d", height, numTx, sizeWithWitness, weight)
 }
 
 func handleHashBlock(payload string) {

@@ -1,4 +1,4 @@
-package mempool
+package types
 
 type Fees struct {
 	Base       float64 `json:"base"`

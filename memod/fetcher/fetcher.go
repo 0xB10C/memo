@@ -1,4 +1,4 @@
-package mempool
+package fetcher
 
 /* fetches */
 
@@ -8,7 +8,10 @@ import (
 	"time"
 
 	"github.com/0xb10c/memo/memod/config"
+	"github.com/0xb10c/memo/memod/encoder"
 	"github.com/0xb10c/memo/memod/logger"
+	"github.com/0xb10c/memo/memod/processor"
+
 	"github.com/jasonlvhit/gocron"
 )
 
@@ -30,14 +33,14 @@ func doWork() {
 		return
 	}
 
-	mempool, err := decodeFetchedMempoolBody(body) // decode fetched response body
+	mempool, err := encoder.DecodeFetchedMempoolBody(body) // decode fetched response body
 	if err != nil {
 		logger.Error.Printf("Failed to decode response body as JSON: %s", err.Error())
 		logger.Error.Println("Response body: ", string(body))
 		return
 	}
 
-	processMempool(mempool)
+	processor.ProcessMempool(mempool)
 }
 
 // fetches the current mempool

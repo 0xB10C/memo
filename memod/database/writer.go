@@ -7,8 +7,7 @@ import (
 	"github.com/0xb10c/memo/memod/logger"
 )
 
-/* wirtes data to database */
-
+// WriteCurrentMempoolData writes the current mempool data into the database
 func WriteCurrentMempoolData(feerateMapJSON string, mempoolSizeInByte int, megabyteMarkersJSON string) error {
 	defer logger.TrackTime(time.Now(), "writeCurrentMempoolData()")
 
@@ -25,6 +24,7 @@ func WriteCurrentMempoolData(feerateMapJSON string, mempoolSizeInByte int, megab
 
 }
 
+// WriteNewBlockData writes data for a new block into the database
 func WriteNewBlockData(height int, numTx int, sizeWithWitness int, weight int) error {
 	defer logger.TrackTime(time.Now(), "writeNewBlockData()")
 
