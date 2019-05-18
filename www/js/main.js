@@ -406,16 +406,14 @@ const pastBlocksCard = {
   },
   processDataForChart: function(response) {
     state.pastBlocks.data.timeLastUpdated = new Date();
-    
-    console.log(response)
 
     let rows = [["date", "block"]]
     let lines = []
     let regions = []
     
-    for(blockIndex in response.data){
-      let timestamp = response.data[blockIndex].receivedBlockTime * 1000
-      let height = response.data[blockIndex].height
+    for(blockIndex in response){
+      let timestamp = response[blockIndex].timestamp * 1000
+      let height = response[blockIndex].height
       
       rows.push([
           new Date(timestamp),  1
@@ -433,14 +431,14 @@ const pastBlocksCard = {
 
     // region from the last block to the current time
     // last block is here element zero
-    regions.push({axis: 'x', start: response.data[0].receivedBlockTime * 1000, end: new Date(), class: 'time-since-last-block'},)
+    regions.push({axis: 'x', start: response[0].timestamp * 1000, end: new Date(), class: 'time-since-last-block'},)
 
     return {
-      blocks: response.data,
+      blocks: response,
       rows: rows,
       lines: lines,
       regions: regions,
-      minHeight: response.data[9].height
+      minHeight: response[9].height
     }
   },
   setTimer: function (){
@@ -450,7 +448,7 @@ const pastBlocksCard = {
     }
 
     // set new timer
-    var sec = (new Date() / 1000 - state.pastBlocks.data.processedBlocks.blocks[0].receivedBlockTime).toFixed(0)
+    var sec = (new Date() / 1000 - state.pastBlocks.data.processedBlocks.blocks[0].timestamp).toFixed(0)
     function pad ( val ) { return val > 9 ? val : "0" + val; }
     state.pastBlocks.data.timer = setInterval( function(){
       ++sec
@@ -522,14 +520,13 @@ const pastBlocksCard = {
       tooltip: {
         contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
           let block = state.pastBlocks.data.processedBlocks.blocks[9-d[0].index]
-          let miner = block.miner == null ? "Unknown" : block.miner.name
-          let foundMinAgo = (Date.now() - block.receivedBlockTime * 1000) / 1000 / 60 
+          let foundMinAgo = (Date.now() - block.timestamp * 1000) / 1000 / 60 
           return `
             <div class="c3-tooltip"><table><tbody>
               <tr><td>Height</td><td>${block.height}</td></tr>
-              <tr><td>Transactions</td><td>${block.transactionsCount}</td></tr>
+              <tr><td>Transactions</td><td>${block.txCount}</td></tr>
               <tr><td>Size</td><td>${(block.size / 1000 / 1000).toFixed(2) + " MB"}</td></tr>
-              <tr><td>Miner</td><td>${miner}</td></tr>
+              <tr><td>Weight units</td><td>${(block.weight / 1000).toFixed(0) + " kWU"}</td></tr>
               <tr><td>Found</td><td>${foundMinAgo.toFixed(0) + " min ago"}</td></tr>
             </tbody></table></div>
             `
@@ -557,10 +554,7 @@ function reloadData() {
     });
 
   // reload last blocks data
-  // using bitaps.com here since it's API gives the time first seen
-  // e.g. blockstream.info only gives the miner timestamp, which 
-  // is to flexibile for us here 
-  axios.get('https://api.bitaps.com/btc/v1/blockchain/blocks/last/10')
+  axios.get('https://mempool.observer/api/recentBlocks')
   .then(function (response) {
     state.pastBlocks.data.processedBlocks = pastBlocksCard.processDataForChart(response.data)
     pastBlocksCard.setTimer()
