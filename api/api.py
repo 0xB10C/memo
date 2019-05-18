@@ -76,7 +76,8 @@ def get_past_blocks():
                 "height": row[0],
                 "timestamp": (row[1] - datetime.datetime(1970, 1, 1)).total_seconds(),
                 "txCount": row[2],
-                "size": row[3]
+                "size": row[3],
+                "weight": row[4]
             }
         )
 
