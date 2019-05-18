@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/0xb10c/memo/memod/config"
 	"github.com/0xb10c/memo/memod/database"
 	"github.com/0xb10c/memo/memod/logger"
 
@@ -16,13 +17,33 @@ func Start() {
 	setupZMQ()
 }
 
+const rawBlock string = "rawblock"
+const hashBlock string = "hashblock"
+const rawTx string = "rawtx"
+const hashTx string = "hashtx"
+
 func setupZMQ() {
+
+	zmqHost := config.GetString("zmq.host")
+	zmqPort := config.GetString("zmq.port")
+	connectionString := "tcp://" + zmqHost + ":" + zmqPort
+
 	subscriber, _ := zmq4.NewSocket(zmq4.SUB)
-	subscriber.Connect("tcp://127.0.0.1:28332")
-	subscriber.SetSubscribe("rawtx")
-	subscriber.SetSubscribe("hashtx")
-	subscriber.SetSubscribe("rawblock")
-	subscriber.SetSubscribe("hashblock")
+	subscriber.Connect(connectionString)
+
+	if config.GetBool("zmq.subscribeTo.rawTx") {
+		subscriber.SetSubscribe(rawTx)
+	}
+	if config.GetBool("zmq.subscribeTo.hashTx") {
+		subscriber.SetSubscribe(hashTx)
+	}
+	if config.GetBool("zmq.subscribeTo.rawBlock") {
+		subscriber.SetSubscribe(rawBlock)
+	}
+	if config.GetBool("zmq.subscribeTo.hashBlock") {
+		subscriber.SetSubscribe(hashBlock)
+	}
+
 	defer subscriber.Close() // cancel subscribe
 
 	loopZMQ(subscriber)
@@ -37,11 +58,6 @@ func loopZMQ(subscriber *zmq4.Socket) {
 		handleZMQMessage(msg)
 	}
 }
-
-const rawBlock string = "rawblock"
-const hashBlock string = "hashblock"
-const rawTx string = "rawtx"
-const hashTx string = "hashtx"
 
 func handleZMQMessage(zmqMessage []string) {
 	topic := zmqMessage[0]
@@ -81,12 +97,11 @@ func handleRawBlock(payload string) {
 }
 
 func handleHashBlock(payload string) {
-	logger.Warning.Println("handleHashBlock() not Implemented")
-	// TODO: maybe use this to notify a new block is found...?
+	//logger.Warning.Println("handleHashBlock() not Implemented")
 }
 
 func handleRawTx(payload string) {
-	//logger.Warning.Println("handleRawTx() not Implemented")
+	logger.Warning.Println("handleRawTx() not Implemented")
 }
 
 func handleHashTx(payload string) {

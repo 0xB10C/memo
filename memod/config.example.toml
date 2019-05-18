@@ -22,3 +22,12 @@ fetchInterval = 60 # seconds
 [log]
 enableTrace = false
 colorizeOutput = true
+
+[zmq]
+host = "localhost" # currently only tcp connections are supported 
+port = "28332"
+  [zmq.subscribeTo]   # default all to false
+  rawTx     = false
+  rawBlock  = true    # needed to write recentBlocks to database 
+  hashTx    = false
+  hashBlock = false

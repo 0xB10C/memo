@@ -35,6 +35,13 @@ func setDefaults() {
 
 	viper.SetDefault("log.enableTrace", false)
 	viper.SetDefault("log.colorizeOutput", true)
+
+	viper.SetDefault("zmq.host", "localhost")
+	viper.SetDefault("zmq.port", 28332)
+	viper.SetDefault("zmq.subscribeTo.rawTx", false)
+	viper.SetDefault("zmq.subscribeTo.rawBlock", false)
+	viper.SetDefault("zmq.subscribeTo.hashTx", false)
+	viper.SetDefault("zmq.subscribeTo.hashBlock", false)
 }
 
 // GetInt returns a config property as int
