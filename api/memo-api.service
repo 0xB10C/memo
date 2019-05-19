@@ -7,7 +7,7 @@ After=network.target
 Type=simple
 Restart=on-failure
 RestartSec=5s
-ExecStart=/opt/memo/memod/api
+ExecStart=/opt/memo/api
 WorkingDirectory=/opt/memo/api/
 
 
