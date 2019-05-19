@@ -132,12 +132,12 @@ const currentMempoolCard = {
     const blocks = []
     const rowData = [[],[]]
   
-    for (var feerate in response.mempoolData) {
+    for (var feerate in response.feerateMap) {
       rowData[0].push(feerate.toString())
-      rowData[1].push(response.mempoolData[feerate])
+      rowData[1].push(response.feerateMap[feerate])
   
       // TODO: (0xb10c) Why do we do this and what does it?
-      log1pOfCount = response.mempoolData[feerate]
+      log1pOfCount = response.feerateMap[feerate]
       if (feerate <= 10) {
         patternAreas['0to10'].push(log1pOfCount)
       } else if (feerate <= 100) {
@@ -150,12 +150,12 @@ const currentMempoolCard = {
     }
   
   
-    for (var position in response.positionsInGreedyBlocks) {
+    for (var position in response.megabyteMarkers) {
       if (position < 3) {
-        blocks.push(response.positionsInGreedyBlocks[position])
+        blocks.push(response.megabyteMarkers[position])
         // add lines to show estimated next blocks on the mempool graph
         lines.push({
-          value: response.positionsInGreedyBlocks[position]
+          value: response.megabyteMarkers[position]
         })
       }
     }
@@ -546,7 +546,7 @@ const pastBlocksCard = {
 function reloadData() {
   
   // reload mempool chart data
-  axios.get('https://mempool.observer/api/mempool')
+  axios.get('http://127.0.0.1:23485/api/mempool')
     .then(function (response) {
       state.currentMempool.data.processedMempool = currentMempoolCard.processDataForChart(response.data)
       currentMempoolCard.updateCard(state.currentMempool.data.processedMempool)
@@ -554,7 +554,7 @@ function reloadData() {
     });
 
   // reload last blocks data
-  axios.get('https://mempool.observer/api/recentBlocks')
+  axios.get('http://127.0.0.1:23485/api/recentBlocks')
   .then(function (response) {
     state.pastBlocks.data.processedBlocks = pastBlocksCard.processDataForChart(response.data)
     pastBlocksCard.setTimer()

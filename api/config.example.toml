@@ -1,0 +1,11 @@
+[api]
+port = "23485" # this needs to be a string
+production = true
+
+
+[database]
+host = ""  # FIXME:
+user = ""  # FIXME:
+passwd = ""  # FIXME:
+name = ""  # FIXME:
+connection = "tcp"

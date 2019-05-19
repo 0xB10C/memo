@@ -1,7 +1,9 @@
 .DS_STORE
-*.pyc
-__pycache__/*
-config.ini
 .vscode
+
+config.ini
+*/config.toml
+
+# build binarys
 memod/memod
-memod/config.toml
+api/api

@@ -1,0 +1,15 @@
+[Unit]
+Description=memo-api - mempool observer API
+Wants=network.target
+After=network.target
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=5s
+ExecStart=/opt/memo/memod/api
+WorkingDirectory=/opt/memo/api/
+
+
+[Install]
+WantedBy=multi-user.target
