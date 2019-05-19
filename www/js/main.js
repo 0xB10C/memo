@@ -546,7 +546,7 @@ const pastBlocksCard = {
 function reloadData() {
   
   // reload mempool chart data
-  axios.get('http://127.0.0.1:23485/api/mempool')
+  axios.get('http://mempool.observer/api/mempool')
     .then(function (response) {
       state.currentMempool.data.processedMempool = currentMempoolCard.processDataForChart(response.data)
       currentMempoolCard.updateCard(state.currentMempool.data.processedMempool)
@@ -554,7 +554,7 @@ function reloadData() {
     });
 
   // reload last blocks data
-  axios.get('http://127.0.0.1:23485/api/recentBlocks')
+  axios.get('http://mempool.observer/api/recentBlocks')
   .then(function (response) {
     state.pastBlocks.data.processedBlocks = pastBlocksCard.processDataForChart(response.data)
     pastBlocksCard.setTimer()
