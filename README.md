@@ -1,6 +1,6 @@
 # memo - mempool.observer
 
-<img align="right" width="250" src="https://raw.githubusercontent.com/0xB10C/memo/v2-master/www/img/brand-icon.png">
+<img align="right" width="280" src="https://raw.githubusercontent.com/0xB10C/memo/v2-master/www/img/brand-icon.png">
 
 [mempool.observer](https://mempool.observer) visualizes various statistics around my Bitcoin memory pool (mempool).
 Seemingly stuck and longtime-unconfirmed transactions can be quite annoying for users transacting on the Bitcoin network.
