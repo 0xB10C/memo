@@ -6,6 +6,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/0xb10c/memo/memod/config"
 	"github.com/0xb10c/memo/memod/database"
 	"github.com/0xb10c/memo/memod/encoder"
 	"github.com/0xb10c/memo/memod/logger"
@@ -21,8 +22,9 @@ const cSATOSHIPERBITCOIN = 100000000
 // ProcessMempool retives the mempool and starts various processing functions on it
 func ProcessMempool(mempool map[string]types.PartialTransaction) {
 
-	// start _current mempool_ stat generation in a goroutine
-	go currentMempool(mempool)
+	if config.GetBool("mempool.processing.processCurrentMempool") {
+		go currentMempool(mempool) // start _current mempool_ stat generation in a goroutine
+	}
 
 }
 
