@@ -31,11 +31,14 @@ func setDefaults() {
 	viper.SetDefault("bitcoind.rest.port", "8332")
 	viper.SetDefault("bitcoind.rest.responseTimeout", 30)
 
+	viper.SetDefault("mempool.enable", false)
+	viper.SetDefault("mempool.processing.processCurrentMempool", true)
 	viper.SetDefault("mempool.fetchInterval", 60)
 
 	viper.SetDefault("log.enableTrace", false)
 	viper.SetDefault("log.colorizeOutput", true)
 
+	viper.SetDefault("zmq.enable", false)
 	viper.SetDefault("zmq.host", "localhost")
 	viper.SetDefault("zmq.port", 28332)
 	viper.SetDefault("zmq.subscribeTo.rawTx", false)

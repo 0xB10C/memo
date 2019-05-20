@@ -5,6 +5,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/0xb10c/memo/memod/config"
 	"github.com/0xb10c/memo/memod/database"
 	"github.com/0xb10c/memo/memod/fetcher"
 	"github.com/0xb10c/memo/memod/logger"
@@ -42,9 +43,15 @@ func handleExitSig(exitSignals chan os.Signal, shouldExit chan bool) {
 }
 
 func startWorkers() {
-	// run the mempool fetcher in a goroutine
-	go fetcher.SetupMempoolFetcher()
 
-	// starts the ZMQ listener
-	go zmq.Start()
+	if config.GetBool("mempool.enable") {
+		logger.Info.Println("Starting with mempool fetching enabled")
+		go fetcher.SetupMempoolFetcher() // run the mempool fetcher in a goroutine
+	}
+
+	if config.GetBool("zmq.enable") {
+		logger.Info.Println("Starting with ZMQ interface enabled")
+		go zmq.Start() // starts the ZMQ interface
+	}
+
 }
