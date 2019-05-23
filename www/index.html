@@ -205,16 +205,26 @@
     <div class="card my-4 shadow-sm bg-white" id="card-historical-mempool">
       <div class="card-body">
         <h3 class="card-title">Historical Bitcoin Mempool</h3>
-        <h5 class="card-subtitle mb-2 text-muted">Need a subheading here. Maybe a question?</h5>
+        <h5 class="card-subtitle mb-2 text-muted">When was the last time the mempool cleared?</h5>
 
         <div class="row">
           <div class="col-md-12">
             <p class="card-text">
-              Description Text
+              The chart below shows how the memepool evolved over time.
+              An ascending slope means that new transactions came into the mempool.
+              A descending slope means that a new block was found and the transactions in that block have been removed
+              form the mempool.
+            </p>
+            <p class="card-text">
+              The timeframe displayed in the chart can be controlled with the buttons below.
             </p>
           </div>
 
           <div class="col-md-12">
+            <div id="historical-mempool-chart"></div>
+          </div>
+
+          <div class="col-md-12 my-3 text-center">
             <div class="btn-group btn-group-toggle" data-toggle="buttons">
               <label class="btn btn-outline-primary active" onclick="historicalMempoolCard.switchTimeframe(1)">
                 <input type="radio" name="options" id="option1" autocomplete="off" checked> 2h
@@ -229,10 +239,6 @@
                 <input type="radio" name="options" id="option4" autocomplete="off"> 7d
               </label>
             </div>
-          </div>
-
-          <div class="col-md-12">
-            <div id="historical-mempool-chart"></div>
           </div>
 
         </div>
