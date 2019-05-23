@@ -420,7 +420,7 @@ const historicalMempoolCard = {
     if (newTimeframe != state.historicalMempool.data.timeframe) {
       state.historicalMempool.data.timeframe = newTimeframe
       // reload last blocks data
-      axios.get('http://mempool.observer/api/historicalMempool/' + state.historicalMempool.data.timeframe)
+      axios.get('https://mempool.observer/api/historicalMempool/' + state.historicalMempool.data.timeframe)
         .then(function (response) {
           state.historicalMempool.data.processedMempool = historicalMempoolCard.processDataForChart(response.data)
           drawChart(state.historicalMempool.elementId)
@@ -703,7 +703,7 @@ function reloadData() {
     });
 
   // reload last blocks data
-  axios.get('http://mempool.observer/api/historicalMempool/' + state.historicalMempool.data.timeframe)
+  axios.get('https://mempool.observer/api/historicalMempool/' + state.historicalMempool.data.timeframe)
     .then(function (response) {
       state.historicalMempool.data.processedMempool = historicalMempoolCard.processDataForChart(response.data)
       drawChart(state.historicalMempool.elementId)
