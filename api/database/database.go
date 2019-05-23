@@ -92,8 +92,8 @@ type MempoolState struct {
 }
 
 func GetHistoricalMempoolForTimeframe(timeframe int) (mempoolStates []MempoolState, err error) {
-	sqlStatement := "SELECT timestamp, countInBuckets FROM historicalMempool ORDER BY timestamp DESC LIMIT 10;"
-	rows, err := DB.Query(sqlStatement)
+	sqlStatement := "SELECT timestamp, countInBuckets FROM historicalMempool WHERE timeframe = ? ORDER BY timestamp DESC LIMIT 30;"
+	rows, err := DB.Query(sqlStatement, timeframe)
 	if err != nil {
 		return mempoolStates, err
 	}

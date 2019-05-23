@@ -50,21 +50,62 @@ func currentMempool(mempool map[string]types.PartialTransaction) {
 func historicalMempool(mempool map[string]types.PartialTransaction) {
 
 	const timeframe2h = 1
+	const timeframe12h = 2
+	const timeframe48h = 3
+	const timeframe7d = 4
 
-	countInBuckets := generateHistoricalMempoolStats(mempool)
-	countInBucketsJSON, err := encoder.EncodeHistoricalStatsToJSON(countInBuckets)
+	nu, err := database.ReadHistroricalMempoolNeedUpdate()
 	if err != nil {
-		logger.Error.Printf("Failed to encode generated data as JSON: %s", err.Error())
-		return
+		logger.Error.Printf("Failed to get Needs Update data from database: %s", err.Error())
 	}
 
-	err = database.WriteHistoricalMempoolData(countInBucketsJSON, timeframe2h)
-	if err != nil {
-		logger.Error.Printf("Failed to write Current Mempool to database: %s", err.Error())
-		return
+	if nu.Update2h || nu.Update12h || nu.Update48h || nu.Update7d {
+
+		countInBuckets := generateHistoricalMempoolStats(mempool)
+		countInBucketsJSON, err := encoder.EncodeHistoricalStatsToJSON(countInBuckets)
+		if err != nil {
+			logger.Error.Printf("Failed to encode generated data as JSON: %s", err.Error())
+			return
+		}
+
+		if nu.Update2h {
+			logger.Info.Println("Writing 2h Historical Mempool data.")
+			err = database.WriteHistoricalMempoolData(countInBucketsJSON, timeframe2h)
+			if err != nil {
+				logger.Error.Printf("Failed to write Current Mempool to database: %s", err.Error())
+				return
+			}
+		}
+
+		if nu.Update12h {
+			logger.Info.Println("Writing 12h Historical Mempool data.")
+			err = database.WriteHistoricalMempoolData(countInBucketsJSON, timeframe12h)
+			if err != nil {
+				logger.Error.Printf("Failed to write Current Mempool to database: %s", err.Error())
+				return
+			}
+		}
+
+		if nu.Update48h {
+			logger.Info.Println("Writing 48h Historical Mempool data.")
+			err = database.WriteHistoricalMempoolData(countInBucketsJSON, timeframe48h)
+			if err != nil {
+				logger.Error.Printf("Failed to write Current Mempool to database: %s", err.Error())
+				return
+			}
+		}
+
+		if nu.Update7d {
+			logger.Info.Println("Writing 7d Historical Mempool data.")
+			err = database.WriteHistoricalMempoolData(countInBucketsJSON, timeframe7d)
+			if err != nil {
+				logger.Error.Printf("Failed to write Current Mempool to database: %s", err.Error())
+				return
+			}
+		}
+		logger.Info.Println("Success writing Historical Mempool to database.")
 	}
 
-	logger.Info.Println("Success writing Historical Mempool to database.")
 }
 
 /* generateCurrentMempoolStats()
