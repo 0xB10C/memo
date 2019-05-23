@@ -22,6 +22,8 @@ const cSATOSHIPERBITCOIN = 100000000
 // ProcessMempool retives the mempool and starts various processing functions on it
 func ProcessMempool(mempool map[string]types.PartialTransaction) {
 
+	go historicalMempool(mempool)
+
 	if config.GetBool("mempool.processing.processCurrentMempool") {
 		go currentMempool(mempool) // start _current mempool_ stat generation in a goroutine
 	}
@@ -43,6 +45,26 @@ func currentMempool(mempool map[string]types.PartialTransaction) {
 	}
 
 	logger.Info.Println("Success writing Current Mempool to database.")
+}
+
+func historicalMempool(mempool map[string]types.PartialTransaction) {
+
+	const timeframe2h = 1
+
+	countInBuckets := generateHistoricalMempoolStats(mempool)
+	countInBucketsJSON, err := encoder.EncodeHistoricalStatsToJSON(countInBuckets)
+	if err != nil {
+		logger.Error.Printf("Failed to encode generated data as JSON: %s", err.Error())
+		return
+	}
+
+	err = database.WriteHistoricalMempoolData(countInBucketsJSON, timeframe2h)
+	if err != nil {
+		logger.Error.Printf("Failed to write Current Mempool to database: %s", err.Error())
+		return
+	}
+
+	logger.Info.Println("Success writing Historical Mempool to database.")
 }
 
 /* generateCurrentMempoolStats()
@@ -99,4 +121,29 @@ func generateCurrentMempoolStats(mempool map[string]types.PartialTransaction) (m
 	}
 
 	return feerateMap, mempoolSizeInByte, megabyteMarkers
+}
+
+var feerateBuckets = [40]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 18, 22, 27, 33, 41, 50, 62, 76, 93, 114, 140, 172, 212, 261, 321, 395, 486, 598, 736, 905, 1113, 1369, 1684, 2071, 2547, 3133, 3854, 3855}
+
+//TODO: what do we do here?
+func generateHistoricalMempoolStats(mempool map[string]types.PartialTransaction) (countInBuckets []int) {
+
+	countInBuckets = make([]int, len(feerateBuckets), len(feerateBuckets))
+
+	for _, tx := range mempool {
+		feerate := tx.Fee * cSATOSHIPERBITCOIN / float64(tx.Size)
+		bucketIndex := findBucketForFeerate(feerate)
+		countInBuckets[bucketIndex]++
+	}
+
+	return
+}
+
+func findBucketForFeerate(feerate float64) int {
+	i := sort.Search(len(feerateBuckets), func(i int) bool { return feerateBuckets[i] >= int(feerate) })
+	if i < len(feerateBuckets) && feerateBuckets[i] >= int(feerate) {
+		return i
+	} else {
+		return len(feerateBuckets) - 1
+	}
 }

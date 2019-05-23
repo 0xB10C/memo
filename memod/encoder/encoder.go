@@ -25,7 +25,7 @@ func DecodeFetchedMempoolBody(body []byte) (map[string]types.PartialTransaction,
 
 // EncodeCurrentMempoolStatsToJSON encodes the current mempool stats to JSON
 func EncodeCurrentMempoolStatsToJSON(feerateMap map[int]int, megabyteMarkers []int) (string, string, error) {
-	defer logger.TrackTime(time.Now(), "encodeCurrentMempoolStatsToJSON()")
+	defer logger.TrackTime(time.Now(), "EncodeCurrentMempoolStatsToJSON()")
 
 	feerateMapJSON, err := json.Marshal(feerateMap)
 	if err != nil {
@@ -38,4 +38,16 @@ func EncodeCurrentMempoolStatsToJSON(feerateMap map[int]int, megabyteMarkers []i
 	}
 
 	return string(feerateMapJSON), string(megabyteMarkersJSON), nil
+}
+
+// EncodeHistoricalStatsToJSON encodes the historical mempool list to JSON
+func EncodeHistoricalStatsToJSON(countInBuckets []int) (string, error) {
+	defer logger.TrackTime(time.Now(), "EncodeHistoricalStatsToJSON()")
+
+	countInBucketsJSON, err := json.Marshal(countInBuckets)
+	if err != nil {
+		return "", err
+	}
+
+	return string(countInBucketsJSON), nil
 }

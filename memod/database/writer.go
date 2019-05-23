@@ -40,3 +40,20 @@ func WriteNewBlockData(height int, numTx int, sizeWithWitness int, weight int) e
 
 	return errors.New("Database pointer is nil")
 }
+
+// WriteHistoricalMempoolData writes the histoical mempool data into the database
+func WriteHistoricalMempoolData(countInBucketsJSON string, timeframe int) error {
+	defer logger.TrackTime(time.Now(), "WriteHistoricalMempoolData()")
+
+	if Database != nil {
+		sql := "INSERT INTO historicalMempool(timeframe, timestamp, countInBuckets) VALUES (?, UTC_TIMESTAMP, ?)"
+		_, err := Database.Exec(sql, timeframe, countInBucketsJSON)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	return errors.New("Database pointer is nil")
+
+}
