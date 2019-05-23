@@ -20,7 +20,7 @@ func main() {
 
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowOrigins = []string{"127.0.0.1", "localhost", "mempool.observer"}
+	corsConfig.AllowOrigins = []string{"http://127.0.0.1/", "http://localhost/", "https://mempool.observer/"}
 	router.Use(cors.New(corsConfig))
 
 
