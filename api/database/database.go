@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -67,8 +68,7 @@ func GetRecentBlocks() (blocks []RecentBlock, err error) {
 	sqlStatement := "SELECT height, timestamp, txCount, size, weight FROM pastBlocks ORDER BY height DESC LIMIT 10;"
 	rows, err := DB.Query(sqlStatement)
 	if err != nil {
-		// handle this error better than this
-		panic(err)
+		return blocks, err
 	}
 	defer rows.Close()
 
@@ -76,11 +76,39 @@ func GetRecentBlocks() (blocks []RecentBlock, err error) {
 		block := RecentBlock{}
 		err = rows.Scan(&block.Height, &block.time, &block.TxCount, &block.Size, &block.Weight)
 		if err != nil {
-			// handle this error
-			panic(err)
+			return blocks, err
 		}
 		block.Timestamp = block.time.Unix()
 		blocks = append(blocks, block)
+	}
+	return
+}
+
+type MempoolState struct {
+	time               time.Time
+	Timestamp          int64 `json:"timestamp"`
+	countInBucketsJSON string
+	CountInBuckets     []int `json:"countInBuckets"`
+}
+
+func GetHistoricalMempoolForTimeframe(timeframe int) (mempoolStates []MempoolState, err error) {
+	sqlStatement := "SELECT timestamp, countInBuckets FROM historicalMempool ORDER BY timestamp DESC LIMIT 10;"
+	rows, err := DB.Query(sqlStatement)
+	if err != nil {
+		return mempoolStates, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		mempoolState := MempoolState{}
+		err = rows.Scan(&mempoolState.time, &mempoolState.countInBucketsJSON)
+		if err != nil {
+			return mempoolStates, err
+		}
+		mempoolState.Timestamp = mempoolState.time.Unix()
+		json.Unmarshal([]byte(mempoolState.countInBucketsJSON), &mempoolState.CountInBuckets)
+
+		mempoolStates = append(mempoolStates, mempoolState)
 	}
 	return
 }

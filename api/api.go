@@ -33,6 +33,7 @@ func main() {
 	{
 		api.GET("/mempool", getMempool)
 		api.GET("/recentBlocks", getRecentBlocks)
+		api.GET("/historicalMempool", getHistoricalMempool)
 	}
 
 	portString := ":" + config.GetString("api.port")
@@ -68,7 +69,6 @@ func getMempool(c *gin.Context) {
 }
 
 
-
 func getRecentBlocks(c *gin.Context) {
 
 	blocks, err := database.GetRecentBlocks()
@@ -80,5 +80,20 @@ func getRecentBlocks(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, blocks)
+}
+
+
+func getHistoricalMempool(c *gin.Context) {
+
+	mempoolStates, err := database.GetHistoricalMempoolForTimeframe(1)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+
+	c.JSON(http.StatusOK, mempoolStates)
 }
 
