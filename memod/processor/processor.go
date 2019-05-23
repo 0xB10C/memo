@@ -125,7 +125,7 @@ func generateCurrentMempoolStats(mempool map[string]types.PartialTransaction) (m
 
 var feerateBuckets = [40]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 18, 22, 27, 33, 41, 50, 62, 76, 93, 114, 140, 172, 212, 261, 321, 395, 486, 598, 736, 905, 1113, 1369, 1684, 2071, 2547, 3133, 3854, 3855}
 
-//TODO: what do we do here?
+// generates a list of counts of transactions representing the count in a feerate bucket
 func generateHistoricalMempoolStats(mempool map[string]types.PartialTransaction) (countInBuckets []int) {
 
 	countInBuckets = make([]int, len(feerateBuckets), len(feerateBuckets))
@@ -139,11 +139,11 @@ func generateHistoricalMempoolStats(mempool map[string]types.PartialTransaction)
 	return
 }
 
+// finds the bucket index for a given feerate in feerateBuckets. the last bucket is a catch all larger-equal
 func findBucketForFeerate(feerate float64) int {
 	i := sort.Search(len(feerateBuckets), func(i int) bool { return feerateBuckets[i] >= int(feerate) })
 	if i < len(feerateBuckets) && feerateBuckets[i] >= int(feerate) {
 		return i
-	} else {
-		return len(feerateBuckets) - 1
 	}
+	return len(feerateBuckets) - 1
 }
