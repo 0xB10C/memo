@@ -22,7 +22,7 @@ var state = {
     data: {
       processedMempool: null,
       timeLastUpdated: null,
-      timeframe: 1
+      timeframe: 2
     },
   },
   pastBlocks: {
