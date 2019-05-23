@@ -21,8 +21,9 @@ const cSATOSHIPERBITCOIN = 100000000
 
 // ProcessMempool retives the mempool and starts various processing functions on it
 func ProcessMempool(mempool map[string]types.PartialTransaction) {
-
-	go historicalMempool(mempool)
+	if config.GetBool("mempool.processing.processHistoricalMempool") {
+		go historicalMempool(mempool)
+	}
 
 	if config.GetBool("mempool.processing.processCurrentMempool") {
 		go currentMempool(mempool) // start _current mempool_ stat generation in a goroutine
