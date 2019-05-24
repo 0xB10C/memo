@@ -224,7 +224,7 @@
             <div id="historical-mempool-chart"></div>
           </div>
 
-          <div class="col-md-12 my-3 text-center">
+          <div class="col-md-12 my-3 text-center mx-3">
             <div class="btn-group btn-group-toggle" data-toggle="buttons">
               <label class="btn btn-outline-primary" onclick="historicalMempoolCard.switchTimeframe(1)">
                 <input type="radio" name="options" id="option1" autocomplete="off"> 2h
@@ -239,7 +239,19 @@
                 <input type="radio" name="options" id="option4" autocomplete="off"> 7d
               </label>
             </div>
+            <div class="btn-group btn-group-toggle mx-3" data-toggle="buttons">
+              <label class="btn btn-outline-primary active" onclick="historicalMempoolCard.switchBySelector('byCount')">
+                <input type="radio" name="options" id="option1" autocomplete="off" checked> by count
+              </label>
+              <label class="btn btn-outline-primary" onclick="historicalMempoolCard.switchBySelector('byFee')">
+                <input type="radio" name="options" id="option2" autocomplete="off"> by fee
+              </label>
+              <label class="btn btn-outline-primary" onclick="historicalMempoolCard.switchBySelector('bySize')">
+                <input type="radio" name="options" id="option3" autocomplete="off"> by size
+              </label>
+            </div>
           </div>
+
 
         </div>
 

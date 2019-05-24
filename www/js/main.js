@@ -22,7 +22,8 @@ var state = {
     data: {
       processedMempool: null,
       timeLastUpdated: null,
-      timeframe: 2
+      timeframe: 2,
+      bySelector: "byCount",
     },
   },
   pastBlocks: {
@@ -256,6 +257,9 @@ const currentMempoolCard = {
           label: {
             text: 'unconfirmed transactions'
           },
+          tick: {
+            format: d3.format(".2s")
+          },
         },
         y2: {
           outer: false,
@@ -419,14 +423,14 @@ const historicalMempoolCard = {
   switchTimeframe: function (newTimeframe) {
     if (newTimeframe != state.historicalMempool.data.timeframe) {
       state.historicalMempool.data.timeframe = newTimeframe
-      // reload last blocks data
-      axios.get('https://mempool.observer/api/historicalMempool/' + state.historicalMempool.data.timeframe)
-        .then(function (response) {
-          state.historicalMempool.data.processedMempool = historicalMempoolCard.processDataForChart(response.data)
-          drawChart(state.historicalMempool.elementId)
-        });
+      reloadHistoricalMempool()
     }
-
+  },
+  switchBySelector: function (newBySelector) {
+    if (newBySelector != state.historicalMempool.data.bySelector) {
+      state.historicalMempool.data.bySelector = newBySelector
+      reloadHistoricalMempool()
+    }
   },
   processDataForChart: function (response) {
     state.historicalMempool.data.timeLastUpdated = new Date();
@@ -437,12 +441,10 @@ const historicalMempoolCard = {
 
     for (blockIndex in response) {
       let timestamp = response[blockIndex].timestamp * 1000
-      let countInBuckets = response[blockIndex].countInBuckets
+      let dataInBuckets = response[blockIndex].dataInBuckets
 
-      rows.push([new Date(timestamp)].concat(countInBuckets))
+      rows.push([new Date(timestamp)].concat(dataInBuckets))
     }
-
-
 
     return {
       rows: rows,
@@ -471,12 +473,17 @@ const historicalMempoolCard = {
         x: {
           type: 'timeseries',
           tick: {
-            format: '%H:%M'
+            format: state.historicalMempool.data.timeframe > 3 ? '%H:%M %d.%m.' : '%H:%M'
+          }
+        },
+        y: {
+          tick: {
+            format: d3.format(".2s")
           }
         }
       },
       size: {
-        height: 400 // css #past-blocks-chart min-height: 300px needs to be changed too
+        height: 450 // css #historical-mempool-chart min-height: 450px needs to be changed too
       },
       padding: {
         top: 20,
@@ -502,14 +509,27 @@ const historicalMempoolCard = {
           let minutes = "0" + date.getMinutes();
           let formattedTime = hours.substr(-2) + ':' + minutes.substr(-2) + " " + day.substr(-2) + "/" + month.substr(-2) + "/" + year
 
+          var value = ""
+          switch (state.historicalMempool.data.bySelector) {
+            case "byCount":
+              value = d[0].value + " transactions"
+              break;
+            case "byFee":
+              value = d[0].value.toFixed(4) + " BTC"
+              break;
+            case "bySize":
+              value = (d[0].value / 1000).toFixed(0) + " kb"
+              break;
+          }
+
           return `
             <div class="c3-tooltip"><table><tbody>
               <tr><td colspan="2">${formattedTime}</td></tr>
-              <tr><td>${d[0].id} sat/vbyte</td><td>${d[0].value} transactions</td></tr>
+              <tr><td>${d[0].id} sat/vbyte</td><td>${value}</td></tr>
             </tbody></table></div>
             `
         }
-      }
+      },
     }
 
     // properly destroy chart and generate new chart
@@ -694,7 +714,7 @@ function reloadData() {
       drawChart(state.currentMempool.elementId)
     });
 
-  // reload last blocks data
+  // reload past blocks data
   axios.get('https://mempool.observer/api/recentBlocks')
     .then(function (response) {
       state.pastBlocks.data.processedBlocks = pastBlocksCard.processDataForChart(response.data)
@@ -702,17 +722,20 @@ function reloadData() {
       drawChart(state.pastBlocks.elementId)
     });
 
-  // reload last blocks data
-  axios.get('https://mempool.observer/api/historicalMempool/' + state.historicalMempool.data.timeframe)
-    .then(function (response) {
-      state.historicalMempool.data.processedMempool = historicalMempoolCard.processDataForChart(response.data)
-      drawChart(state.historicalMempool.elementId)
-    });
+  reloadHistoricalMempool()
 
   // reload data again in 30 seconds
   setTimeout(function () {
     reloadData()
   }, 30000);
+}
+
+function reloadHistoricalMempool() {
+  axios.get('https://mempool.observer/api/historicalMempool/' + state.historicalMempool.data.timeframe + "/" + state.historicalMempool.data.bySelector)
+    .then(function (response) {
+      state.historicalMempool.data.processedMempool = historicalMempoolCard.processDataForChart(response.data)
+      drawChart(state.historicalMempool.elementId)
+    });
 }
 
 // draws charts for visible cards

@@ -104,8 +104,12 @@ svg#brand-icon g.text {
 
 /* historical mempool chart */
 
-.c3-area {
+#historical-mempool-chart .c3-area {
   opacity: 0.9 !important;
+}
+
+#historical-mempool-chart {
+  min-height: 450px;
 }
 
 
