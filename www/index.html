@@ -130,6 +130,7 @@
               The highest feerate groups appear at the top of the chart descending to lower feerates.
               Each horizontal line shows <abbr title="one virtual megabyte (vMB) to be precise">one megabyte</abbr> of
               transactions.
+              The bars are colorcoded according to thier feerate.
             </p>
 
             <p id="total-transactions" class="card-text text-center lead">
@@ -188,6 +189,15 @@
 
           <div class="col-md-6">
             <div id="current-mempool-chart" class="my-3"> This chart hasn't been drawn yet. </div>
+            <div class="text-center">
+              <span class="rounded-left"
+                style="background-image: linear-gradient(to right,#57e0fbB0, #55ff00B0);">&nbsp;0
+                -- 1</span><span style="background-image: linear-gradient(to right,#55ff00B0, #febf00B0);">0 --
+                &nbsp;10</span><span style="background-image: linear-gradient(to right,#febf00B0, #ff339cB0);">0 --
+                100</span><span class="rounded-right"
+                style="background-image: linear-gradient(to right,#ff339cB0, #7705ecB0);">00&nbsp;</span><br>
+              Colorcoding in sat/vbyte
+            </div>
           </div>
 
         </div>
