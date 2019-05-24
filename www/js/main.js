@@ -60,6 +60,14 @@ window.onload = function () {
   // add scroll listener 
   $(document).scroll(scrollEventHandler);
 
+
+  if ((localStorage.getItem('mode') || "light") == 'light') {
+    $('body').attr('data-theme', 'light');
+  } else {
+    $('body').attr('data-theme', 'dark')
+  }
+
+
   // init data reload loop
   reloadData()
 }
@@ -412,8 +420,6 @@ const currentMempoolCard = {
   }
 }
 
-
-
 const historicalMempoolCard = {
   updateCardLastUpdated: function () {
     // calc seconds from milliseconds
@@ -540,7 +546,6 @@ const historicalMempoolCard = {
 
   }
 }
-
 
 const pastBlocksCard = {
   updateCardLastUpdated: function () {

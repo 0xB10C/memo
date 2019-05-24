@@ -33,7 +33,7 @@
 
 <body>
   <header>
-    <nav class="navbar navbar-expand-md navbar-white bg-white fixed-top shadow-sm">
+    <nav class="navbar navbar-expand-md navbar-bg fixed-top shadow-sm">
       <div class="container">
         <a class="navbar-brand" href="">
           <!--- img/brand-icon.svg (add id="brand-icon" )-->
@@ -87,16 +87,19 @@
             <li class="nav-item active">
               <a class="nav-link" href="#current-mempool">Current<span class="sr-only">(current)</span></a>
             </li>
-            <!--li class="nav-item">
-                <a class="nav-link" href="#historical-mempool">Historical</a>
-            </li-->
+            <li class="nav-item">
+              <a class="nav-link" href="#historical-mempool">Historical</a>
+            </li>
             <li class="nav-item">
               <a class="nav-link" href="#past-blocks">Blocks</a>
             </li>
           </ul>
-          <!-- <button class="btn my-2 my-sm-0 btn-light btn-outline-white" onclick="alert('not part of the mvp :)');"> -->
-          <!-- <i class="fas fa-adjust"></i> -->
-          <!-- </button> -->
+          <button class="btn my-2 my-sm-0 btn-light btn-outline-white"
+            onclick="
+          localStorage.setItem('mode', (localStorage.getItem('mode') || 'light') === 'dark' ? 'light' : 'dark');
+          localStorage.getItem('mode') === 'dark' ? $('body').attr('data-theme','dark'): $('body').attr('data-theme','light');">
+            <i class=" fas fa-adjust"></i>
+          </button>
         </div>
 
       </div>
@@ -337,18 +340,18 @@
       </div>
     </div>
 
-    <div class="alert alert-warning alert-dismissible fade show shadow-sm border-warning mt-3" role="alert">
+    <!--div class="alert alert-warning alert-dismissible fade show shadow-sm border-warning mt-3" role="alert">
       <strong>Work in progress!</strong>
       This is an early prototype of mempool.observer v2.
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
-    </div>
+    </div>-->
 
   </main>
 
 
-  <footer class="footer bg-white">
+  <footer class="footer">
     <div class="container">
       <div class="row text-center">
         <div class="col-sm">

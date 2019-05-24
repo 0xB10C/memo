@@ -7,6 +7,11 @@ body {
   /* Margin top and bottom by nav and footer height */
   margin-bottom: 60px;
   margin-top: 60px;
+  color: var(--text-color)
+}
+
+a {
+  color: var(--primary)
 }
 
 a.href-target {
@@ -17,8 +22,8 @@ a.href-target {
 
 /* navbar */
 
-.navbar-white {
-  background: #ffffff !important;
+.navbar-bg {
+  background: var(--background-nav) !important;
 }
 
 #brand-icon {
@@ -27,10 +32,12 @@ a.href-target {
   transform: rotate(0deg) translate(0px, 0px) scale(1);
 }
 
-svg#brand-icon g.text {
+svg#brand-icon g.text,
+svg#brand-icon g.text>path {
   -webkit-transition: opacity 0.05s ease-in-out;
   transition: opacity 0.05s ease-in-out 0.18s;
   opacity: 1;
+  fill: var(--text-color);
 }
 
 .scrolled #brand-icon {
@@ -53,7 +60,7 @@ svg#brand-icon g.text {
 }
 
 #input-lookup-txid {
-  background-image: none;
+  background-color: var(--background-card);
   padding: 0.5em;
 }
 
@@ -81,7 +88,7 @@ svg#brand-icon g.text {
 #current-mempool-chart.c3-axis-y line,
 #current-mempool-chart.c3-axis-y2 path,
 #current-mempool-chart.c3-axis-y2 line {
-  stroke: gray;
+  stroke: var(--text-color);
 }
 
 #current-mempool-chart.c3 g.c3-axis.c3-axis-x g.tick {
@@ -136,10 +143,12 @@ svg#brand-icon g.text {
   fill-opacity: 0.1;
 }
 
+/* 
 #card-past-blocks.c3-xgrid-line>line,
 #card-past-blocks.c3-ygrid-line>line {
   stroke: rgb(50, 50, 50);
 }
+*/
 
 #card-past-blocks g.c3-lines-block>path {
   visibility: hidden;
@@ -147,8 +156,9 @@ svg#brand-icon g.text {
 
 #card-past-blocks circle.c3-circle {
   clip-path: inset(3px 3px 3px 3px);
-  fill: #323232 !important;
+  fill: var(--text-color) !important;
 }
+
 
 /* hides the last block */
 #card-past-blocks circle.c3-shape.c3-shape-10.c3-circle.c3-circle-10 {
@@ -156,7 +166,7 @@ svg#brand-icon g.text {
 }
 
 #card-past-blocks .c3-xgrid-line>line {
-  stroke: rgb(50, 50, 50);
+  stroke: var(--text-color);
   stroke-width: 1.5px;
 }
 
@@ -170,12 +180,20 @@ svg#brand-icon g.text {
 }
 
 
-.c3-ygrid-line>text,
-.c3-xgrid-line>text {
-  fill: rgb(50, 50, 50);
-  font-size: 1.2em;
+.c3 .c3-axis path,
+.c3 .c3-axis line {
+  stroke: var(--text-color);
 }
 
+
+.c3-axis-y2 text,
+text.c3-axis-y-label,
+text.c3-axis-y2-label,
+.c3-ygrid-line>text,
+.c3-xgrid-line>text {
+  fill: var(--text-color);
+  font-size: 1.2em;
+}
 
 .c3 .c3-axis-y-label,
 .c3 .c3-axis-y2-label {
@@ -189,7 +207,7 @@ svg#brand-icon g.text {
 .c3 .c3-axis-x g,
 .c3 .c3-axis-y g,
 .c3 .c3-legend-item-data text {
-  fill: rgb(50, 50, 50);
+  fill: var(--text-color);
 }
 
 /* Footer */
@@ -199,24 +217,54 @@ svg#brand-icon g.text {
   bottom: 0;
   width: 100%;
   height: 60px;
-  line-height: 30px;
+  line-height: 60px;
+  background-color: var(--footer-background) !important;
 }
 
-#footer-mobile .container {
-  line-height: 1.5;
+
+:root {
+  --background: var(--white);
+  --background-nav: var(--white);
+  --background-footer: var(--light);
+  --text-color: var(--dark)
 }
 
-#footer-desktop {
-  display: none;
+nav .nar .navbar,
+body {
+  background: var(--background) !important;
 }
 
-/* media queries */
-@media only screen and (min-width: 768px) {
-  #footer-mobile {
-    display: none;
-  }
+div.card,
+div.card-body {
+  background: var(--background-card) !important;
+}
 
-  #footer-desktop {
-    display: block;
-  }
+.btn.btn-outline-white {
+  color: var(--text-color);
+  background-color: var(--background-card);
+  border-color: transparent;
+}
+
+.btn.btn-outline-primary {
+  border-color: var(--primary) !important;
+  color: var(--primary);
+}
+
+.btn.btn-outline-primary:hover {
+  background: var(--primary) !important;
+  color: var(--secundary);
+}
+
+.btn.btn-outline-primary.active {
+  background: var(--primary) !important;
+}
+
+
+[data-theme="dark"] {
+  --primary: var(--danger);
+  --background: #000000de;
+  --background-nav: #222222;
+  --background-card: #33333333;
+  --background-footer: #000000de;
+  --text-color: var(--light)
 }
