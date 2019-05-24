@@ -42,12 +42,12 @@ func WriteNewBlockData(height int, numTx int, sizeWithWitness int, weight int) e
 }
 
 // WriteHistoricalMempoolData writes the histoical mempool data into the database
-func WriteHistoricalMempoolData(countInBucketsJSON string, timeframe int) error {
+func WriteHistoricalMempoolData(countInBucketsJSON string, feeInBucketsJSON string, sizeInBucketsJSON string, timeframe int) error {
 	defer logger.TrackTime(time.Now(), "WriteHistoricalMempoolData()")
 
 	if Database != nil {
-		sql := "INSERT INTO historicalMempool(timeframe, timestamp, countInBuckets) VALUES (?, UTC_TIMESTAMP, ?)"
-		_, err := Database.Exec(sql, timeframe, countInBucketsJSON)
+		sql := "INSERT INTO historicalMempool(timeframe, timestamp, countInBuckets, feeInBuckets) VALUES (?, UTC_TIMESTAMP, ?, ?, ?)"
+		_, err := Database.Exec(sql, timeframe, countInBucketsJSON, countInBucketsJSON, feeInBucketsJSON)
 		if err != nil {
 			return err
 		}

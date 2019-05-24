@@ -62,8 +62,8 @@ func historicalMempool(mempool map[string]types.PartialTransaction) {
 
 	if nu.Update2h || nu.Update12h || nu.Update48h || nu.Update7d {
 
-		countInBuckets := generateHistoricalMempoolStats(mempool)
-		countInBucketsJSON, err := encoder.EncodeHistoricalStatsToJSON(countInBuckets)
+		countInBuckets, feeInBuckets, sizeInBuckets := generateHistoricalMempoolStats(mempool)
+		countInBucketsJSON, feeInBucketsJSON, sizeInBucketsJSON, err := encoder.EncodeHistoricalStatsToJSON(countInBuckets, feeInBuckets, sizeInBuckets)
 		if err != nil {
 			logger.Error.Printf("Failed to encode generated data as JSON: %s", err.Error())
 			return
@@ -71,7 +71,7 @@ func historicalMempool(mempool map[string]types.PartialTransaction) {
 
 		if nu.Update2h {
 			logger.Info.Println("Writing 2h Historical Mempool data.")
-			err = database.WriteHistoricalMempoolData(countInBucketsJSON, timeframe2h)
+			err = database.WriteHistoricalMempoolData(countInBucketsJSON, feeInBucketsJSON, sizeInBucketsJSON, timeframe2h)
 			if err != nil {
 				logger.Error.Printf("Failed to write Current Mempool to database: %s", err.Error())
 				return
@@ -80,7 +80,7 @@ func historicalMempool(mempool map[string]types.PartialTransaction) {
 
 		if nu.Update12h {
 			logger.Info.Println("Writing 12h Historical Mempool data.")
-			err = database.WriteHistoricalMempoolData(countInBucketsJSON, timeframe12h)
+			err = database.WriteHistoricalMempoolData(countInBucketsJSON, feeInBucketsJSON, sizeInBucketsJSON, timeframe12h)
 			if err != nil {
 				logger.Error.Printf("Failed to write Current Mempool to database: %s", err.Error())
 				return
@@ -89,7 +89,7 @@ func historicalMempool(mempool map[string]types.PartialTransaction) {
 
 		if nu.Update48h {
 			logger.Info.Println("Writing 48h Historical Mempool data.")
-			err = database.WriteHistoricalMempoolData(countInBucketsJSON, timeframe48h)
+			err = database.WriteHistoricalMempoolData(countInBucketsJSON, feeInBucketsJSON, sizeInBucketsJSON, timeframe48h)
 			if err != nil {
 				logger.Error.Printf("Failed to write Current Mempool to database: %s", err.Error())
 				return
@@ -98,7 +98,7 @@ func historicalMempool(mempool map[string]types.PartialTransaction) {
 
 		if nu.Update7d {
 			logger.Info.Println("Writing 7d Historical Mempool data.")
-			err = database.WriteHistoricalMempoolData(countInBucketsJSON, timeframe7d)
+			err = database.WriteHistoricalMempoolData(countInBucketsJSON, feeInBucketsJSON, sizeInBucketsJSON, timeframe7d)
 			if err != nil {
 				logger.Error.Printf("Failed to write Current Mempool to database: %s", err.Error())
 				return
@@ -168,14 +168,18 @@ func generateCurrentMempoolStats(mempool map[string]types.PartialTransaction) (m
 var feerateBuckets = [40]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 18, 22, 27, 33, 41, 50, 62, 76, 93, 114, 140, 172, 212, 261, 321, 395, 486, 598, 736, 905, 1113, 1369, 1684, 2071, 2547, 3133, 3854, 3855}
 
 // generates a list of counts of transactions representing the count in a feerate bucket
-func generateHistoricalMempoolStats(mempool map[string]types.PartialTransaction) (countInBuckets []int) {
+func generateHistoricalMempoolStats(mempool map[string]types.PartialTransaction) (countInBuckets []int, feeInBuckets []float64, sizeInBuckets []int) {
 
 	countInBuckets = make([]int, len(feerateBuckets), len(feerateBuckets))
+	feeInBuckets = make([]float64, len(feerateBuckets), len(feerateBuckets))
+	sizeInBuckets = make([]int, len(feerateBuckets), len(feerateBuckets))
 
 	for _, tx := range mempool {
 		feerate := tx.Fee * cSATOSHIPERBITCOIN / float64(tx.Size)
 		bucketIndex := findBucketForFeerate(feerate)
 		countInBuckets[bucketIndex]++
+		feeInBuckets[bucketIndex] += tx.Fee
+		sizeInBuckets[bucketIndex] += tx.Size
 	}
 
 	return
