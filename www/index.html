@@ -187,8 +187,7 @@
           </div>
 
           <div class="col-md-6">
-            <div id="current-mempool-chart" class="my-3"> This chart hasn't been drawn yet since the tab wasn't active
-              when opening.</div>
+            <div id="current-mempool-chart" class="my-3"> This chart hasn't been drawn yet. </div>
           </div>
 
         </div>
@@ -216,37 +215,40 @@
               form the mempool.
             </p>
             <p class="card-text">
-              The timeframe displayed in the chart can be controlled with the buttons below.
+              The timeframe and the y-Axis can be controlled with the buttons below.
+              <i>By count</i> displays the historical mempool by transaction count, <i>by fee</i> displays by fees in
+              Bitcoin and <i>by size</i> by transaction size in vkB.
             </p>
           </div>
 
           <div class="col-md-12">
-            <div id="historical-mempool-chart"></div>
+            <div id="historical-mempool-chart"> This chart hasn't been drawn yet. </div>
           </div>
 
-          <div class="col-md-12 my-3 text-center mx-3">
-            <div class="btn-group btn-group-toggle" data-toggle="buttons">
-              <label class="btn btn-outline-primary" onclick="historicalMempoolCard.switchTimeframe(1)">
+          <div class="col-md-12 my-3 text-center">
+            <div class="btn-group btn-group-toggle m-2" data-toggle="buttons">
+              <label class="btn btn-outline-primary pointer" onclick="historicalMempoolCard.switchTimeframe(1)">
                 <input type="radio" name="options" id="option1" autocomplete="off"> 2h
               </label>
-              <label class="btn btn-outline-primary active" onclick="historicalMempoolCard.switchTimeframe(2)">
+              <label class="btn btn-outline-primary active pointer" onclick="historicalMempoolCard.switchTimeframe(2)">
                 <input type="radio" name="options" id="option2" autocomplete="off" checked> 12h
               </label>
-              <label class="btn btn-outline-primary" onclick="historicalMempoolCard.switchTimeframe(3)">
+              <label class="btn btn-outline-primary pointer" onclick="historicalMempoolCard.switchTimeframe(3)">
                 <input type="radio" name="options" id="option3" autocomplete="off"> 48h
               </label>
-              <label class="btn btn-outline-primary" onclick="historicalMempoolCard.switchTimeframe(4)">
+              <label class="btn btn-outline-primary pointer" onclick="historicalMempoolCard.switchTimeframe(4)">
                 <input type="radio" name="options" id="option4" autocomplete="off"> 7d
               </label>
             </div>
-            <div class="btn-group btn-group-toggle mx-3" data-toggle="buttons">
-              <label class="btn btn-outline-primary active" onclick="historicalMempoolCard.switchBySelector('byCount')">
+            <div class="btn-group btn-group-toggle m-2" data-toggle="buttons">
+              <label class="btn btn-outline-primary active pointer"
+                onclick="historicalMempoolCard.switchBySelector('byCount')">
                 <input type="radio" name="options" id="option1" autocomplete="off" checked> by count
               </label>
-              <label class="btn btn-outline-primary" onclick="historicalMempoolCard.switchBySelector('byFee')">
+              <label class="btn btn-outline-primary pointer" onclick="historicalMempoolCard.switchBySelector('byFee')">
                 <input type="radio" name="options" id="option2" autocomplete="off"> by fee
               </label>
-              <label class="btn btn-outline-primary" onclick="historicalMempoolCard.switchBySelector('bySize')">
+              <label class="btn btn-outline-primary pointer" onclick="historicalMempoolCard.switchBySelector('bySize')">
                 <input type="radio" name="options" id="option3" autocomplete="off"> by size
               </label>
             </div>
@@ -294,7 +296,7 @@
           </div>
 
           <div class="col-md-12">
-            <div id="past-blocks-chart"></div>
+            <div id="past-blocks-chart"> This chart hasn't been drawn yet. </div>
           </div>
 
           <div class="col-md-12">

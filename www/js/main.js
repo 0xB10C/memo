@@ -518,7 +518,7 @@ const historicalMempoolCard = {
               value = d[0].value.toFixed(4) + " BTC"
               break;
             case "bySize":
-              value = (d[0].value / 1000).toFixed(0) + " kb"
+              value = (d[0].value / 1000).toFixed(0) + " vkB"
               break;
           }
 
@@ -774,15 +774,6 @@ setInterval(function () {
   pastBlocksCard.updateCardLastUpdated()
 }, 10000);
 
-// TODO: unused, can be removed
-function getLastTenBlocksFromApi() {
-  return axios.get(`https://blockstream.info/api/blocks`)
-    .then(res => res.data)
-    .catch(e => {
-      console.error('Error getting data from explorer:', e)
-      throw new Error('Could not load data from https://blockstream.info/api/blocks.')
-    })
-}
 
 function getTxFromApi(txId) {
   return axios.get(`https://blockstream.info/api/tx/${txId}`)

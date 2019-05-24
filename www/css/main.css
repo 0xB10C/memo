@@ -112,6 +112,9 @@ svg#brand-icon g.text {
   min-height: 450px;
 }
 
+.pointer {
+  cursor: pointer;
+}
 
 /* past blocks card */
 
