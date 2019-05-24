@@ -33,6 +33,7 @@ func setDefaults() {
 
 	viper.SetDefault("mempool.enable", false)
 	viper.SetDefault("mempool.processing.processCurrentMempool", true)
+	viper.SetDefault("mempool.processing.processHistoricalMempool", true)
 	viper.SetDefault("mempool.fetchInterval", 60)
 
 	viper.SetDefault("log.enableTrace", false)

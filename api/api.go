@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"encoding/json"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/0xb10c/memo/api/database"
@@ -20,7 +21,11 @@ func main() {
 
 	router := gin.Default()
 	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowOrigins = []string{"http://127.0.0.1/", "http://localhost/", "https://mempool.observer/"}
+	if config.GetBool("api.production") {
+		corsConfig.AllowOrigins = []string{"https://mempool.observer/"}
+	}else{
+		corsConfig.AllowOrigins = []string{"*"}
+	}
 	router.Use(cors.New(corsConfig))
 
 
@@ -33,6 +38,7 @@ func main() {
 	{
 		api.GET("/mempool", getMempool)
 		api.GET("/recentBlocks", getRecentBlocks)
+		api.GET("/historicalMempool/:timeframe/:by", getHistoricalMempool)
 	}
 
 	portString := ":" + config.GetString("api.port")
@@ -44,8 +50,9 @@ func getMempool(c *gin.Context) {
 
 	timestamp, byCount, megabyteMarkersJSON, mempoolSize, err := database.GetMempool()
 	if err != nil {
+		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+			"error": "Database error",
 		})
 		return
 	}
@@ -68,17 +75,49 @@ func getMempool(c *gin.Context) {
 }
 
 
-
 func getRecentBlocks(c *gin.Context) {
 
 	blocks, err := database.GetRecentBlocks()
 	if err != nil {
+		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+			"error": "Database error",
 		})
 		return
 	}
 
 	c.JSON(http.StatusOK, blocks)
+}
+
+
+func getHistoricalMempool(c *gin.Context) {
+	timeframe, err := strconv.ParseInt(c.Param("timeframe"), 10, 0)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Invalid input error",
+		})
+		return
+	}
+
+	by := c.Param("by")
+	if by != "byCount" && by != "byFee" && by != "bySize" {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Invalid input error",
+		})
+		return
+	}
+
+	mempoolStates, err := database.GetHistorical(int(timeframe), by)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Database error",
+		})
+		return
+	}
+
+
+	c.JSON(http.StatusOK, mempoolStates)
 }
 

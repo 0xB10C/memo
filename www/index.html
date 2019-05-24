@@ -187,7 +187,7 @@
           </div>
 
           <div class="col-md-6">
-            <div id="current-mempool-chart" class="my-3"> This chart hasn't been drawn yet since the tab wasn't active when opening.</div>
+            <div id="current-mempool-chart" class="my-3"> This chart hasn't been drawn yet. </div>
           </div>
 
         </div>
@@ -201,10 +201,62 @@
     </div>
 
     <a id="historical-mempool" class="href-target"></a>
-    <div class="card my-4 shadow-sm bg-white" id="card-historical-mempool" style="display: none;">
+    <div class="card my-4 shadow-sm bg-white" id="card-historical-mempool">
       <div class="card-body">
         <h3 class="card-title">Historical Bitcoin Mempool</h3>
-        <h5 class="card-subtitle mb-2 text-muted">Need a subheading here. Maybe a question?</h5>
+        <h5 class="card-subtitle mb-2 text-muted">When was the last time the mempool cleared?</h5>
+
+        <div class="row">
+          <div class="col-md-12">
+            <p class="card-text">
+              The chart below shows how the memepool evolved over time.
+              An ascending slope means that new transactions came into the mempool.
+              A descending slope means that a new block was found and the transactions in that block have been removed
+              form the mempool.
+            </p>
+            <p class="card-text">
+              The timeframe and the y-Axis can be controlled with the buttons below.
+              <i>By count</i> displays the historical mempool by transaction count, <i>by fee</i> displays by fees in
+              Bitcoin and <i>by size</i> by transaction size in vkB.
+            </p>
+          </div>
+
+          <div class="col-md-12">
+            <div id="historical-mempool-chart"> This chart hasn't been drawn yet. </div>
+          </div>
+
+          <div class="col-md-12 my-3 text-center">
+            <div class="btn-group btn-group-toggle m-2" data-toggle="buttons">
+              <label class="btn btn-outline-primary pointer" onclick="historicalMempoolCard.switchTimeframe(1)">
+                <input type="radio" name="options" id="option1" autocomplete="off"> 2h
+              </label>
+              <label class="btn btn-outline-primary active pointer" onclick="historicalMempoolCard.switchTimeframe(2)">
+                <input type="radio" name="options" id="option2" autocomplete="off" checked> 12h
+              </label>
+              <label class="btn btn-outline-primary pointer" onclick="historicalMempoolCard.switchTimeframe(3)">
+                <input type="radio" name="options" id="option3" autocomplete="off"> 48h
+              </label>
+              <label class="btn btn-outline-primary pointer" onclick="historicalMempoolCard.switchTimeframe(4)">
+                <input type="radio" name="options" id="option4" autocomplete="off"> 7d
+              </label>
+            </div>
+            <div class="btn-group btn-group-toggle m-2" data-toggle="buttons">
+              <label class="btn btn-outline-primary active pointer"
+                onclick="historicalMempoolCard.switchBySelector('byCount')">
+                <input type="radio" name="options" id="option1" autocomplete="off" checked> by count
+              </label>
+              <label class="btn btn-outline-primary pointer" onclick="historicalMempoolCard.switchBySelector('byFee')">
+                <input type="radio" name="options" id="option2" autocomplete="off"> by fee
+              </label>
+              <label class="btn btn-outline-primary pointer" onclick="historicalMempoolCard.switchBySelector('bySize')">
+                <input type="radio" name="options" id="option3" autocomplete="off"> by size
+              </label>
+            </div>
+          </div>
+
+
+        </div>
+
       </div>
       <div class="card-footer text-muted text-right">
         <small>
@@ -223,25 +275,28 @@
         <div class="row">
           <div class="col-md-12">
             <p class="card-text">
-              The chart below shows the arrival times of the last ten blocks. 
+              The chart below shows the arrival times of the last ten blocks.
               Since finding a valid block (mining) is a random process, the time between two blocks is random.
               Sometimes blocks are found only seconds apart, sometimes it takes over an hour till a new block is found.
               On average a new block is found roughly every ten minutes.
-              However, there is no way of accurately estimating when the next block will be found, since mining is a random process.
+              However, there is no way of accurately estimating when the next block will be found, since mining is a
+              random process.
               <!--However the probability of a new block being found in, for example, the next five minutes rises as time goes by.-->
               <!-- leaving this out for now. might add back later once we have a probability estimator ready-->
             </p>
 
             <p class="card-text">
               The time displayed in the chart is the time the blocks arrived over the
-              <abbr title="While blocks contain a timestamp field in the block header, this timestamp must not be the time the block was actually mined. Thus this timestamp is not useful for this chart.">P2P network</abbr>.
+              <abbr
+                title="While blocks contain a timestamp field in the block header, this timestamp must not be the time the block was actually mined. Thus this timestamp is not useful for this chart.">P2P
+                network</abbr>.
               Hovering over a block shows additional information like the transaction count and the block size.
-              The time since the last block is marked red.              
+              The time since the last block is marked red.
             </p>
           </div>
 
           <div class="col-md-12">
-            <div id="past-blocks-chart"></div>
+            <div id="past-blocks-chart"> This chart hasn't been drawn yet. </div>
           </div>
 
           <div class="col-md-12">
@@ -264,11 +319,11 @@
     </div>
 
     <div class="alert alert-warning alert-dismissible fade show shadow-sm border-warning mt-3" role="alert">
-        <strong>Work in progress!</strong>
-        This is an early prototype of mempool.observer v2.
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+      <strong>Work in progress!</strong>
+      This is an early prototype of mempool.observer v2.
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
     </div>
 
   </main>

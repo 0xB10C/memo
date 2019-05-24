@@ -21,6 +21,7 @@ enable = false            # enable mempool fetching
 fetchInterval = 60        # seconds
   [mempool.processing]
   processCurrentMempool = true
+  processHistoricalMempool = true
 
 [log]
 enableTrace = false

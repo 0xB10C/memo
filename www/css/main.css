@@ -61,11 +61,10 @@ svg#brand-icon g.text {
   display: none;
 }
 
-
 /* current mempool chart */
 
 #current-mempool-chart {
-   /* So it doesn't need to resize after chart is rendered */
+  /* So it doesn't need to resize after chart is rendered */
   min-height: 750px;
 }
 
@@ -97,18 +96,32 @@ svg#brand-icon g.text {
   margin-left: 20px;
 }
 
-.c3-ygrid-line.red-line > text {
+.c3-ygrid-line.red-line>text {
   fill: red;
   transform: translateY(17px);
 }
 
+
+/* historical mempool chart */
+
+#historical-mempool-chart .c3-area {
+  opacity: 0.9 !important;
+}
+
+#historical-mempool-chart {
+  min-height: 450px;
+}
+
+.pointer {
+  cursor: pointer;
+}
 
 /* past blocks card */
 
 #past-blocks-timer {
   background-color: #ff000036;
   /* have a bit less padding on the bottom lets it appear more centered */
-  padding: 0.4rem; 
+  padding: 0.4rem;
   padding-bottom: 0.3rem;
   border-radius: 0.3rem;
 }
@@ -123,12 +136,12 @@ svg#brand-icon g.text {
   fill-opacity: 0.1;
 }
 
-#card-past-blocks.c3-xgrid-line > line,
-#card-past-blocks.c3-ygrid-line > line {
+#card-past-blocks.c3-xgrid-line>line,
+#card-past-blocks.c3-ygrid-line>line {
   stroke: rgb(50, 50, 50);
 }
 
-#card-past-blocks g.c3-lines-block > path {
+#card-past-blocks g.c3-lines-block>path {
   visibility: hidden;
 }
 
@@ -142,23 +155,23 @@ svg#brand-icon g.text {
   display: none;
 }
 
-#card-past-blocks .c3-xgrid-line > line {
+#card-past-blocks .c3-xgrid-line>line {
   stroke: rgb(50, 50, 50);
   stroke-width: 1.5px;
 }
 
 /* general chart css*/
-.red-line > line {
+.red-line>line {
   stroke: red !important;
 }
 
-.red-line > text {
+.red-line>text {
   fill: red !important;
 }
 
 
-.c3-ygrid-line > text,
-.c3-xgrid-line > text {
+.c3-ygrid-line>text,
+.c3-xgrid-line>text {
   fill: rgb(50, 50, 50);
   font-size: 1.2em;
 }

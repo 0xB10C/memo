@@ -2,6 +2,8 @@ package database
 
 import (
 	"database/sql"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -67,8 +69,7 @@ func GetRecentBlocks() (blocks []RecentBlock, err error) {
 	sqlStatement := "SELECT height, timestamp, txCount, size, weight FROM pastBlocks ORDER BY height DESC LIMIT 10;"
 	rows, err := DB.Query(sqlStatement)
 	if err != nil {
-		// handle this error better than this
-		panic(err)
+		return blocks, err
 	}
 	defer rows.Close()
 
@@ -76,11 +77,52 @@ func GetRecentBlocks() (blocks []RecentBlock, err error) {
 		block := RecentBlock{}
 		err = rows.Scan(&block.Height, &block.time, &block.TxCount, &block.Size, &block.Weight)
 		if err != nil {
-			// handle this error
-			panic(err)
+			return blocks, err
 		}
 		block.Timestamp = block.time.Unix()
 		blocks = append(blocks, block)
+	}
+	return
+}
+
+type MempoolState struct {
+	time              time.Time
+	Timestamp         int64 `json:"timestamp"`
+	dataInBucketsJSON string
+	DataInBuckets     []float64 `json:"dataInBuckets"`
+}
+
+func GetHistorical(timeframe int, by string) (mempoolStates []MempoolState, err error) {
+
+	var bySelector string
+	switch by {
+	case "byCount":
+		bySelector = "countInBuckets"
+	case "byFee":
+		bySelector = "feeInBuckets"
+	case "bySize":
+		bySelector = "sizeInBuckets"
+	default:
+		return mempoolStates, errors.New("Invalid input")
+	}
+
+	sqlStatement := "SELECT timestamp, " + bySelector + " FROM historicalMempool WHERE timeframe = ? ORDER BY timestamp DESC LIMIT 30;"
+	rows, err := DB.Query(sqlStatement, timeframe)
+	if err != nil {
+		return mempoolStates, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		mempoolState := MempoolState{}
+		err = rows.Scan(&mempoolState.time, &mempoolState.dataInBucketsJSON)
+		if err != nil {
+			return mempoolStates, err
+		}
+		mempoolState.Timestamp = mempoolState.time.Unix()
+		json.Unmarshal([]byte(mempoolState.dataInBucketsJSON), &mempoolState.DataInBuckets)
+
+		mempoolStates = append(mempoolStates, mempoolState)
 	}
 	return
 }

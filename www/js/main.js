@@ -19,7 +19,12 @@ var state = {
     chart: null,
     elementId: "card-historical-mempool",
     isScrolledIntoView: false,
-    data: {},
+    data: {
+      processedMempool: null,
+      timeLastUpdated: null,
+      timeframe: 2,
+      bySelector: "byCount",
+    },
   },
   pastBlocks: {
     chart: null,
@@ -46,28 +51,28 @@ window.onload = function () {
   })
   document.getElementById('random-tx').addEventListener('click', currentMempoolCard.loadRandomTransactionFromApi)
 
-  window.onfocus = function () { 
+  window.onfocus = function () {
     drawChart(state.currentMempool.elementId)
-  }; 
-  
+  };
+
   document.addEventListener("visibilitychange", visibilityChangeHandler, false);
 
   // add scroll listener 
   $(document).scroll(scrollEventHandler);
 
   // init data reload loop
-  reloadData() 
+  reloadData()
 }
 
 function visibilityChangeHandler() {
-  if(!document.hidden) {
+  if (!document.hidden) {
     // the page is now visible 
     // call scrollEventHandler() which already implements much of the functionality we need
     scrollEventHandler()
   }
 }
 
-function scrollEventHandler(){
+function scrollEventHandler() {
 
   // handle scroll offset over 60px from top to animate the icon
   if ($(".navbar").offset().top > 60) {
@@ -75,22 +80,20 @@ function scrollEventHandler(){
   } else {
     $(".navbar").removeClass("scrolled");
   }
- 
+
   cards.forEach(card => {
     let el = document.getElementById(card.elementId)
-    
+
     let scrolledIntoView = isScrolledIntoView(el)
 
-    if(card.isScrolledIntoView == false && scrolledIntoView == true) {
+    if (card.isScrolledIntoView == false && scrolledIntoView == true) {
       // redraw chart if card just scrolled into view
       card.isScrolledIntoView = scrolledIntoView
       drawChart(card.elementId)
-    } 
-    
-    else if (card.isScrolledIntoView == true && scrolledIntoView == false) {
+    } else if (card.isScrolledIntoView == true && scrolledIntoView == false) {
       // destroy chart if card just scrolled out of view
       card.isScrolledIntoView = scrolledIntoView
-      if(card.chart != null){
+      if (card.chart != null) {
         card.chart = card.chart.destroy();
         //console.error("Destroying", card.elementId)
       }
@@ -107,14 +110,14 @@ function scrollEventHandler(){
     */
 
   });
-  
+
 }
 
 function isScrolledIntoView(el) {
   const offset = 100
   let elemTop = el.getBoundingClientRect().top;
   let elemBottom = el.getBoundingClientRect().bottom;
-  let elemHeight = elemBottom - elemTop 
+  let elemHeight = elemBottom - elemTop
 
   let isVisible = (elemTop + elemHeight + offset >= 0) && (elemBottom - elemHeight - offset <= window.innerHeight);
   return isVisible;
@@ -122,20 +125,28 @@ function isScrolledIntoView(el) {
 
 // this object inhibits all functions used by or for the current mempool card
 const currentMempoolCard = {
-  processDataForChart: function(response) {
+  processDataForChart: function (response) {
     state.currentMempool.data.timeLastUpdated = response.timestamp
-  
+
     const mempoolSize = +(response.mempoolSize / 1000000).toFixed(2)
-    const patternAreas = {'0to10': [], '11to100': [], '101to1k': [],'from1001': []}
-  
+    const patternAreas = {
+      '0to10': [],
+      '11to100': [],
+      '101to1k': [],
+      'from1001': []
+    }
+
     const lines = []
     const blocks = []
-    const rowData = [[],[]]
-  
+    const rowData = [
+      [],
+      []
+    ]
+
     for (var feerate in response.feerateMap) {
       rowData[0].push(feerate.toString())
       rowData[1].push(response.feerateMap[feerate])
-  
+
       // TODO: (0xb10c) Why do we do this and what does it?
       log1pOfCount = response.feerateMap[feerate]
       if (feerate <= 10) {
@@ -148,8 +159,8 @@ const currentMempoolCard = {
         patternAreas['from1001'].push(log1pOfCount)
       }
     }
-  
-  
+
+
     for (var position in response.megabyteMarkers) {
       if (position < 3) {
         blocks.push(response.megabyteMarkers[position])
@@ -159,9 +170,9 @@ const currentMempoolCard = {
         })
       }
     }
-  
+
     let colorPattern = currentMempoolCard.generateColorPattern(patternAreas)
-  
+
     // Sum all txs to get the total number of tx in the mempool
     const sum = Object.values(rowData[1]).reduce((a, b) => a + b, 0)
     return {
@@ -173,14 +184,14 @@ const currentMempoolCard = {
       "sum": sum
     }
   },
-  generateColorPattern: function(patternAreas) {
+  generateColorPattern: function (patternAreas) {
     const patternColors = [
       ["#57e0fb", "#55ff00"],
       ["#55ff00", "#febf00"],
       ["#febf00", "#ff339c"],
       ["#ff339c", "#7705ec"]
     ]
-  
+
     var colorPattern = []
     var c_counter = 0
     for (area in patternAreas) {
@@ -188,14 +199,14 @@ const currentMempoolCard = {
       pattern = chroma.scale(patternColors[c_counter])
         .mode('lch').classes(logLimits)
         .colors(patternAreas[area].length);
-  
+
       colorPattern = colorPattern.concat(pattern)
       c_counter++
     }
-  
+
     return colorPattern
   },
-  draw: async function() {
+  draw: async function () {
     let processed = state.currentMempool.data.processedMempool
 
     chartSetting = {
@@ -246,6 +257,9 @@ const currentMempoolCard = {
           label: {
             text: 'unconfirmed transactions'
           },
+          tick: {
+            format: d3.format(".2s")
+          },
         },
         y2: {
           outer: false,
@@ -267,13 +281,13 @@ const currentMempoolCard = {
         }
       }
     }
-  
+
     // properly destroy chart and generate new chart
-    if(state.currentMempool.chart){
-      state.currentMempool.chart = state.currentMempool.chart.destroy(); 
+    if (state.currentMempool.chart) {
+      state.currentMempool.chart = state.currentMempool.chart.destroy();
     }
     state.currentMempool.chart = c3.generate(chartSetting)
-  
+
     // draw the tx the chart if it's unconfirmed
     let tx = state.currentMempool.data.currentTx;
     if (tx != null) {
@@ -284,44 +298,44 @@ const currentMempoolCard = {
         currentMempoolCard.drawUserTxByFeeRate(feeRate)
       }
     }
-  
+
   },
-  updateCard: function(processed) {
+  updateCard: function (processed) {
     const spanTxCount = document.getElementById('current-mempool-count')
     const spanMempoolSize = document.getElementById('current-mempool-size')
-  
+
     const txCountInMempool = processed.sum
     const txSizeInMempool = processed.mempoolSize
-  
+
     spanTxCount.innerHTML = txCountInMempool
     spanMempoolSize.innerHTML = txSizeInMempool
-  
+
     timeSinceLastUpdate = 0
     currentMempoolCard.updateCardLastUpdated()
   },
-  updateCardLastUpdated: function() {
-  // calc minutes from milliseconds
-  const minutes = Math.floor((Date.now() - (state.currentMempool.data.timeLastUpdated * 1000)) / 1000 / 60)
-  document.getElementById('current-mempool-last-update').innerHTML = (minutes)
+  updateCardLastUpdated: function () {
+    // calc minutes from milliseconds
+    const minutes = Math.floor((Date.now() - (state.currentMempool.data.timeLastUpdated * 1000)) / 1000 / 60)
+    document.getElementById('current-mempool-last-update').innerHTML = (minutes)
   },
-  handleTxSearch: async function() {
+  handleTxSearch: async function () {
     $('#input-lookup-txid').removeClass("is-invalid") // remove invalid tx message 
     $('#current-mempool-tx-data').hide() // hide the current tx data
-  
+
     inputTxid = document.getElementById('input-lookup-txid').value
-  
+
     // Check if the input has the format of a txid
     if (/^[a-fA-F0-9]{64}$/.test(inputTxid) == false) {
-    
+
       $('#invalid-feedback').html('Invalid Bitcoin transaction id.') // Set invalidt tx message
       $('#input-lookup-txid').addClass("is-invalid") // Show invalid tx message
-    
+
     } else {
-  
+
       try {
         state.currentMempool.data.currentTx = await getTxFromApi(inputTxid)
         let tx = state.currentMempool.data.currentTx
-  
+
         if (tx.status.confirmed) {
           let minutes_since_confirmation = Math.floor((Date.now() - tx.status.block_time * 1000) / 1000 / 60)
           let error = `The transaction is already confirmed and therefore not in the mempool. (block ${tx.status.block_height}, ${minutes_since_confirmation} minutes ago)`
@@ -330,27 +344,27 @@ const currentMempoolCard = {
           $('#input-lookup-txid').addClass("is-invalid")
         } else { // tx is unconfirmed
           const vSize = (tx.weight / 4) // see Issue #11  
-          const feeRate = Math.floor(tx.fee / vSize) 
+          const feeRate = Math.floor(tx.fee / vSize)
           currentMempoolCard.drawUserTxByFeeRate(feeRate)
           currentMempoolCard.displayTransactionData(tx.fee, vSize, feeRate)
         }
-  
+
       } catch (error) {
         console.error(error)
         $('#invalid-feedback').html(error)
         $('#input-lookup-txid').addClass("is-invalid")
       }
-  
+
     }
   },
   drawUserTxByFeeRate: function (feeRate) {
     const position = currentMempoolCard.getUserTxPositionInChartByFeeRate(feeRate)
-  
+
     // Remove existing line(s)
     state.currentMempool.chart.ygrids.remove({
       class: 'red-line'
     });
-  
+
     // Draw a new line, but wait 20ms for c3.js to not to remove it directly
     setTimeout(function () {
       state.currentMempool.chart.ygrids.add([{
@@ -365,18 +379,18 @@ const currentMempoolCard = {
   getUserTxPositionInChartByFeeRate: function (feeRate) {
     let position = 0
     let processedMempool = state.currentMempool.data.processedMempool
-  
+
     for (index in processedMempool.rowData[0]) {
       if (processedMempool.rowData[0][index] < feeRate) {
         position += processedMempool.rowData[1][index]
-      } else if(processedMempool.rowData[0][index] == feeRate) {
+      } else if (processedMempool.rowData[0][index] == feeRate) {
         // get ruffly the middle position of the bar
-        position += Math.round(processedMempool.rowData[1][index] / 2) 
+        position += Math.round(processedMempool.rowData[1][index] / 2)
       } else {
         break;
       }
     }
-  
+
     return position
   },
   displayTransactionData: function (fee, vsize, feeRate) {
@@ -385,7 +399,7 @@ const currentMempoolCard = {
     $('#current-mempool-tx-data-size').html(vsize)
     $('#current-mempool-tx-data-feerate').html(feeRate)
   },
-  loadRandomTransactionFromApi: async function() {
+  loadRandomTransactionFromApi: async function () {
     try {
       const recentTxs = await axios.get('https://blockstream.info/api/mempool/recent')
       const feePayingTxs = recentTxs.data.filter(tx => tx.fee > 0).map(tx => tx.txid)
@@ -398,40 +412,182 @@ const currentMempoolCard = {
   }
 }
 
-const pastBlocksCard = {
-  updateCardLastUpdated: function () { 
+
+
+const historicalMempoolCard = {
+  updateCardLastUpdated: function () {
     // calc seconds from milliseconds
-    const minutes = Math.floor((Date.now() - (state.pastBlocks.data.timeLastUpdated)) / 1000 / 60) 
+    const minutes = Math.floor((Date.now() - (state.historicalMempool.data.timeLastUpdated)) / 1000 / 60)
+    document.getElementById('historical-mempool-last-update').innerHTML = (minutes)
+  },
+  switchTimeframe: function (newTimeframe) {
+    if (newTimeframe != state.historicalMempool.data.timeframe) {
+      state.historicalMempool.data.timeframe = newTimeframe
+      reloadHistoricalMempool()
+    }
+  },
+  switchBySelector: function (newBySelector) {
+    if (newBySelector != state.historicalMempool.data.bySelector) {
+      state.historicalMempool.data.bySelector = newBySelector
+      reloadHistoricalMempool()
+    }
+  },
+  processDataForChart: function (response) {
+    state.historicalMempool.data.timeLastUpdated = new Date();
+
+    let rows = [
+      ["x", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 18, 22, 27, 33, 41, 50, 62, 76, 93, 114, 140, 172, 212, 261, 321, 395, 486, 598, 736, 905, 1113, 1369, 1684, 2071, 2547, 3133, 3854, "3854+"]
+    ]
+
+    for (blockIndex in response) {
+      let timestamp = response[blockIndex].timestamp * 1000
+      let dataInBuckets = response[blockIndex].dataInBuckets
+
+      rows.push([new Date(timestamp)].concat(dataInBuckets))
+    }
+
+    return {
+      rows: rows,
+    }
+  },
+  draw: async function () {
+
+    let processed = state.historicalMempool.data.processedMempool
+
+    if (processed == null) {
+      return
+    }
+
+
+    chartSetting = {
+      bindto: '#historical-mempool-chart',
+      data: {
+        x: "x",
+        xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
+        rows: processed.rows,
+        type: "area-spline",
+        groups: [processed.rows[0]],
+        order: null,
+      },
+      axis: {
+        x: {
+          type: 'timeseries',
+          tick: {
+            format: state.historicalMempool.data.timeframe > 3 ? '%H:%M %d.%m.' : '%H:%M'
+          }
+        },
+        y: {
+          tick: {
+            format: d3.format(".2s")
+          }
+        }
+      },
+      size: {
+        height: 450 // css #historical-mempool-chart min-height: 450px needs to be changed too
+      },
+      padding: {
+        top: 20,
+        bottom: 20,
+      },
+      color: {
+        pattern: ["#57e0fb", "#00e7fb", "#00edf5", "#00f2e9", "#00f7d6", "#00fbbe", "#00fda1", "#00ff7f", "#00ff55", "#55ff00", "#55ff00", "#79f900", "#92f300", "#a7ed00", "#b9e700", "#c8e000", "#d6da00", "#e2d300", "#edcc00", "#f6c600", "#febf00", "#febf00", "#ffb011", "#ffa022", "#ff9032", "#ff8041", "#ff6f50", "#ff5f5f", "#ff506e", "#ff427e", "#ff388d", "#ff339c", "#ff339c", "#f719a5", "#ec00af", "#df00ba", "#ce00c6", "#b800d2", "#9d00df", "#7705ec"]
+      },
+      legend: {
+        show: false
+      },
+      point: {
+        show: false,
+      },
+      tooltip: {
+        grouped: false,
+        contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
+          date = d[0].x
+          let day = "0" + date.getDate();
+          let month = "0" + (date.getMonth() + 1)
+          let year = date.getFullYear()
+          let hours = "0" + date.getHours();
+          let minutes = "0" + date.getMinutes();
+          let formattedTime = hours.substr(-2) + ':' + minutes.substr(-2) + " " + day.substr(-2) + "/" + month.substr(-2) + "/" + year
+
+          var value = ""
+          switch (state.historicalMempool.data.bySelector) {
+            case "byCount":
+              value = d[0].value + " transactions"
+              break;
+            case "byFee":
+              value = d[0].value.toFixed(4) + " BTC"
+              break;
+            case "bySize":
+              value = (d[0].value / 1000).toFixed(0) + " vkB"
+              break;
+          }
+
+          return `
+            <div class="c3-tooltip"><table><tbody>
+              <tr><td colspan="2">${formattedTime}</td></tr>
+              <tr><td>${d[0].id} sat/vbyte</td><td>${value}</td></tr>
+            </tbody></table></div>
+            `
+        }
+      },
+    }
+
+    // properly destroy chart and generate new chart
+    if (state.historicalMempool.chart) {
+      state.historicalMempool.chart = state.historicalMempool.chart.destroy();
+    }
+    state.historicalMempool.chart = c3.generate(chartSetting)
+
+  }
+}
+
+
+const pastBlocksCard = {
+  updateCardLastUpdated: function () {
+    // calc seconds from milliseconds
+    const minutes = Math.floor((Date.now() - (state.pastBlocks.data.timeLastUpdated)) / 1000 / 60)
     document.getElementById('past-blocks-last-update').innerHTML = (minutes)
   },
-  processDataForChart: function(response) {
+  processDataForChart: function (response) {
     state.pastBlocks.data.timeLastUpdated = new Date();
 
-    let rows = [["date", "block"]]
+    let rows = [
+      ["date", "block"]
+    ]
     let lines = []
     let regions = []
-    
-    for(blockIndex in response){
+
+    for (blockIndex in response) {
       let timestamp = response[blockIndex].timestamp * 1000
       let height = response[blockIndex].height
-      
+
       rows.push([
-          new Date(timestamp),  1
+        new Date(timestamp), 1
       ])
 
       lines.push({
         value: new Date(timestamp),
         text: "Block " + height,
       })
-    
+
     }
-    
-    lines.push({value: new Date(), text: 'Now', position: 'start' , class: "red-line"})
+
+    lines.push({
+      value: new Date(),
+      text: 'Now',
+      position: 'start',
+      class: "red-line"
+    })
     rows.push([new Date(), 1])
 
     // region from the last block to the current time
     // last block is here element zero
-    regions.push({axis: 'x', start: response[0].timestamp * 1000, end: new Date(), class: 'time-since-last-block'},)
+    regions.push({
+      axis: 'x',
+      start: response[0].timestamp * 1000,
+      end: new Date(),
+      class: 'time-since-last-block'
+    }, )
 
     return {
       blocks: response,
@@ -441,18 +597,21 @@ const pastBlocksCard = {
       minHeight: response[9].height
     }
   },
-  setTimer: function (){
+  setTimer: function () {
     // clear timer if set
-    if(state.pastBlocks.data.timer != null) {
-      clearInterval ( state.pastBlocks.data.timer );
+    if (state.pastBlocks.data.timer != null) {
+      clearInterval(state.pastBlocks.data.timer);
     }
 
     // set new timer
     var sec = (new Date() / 1000 - state.pastBlocks.data.processedBlocks.blocks[0].timestamp).toFixed(0)
-    function pad ( val ) { return val > 9 ? val : "0" + val; }
-    state.pastBlocks.data.timer = setInterval( function(){
+
+    function pad(val) {
+      return val > 9 ? val : "0" + val;
+    }
+    state.pastBlocks.data.timer = setInterval(function () {
       ++sec
-      $("#past-blocks-timer").html(pad(parseInt(sec/60,10)) + ":" + pad(sec%60));
+      $("#past-blocks-timer").html(pad(parseInt(sec / 60, 10)) + ":" + pad(sec % 60));
     }, 1000);
 
   },
@@ -460,14 +619,16 @@ const pastBlocksCard = {
 
     let processed = state.pastBlocks.data.processedBlocks
 
-    if(processed == null){return}
+    if (processed == null) {
+      return
+    }
 
     chartSetting = {
       bindto: '#past-blocks-chart',
       data: {
-          x: 'date',
-          xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
-          rows: processed.rows
+        x: 'date',
+        xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
+        rows: processed.rows
       },
       size: {
         height: 300 // css #past-blocks-chart min-height: 300px needs to be changed too
@@ -510,7 +671,7 @@ const pastBlocksCard = {
           show: false,
           max: 1.4,
           min: 0.8
-        }, 
+        },
       },
       grid: {
         x: {
@@ -519,8 +680,8 @@ const pastBlocksCard = {
       },
       tooltip: {
         contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
-          let block = state.pastBlocks.data.processedBlocks.blocks[9-d[0].index]
-          let foundMinAgo = (Date.now() - block.timestamp * 1000) / 1000 / 60 
+          let block = state.pastBlocks.data.processedBlocks.blocks[9 - d[0].index]
+          let foundMinAgo = (Date.now() - block.timestamp * 1000) / 1000 / 60
           return `
             <div class="c3-tooltip"><table><tbody>
               <tr><td>Height</td><td>${block.height}</td></tr>
@@ -533,10 +694,10 @@ const pastBlocksCard = {
         }
       }
     }
-    
+
     // properly destroy chart and generate new chart
-    if(state.pastBlocks.chart){
-      state.pastBlocks.chart = state.pastBlocks.chart.destroy(); 
+    if (state.pastBlocks.chart) {
+      state.pastBlocks.chart = state.pastBlocks.chart.destroy();
     }
     state.pastBlocks.chart = c3.generate(chartSetting)
 
@@ -544,7 +705,7 @@ const pastBlocksCard = {
 }
 
 function reloadData() {
-  
+
   // reload mempool chart data
   axios.get('https://mempool.observer/api/mempool')
     .then(function (response) {
@@ -553,29 +714,42 @@ function reloadData() {
       drawChart(state.currentMempool.elementId)
     });
 
-  // reload last blocks data
+  // reload past blocks data
   axios.get('https://mempool.observer/api/recentBlocks')
-  .then(function (response) {
-    state.pastBlocks.data.processedBlocks = pastBlocksCard.processDataForChart(response.data)
-    pastBlocksCard.setTimer()
-    drawChart(state.pastBlocks.elementId)
-  });
+    .then(function (response) {
+      state.pastBlocks.data.processedBlocks = pastBlocksCard.processDataForChart(response.data)
+      pastBlocksCard.setTimer()
+      drawChart(state.pastBlocks.elementId)
+    });
+
+  reloadHistoricalMempool()
 
   // reload data again in 30 seconds
-  setTimeout(function () {reloadData()}, 30000); 
+  setTimeout(function () {
+    reloadData()
+  }, 30000);
+}
+
+function reloadHistoricalMempool() {
+  axios.get('https://mempool.observer/api/historicalMempool/' + state.historicalMempool.data.timeframe + "/" + state.historicalMempool.data.bySelector)
+    .then(function (response) {
+      state.historicalMempool.data.processedMempool = historicalMempoolCard.processDataForChart(response.data)
+      drawChart(state.historicalMempool.elementId)
+    });
 }
 
 // draws charts for visible cards
 function drawChart(id) {
-  
-  if (!document.hidden) { 
 
-    if (state.currentMempool.elementId == id && state.currentMempool.isScrolledIntoView){
+  if (!document.hidden) {
+
+    if (state.currentMempool.elementId == id && state.currentMempool.isScrolledIntoView) {
       // console.log("Drawing currentMempool chart")
       currentMempoolCard.draw()
     }
 
     if (state.historicalMempool.elementId == id && state.historicalMempool.isScrolledIntoView) {
+      historicalMempoolCard.draw()
       // console.log("Drawing historicalMempool chart")
     }
 
@@ -600,15 +774,6 @@ setInterval(function () {
   pastBlocksCard.updateCardLastUpdated()
 }, 10000);
 
-
-function getLastTenBlocksFromApi() {
-  return axios.get(`https://blockstream.info/api/blocks`)
-    .then(res => res.data)
-    .catch(e => {
-      console.error('Error getting data from explorer:', e)
-      throw new Error('Could not load data from https://blockstream.info/api/blocks.')
-    })
-}
 
 function getTxFromApi(txId) {
   return axios.get(`https://blockstream.info/api/tx/${txId}`)
