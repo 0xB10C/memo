@@ -38,7 +38,7 @@ func main() {
 	{
 		api.GET("/mempool", getMempool)
 		api.GET("/recentBlocks", getRecentBlocks)
-		api.GET("/historicalMempool/:timeframe", getHistoricalMempool)
+		api.GET("/historicalMempool/:timeframe/:by", getHistoricalMempool)
 	}
 
 	portString := ":" + config.GetString("api.port")
@@ -100,7 +100,15 @@ func getHistoricalMempool(c *gin.Context) {
 		return
 	}
 
-	mempoolStates, err := database.GetHistoricalMempoolForTimeframe(int(timeframe))
+	by := c.Param("by")
+	if by != "byCount" && by != "byFee" && by != "bySize" {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Invalid input error",
+		})
+		return
+	}
+
+	mempoolStates, err := database.GetHistorical(int(timeframe), by)
 	if err != nil {
 		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{

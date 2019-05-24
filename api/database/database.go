@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -85,14 +86,27 @@ func GetRecentBlocks() (blocks []RecentBlock, err error) {
 }
 
 type MempoolState struct {
-	time               time.Time
-	Timestamp          int64 `json:"timestamp"`
-	countInBucketsJSON string
-	CountInBuckets     []int `json:"countInBuckets"`
+	time              time.Time
+	Timestamp         int64 `json:"timestamp"`
+	dataInBucketsJSON string
+	DataInBuckets     []float64 `json:"dataInBuckets"`
 }
 
-func GetHistoricalMempoolForTimeframe(timeframe int) (mempoolStates []MempoolState, err error) {
-	sqlStatement := "SELECT timestamp, countInBuckets FROM historicalMempool WHERE timeframe = ? ORDER BY timestamp DESC LIMIT 30;"
+func GetHistorical(timeframe int, by string) (mempoolStates []MempoolState, err error) {
+
+	var bySelector string
+	switch by {
+	case "byCount":
+		bySelector = "countInBuckets"
+	case "byFee":
+		bySelector = "feeInBuckets"
+	case "bySize":
+		bySelector = "sizeInBuckets"
+	default:
+		return mempoolStates, errors.New("Invalid input")
+	}
+
+	sqlStatement := "SELECT timestamp, " + bySelector + " FROM historicalMempool WHERE timeframe = ? ORDER BY timestamp DESC LIMIT 30;"
 	rows, err := DB.Query(sqlStatement, timeframe)
 	if err != nil {
 		return mempoolStates, err
@@ -101,12 +115,12 @@ func GetHistoricalMempoolForTimeframe(timeframe int) (mempoolStates []MempoolSta
 
 	for rows.Next() {
 		mempoolState := MempoolState{}
-		err = rows.Scan(&mempoolState.time, &mempoolState.countInBucketsJSON)
+		err = rows.Scan(&mempoolState.time, &mempoolState.dataInBucketsJSON)
 		if err != nil {
 			return mempoolStates, err
 		}
 		mempoolState.Timestamp = mempoolState.time.Unix()
-		json.Unmarshal([]byte(mempoolState.countInBucketsJSON), &mempoolState.CountInBuckets)
+		json.Unmarshal([]byte(mempoolState.dataInBucketsJSON), &mempoolState.DataInBuckets)
 
 		mempoolStates = append(mempoolStates, mempoolState)
 	}
