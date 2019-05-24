@@ -46,12 +46,8 @@ func WriteHistoricalMempoolData(countInBucketsJSON string, feeInBucketsJSON stri
 	defer logger.TrackTime(time.Now(), "WriteHistoricalMempoolData()")
 
 	if Database != nil {
-		sql := "INSERT INTO historicalMempool(timeframe, timestamp, countInBuckets, feeInBuckets) VALUES (?, UTC_TIMESTAMP, ?, ?, ?)"
-<<<<<<< HEAD
+		sql := "INSERT INTO historicalMempool(timeframe, timestamp, countInBuckets, feeInBuckets, sizeInBuckets) VALUES (?, UTC_TIMESTAMP, ?, ?, ?)"
 		_, err := Database.Exec(sql, timeframe, countInBucketsJSON, feeInBucketsJSON, sizeInBucketsJSON)
-=======
-		_, err := Database.Exec(sql, timeframe, countInBucketsJSON, countInBucketsJSON, feeInBucketsJSON)
->>>>>>> e6421b2763d17061e620a0fdad1689d4b86012c9
 		if err != nil {
 			return err
 		}
