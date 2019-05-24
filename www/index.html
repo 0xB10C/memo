@@ -132,55 +132,63 @@
               transactions.
               The bars are colorcoded according to thier feerate.
             </p>
-
             <p id="total-transactions" class="card-text text-center lead">
               <span id="current-mempool-count">0</span>
               unconfirmed Transactions <wbr>
               (<span id="current-mempool-size">0</span>&nbsp;MB)
             </p>
-
-            <label for="input-txid-lookup">
-              Enter or
-              <span id="random-tx" class="input-subtitle" href="#">try a random</span>
-              transaction id to see where it is in the mempool:
-            </label>
-            <div class="row">
-              <div class="col-10 pr-1">
-                <input type="text" id="input-lookup-txid" class="form-control"
-                  placeholder="4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"
-                  onfocus="this.placeholder = ''"
-                  onblur="this.placeholder = '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'"
-                  aria-describedby="button-lookup-txid" aria-label="txid">
-                <div id="invalid-feedback" class="invalid-feedback"></div>
-              </div>
-              <div class="col-2 px-2">
-                <button class="btn btn-outline-primary" type="button" id="button-lookup-txid">
-                  <i class="fas fa-search-location"></i>
-                </button>
-              </div>
-            </div>
-
-            <div class="row py-2 mt-2" id="current-mempool-tx-data">
-              <div class="col-sm-10 px-1">
-                <div class="row">
-                  <!-- nesting to have the same width as the search bar-->
-                  <div class="col-4 text-center px-2">
-                    <span class="badge badge-light p-2">
-                      <span class="text-muted">fee</span><br style="line-height: 150%;">
-                      <span id="current-mempool-tx-data-fee">0</span>&nbsp;sat
-                    </span>
+            <div>
+              <label for="input-txid-lookup">
+                Enter or
+                <span id="random-tx" class="input-subtitle" href="#">try a random</span>
+                transaction id to see where it is in the mempool:
+              </label>
+              <div class="row">
+                <div class="col-10">
+                  <input type="text" id="input-lookup-txid" class="form-control "
+                    placeholder="4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"
+                    onfocus="this.placeholder = ''"
+                    onblur="this.placeholder = '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'"
+                    aria-describedby="button-lookup-txid" aria-label="txid">
+                  <div id="invalid-feedback" class="invalid-feedback"></div>
+                </div>
+                <div class="col-2 text-center">
+                  <button class="btn btn-outline-primary text-center" type="button" id="button-lookup-txid">
+                    <i class="fas fa-search-location"></i>
+                  </button>
+                </div>
+                <div class="row mt-3" id="current-mempool-tx-data">
+                  <!--div class="col-md-6 text-center mt-2">
+                    <button class="btn btn-outline-secondary " type="button">
+                      Blockstream.info
+                    </button>
                   </div>
-                  <div class="col-4 text-center px-2">
-                    <span class="badge badge-light p-2">
-                      <span class="text-muted">vsize</span><br style="line-height: 150%;">
-                      <span id="current-mempool-tx-data-size">0</span>&nbsp;vbyte
-                    </span>
+                  <div class="col-md-6 text-center mt-2">
+                    <button class="btn btn-outline-secondary " type="button">
+                      OXT.me
+                    </button>
+                  </div-->
+                  <div class="col-6">
+                    <div class="row">
+                      <span class="col-12 text-center px-2">
+                        <span id="current-mempool-tx-data-fee">0</span>&nbsp;sat
+                        <span class="text-muted">fee</span>
+                      </span>
+                      <span class="col-12 text-center">
+                        <hr class="mx-4" style="background: darkgray">
+                      </span>
+                      <span class="col-12 text-center px-2">
+                        <span id="current-mempool-tx-data-size">0</span>&nbsp;vbyte
+                        <span class="text-muted">vsize</span>
+                      </span>
+                    </div>
                   </div>
-                  <div class="col-4 text-center px-2">
-                    <span class="badge badge-light p-2">
-                      <span class="text-muted">feerate</span><br style="line-height: 150%;">
-                      <span id="current-mempool-tx-data-feerate">0</span>&nbsp;sat/vbyte
-                    </span>
+                  <div class="col-1 text-center my-auto">
+                    <span style="font-size: 1.2rem;">＝</span>
+                  </div>
+                  <div class="col-5 text-center my-auto">
+                    <span id="current-mempool-tx-data-feerate">0</span>&nbsp;sat/vbyte <span
+                      class="text-muted">&nbsp;feerate</span>
                   </div>
                 </div>
               </div>
@@ -287,7 +295,8 @@
             <p class="card-text">
               The chart below shows the arrival times of the last ten blocks.
               Since finding a valid block (mining) is a random process, the time between two blocks is random.
-              Sometimes blocks are found only seconds apart, sometimes it takes over an hour till a new block is found.
+              Sometimes blocks are found only seconds apart, sometimes it takes over an hour till a new block is
+              found.
               On average a new block is found roughly every ten minutes.
               However, there is no way of accurately estimating when the next block will be found, since mining is a
               random process.
