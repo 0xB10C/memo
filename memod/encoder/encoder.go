@@ -41,13 +41,21 @@ func EncodeCurrentMempoolStatsToJSON(feerateMap map[int]int, megabyteMarkers []i
 }
 
 // EncodeHistoricalStatsToJSON encodes the historical mempool list to JSON
-func EncodeHistoricalStatsToJSON(countInBuckets []int) (string, error) {
+func EncodeHistoricalStatsToJSON(countInBuckets []int, feeInBuckets []float64, sizeInBuckets []int) (string, string, string, error) {
 	defer logger.TrackTime(time.Now(), "EncodeHistoricalStatsToJSON()")
 
 	countInBucketsJSON, err := json.Marshal(countInBuckets)
 	if err != nil {
-		return "", err
+		return "", "", "", err
+	}
+	feeInBucketsJSON, err := json.Marshal(feeInBuckets)
+	if err != nil {
+		return "", "", "", err
+	}
+	sizeInBucketsJSON, err := json.Marshal(sizeInBuckets)
+	if err != nil {
+		return "", "", "", err
 	}
 
-	return string(countInBucketsJSON), nil
+	return string(countInBucketsJSON), string(feeInBucketsJSON), string(sizeInBucketsJSON), nil
 }
