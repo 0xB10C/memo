@@ -11,9 +11,14 @@ The idea of mempool.observer is to provide users with information about unconfir
 
 ## Project Structure
 
-This repository contains the following files:
-- TODO
-- TODO
+Folder Structure
+```
+memo/
+├── api/          # Go module functioning as an API returning JSON
+├── database/     # Database creation scripts
+├── memod/        # Go module functioning as a worker deamon wirting data to database
+└── www/          # Statically served HTML, JS and CSS files
+```
 
 The wiki cointains two architecture overview's: One of the [whole project](https://github.com/0xB10C/memo/wiki/Infrastructure-memo-v2). And one specifically for [memod](https://github.com/0xB10C/memo/wiki/memod-architecture).
 
@@ -38,7 +43,8 @@ I'm open for ideas and feedback.
 
 
 ## Licencse
-- TODO
+This project and all it's files are licensed under a GNU Affero General Public License.
+
 ---
 
 >"What's going to happen to Bitcoin?" is the wrong question. The right question is "What are you going to contribute?" &mdash; <cite>[Greg Maxwell](https://github.com/gmaxwell)</cite>
