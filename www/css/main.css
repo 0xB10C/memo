@@ -217,10 +217,15 @@ text.c3-axis-y2-label,
   bottom: 0;
   width: 100%;
   height: 60px;
-  line-height: 60px;
+  line-height: 20px;
   background-color: var(--footer-background) !important;
 }
 
+@media (min-width: 992px) {
+  .footer {
+    line-height: 60px;
+  }
+}
 
 :root {
   --background: var(--white);
