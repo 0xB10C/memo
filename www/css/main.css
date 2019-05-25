@@ -245,6 +245,10 @@ div.card-body {
   border-color: transparent;
 }
 
+.c3-tooltip {
+  color: var(--dark) !important;
+}
+
 .btn.btn-outline-primary {
   border-color: var(--primary) !important;
   color: var(--primary);
