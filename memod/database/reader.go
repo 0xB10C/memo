@@ -17,12 +17,12 @@ type needsUpdate struct {
 
 func ReadHistroricalMempoolNeedUpdate() (nu needsUpdate, err error) {
 	sqlStatement := `SELECT
-	(select UTC_TIMESTAMP-timestamp from historicalMempool where timeframe = 1 ORDER BY timestamp DESC LIMIT 1) AS timediff2h,
-	(select UTC_TIMESTAMP-timestamp from historicalMempool where timeframe = 2 ORDER BY timestamp DESC LIMIT 1) AS timediff12h,
-	(select UTC_TIMESTAMP-timestamp from historicalMempool where timeframe = 3 ORDER BY timestamp DESC LIMIT 1) AS timediff48h,
-	(select UTC_TIMESTAMP-timestamp from historicalMempool where timeframe = 4 ORDER BY timestamp DESC LIMIT 1) AS timediff7d,
-	(select UTC_TIMESTAMP-timestamp from historicalMempool where timeframe = 5 ORDER BY timestamp DESC LIMIT 1) AS timediff30d,
-	(select UTC_TIMESTAMP-timestamp from historicalMempool where timeframe = 6 ORDER BY timestamp DESC LIMIT 1) AS timediff180d;`
+	(select UNIX_TIMESTAMP(UTC_TIMESTAMP)-UNIX_TIMESTAMP(timestamp) from historicalMempool where timeframe = 1 ORDER BY timestamp DESC LIMIT 1) AS timediff2h,
+	(select UNIX_TIMESTAMP(UTC_TIMESTAMP)-UNIX_TIMESTAMP(timestamp) from historicalMempool where timeframe = 2 ORDER BY timestamp DESC LIMIT 1) AS timediff12h,
+	(select UNIX_TIMESTAMP(UTC_TIMESTAMP)-UNIX_TIMESTAMP(timestamp) from historicalMempool where timeframe = 3 ORDER BY timestamp DESC LIMIT 1) AS timediff48h,
+	(select UNIX_TIMESTAMP(UTC_TIMESTAMP)-UNIX_TIMESTAMP(timestamp) from historicalMempool where timeframe = 4 ORDER BY timestamp DESC LIMIT 1) AS timediff7d,
+	(select UNIX_TIMESTAMP(UTC_TIMESTAMP)-UNIX_TIMESTAMP(timestamp) from historicalMempool where timeframe = 5 ORDER BY timestamp DESC LIMIT 1) AS timediff30d,
+	(select UNIX_TIMESTAMP(UTC_TIMESTAMP)-UNIX_TIMESTAMP(timestamp) from historicalMempool where timeframe = 6 ORDER BY timestamp DESC LIMIT 1) AS timediff180d;`
 
 	row := Database.QueryRow(sqlStatement)
 	var timediff2h, timediff12h, timediff48h, timediff7d, timediff30d, timediff180d int
