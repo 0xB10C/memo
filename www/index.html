@@ -247,11 +247,12 @@
           </div>
 
           <div class="col-md-12 my-3 text-center">
-            <div class="btn-group btn-group-toggle m-2" data-toggle="buttons">
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+              <button type="button" class="btn btn-outline-secondary normal-text-color" disabled>x-axis:</button>
               <label class="btn btn-outline-primary pointer" onclick="historicalMempoolCard.switchTimeframe(1)">
                 <input type="radio" name="options" id="option1" autocomplete="off"> 2h
               </label>
-              <label class="btn btn-outline-primary active pointer" onclick="historicalMempoolCard.switchTimeframe(2)">
+              <label class="btn btn-outline-primary pointer active" onclick="historicalMempoolCard.switchTimeframe(2)">
                 <input type="radio" name="options" id="option2" autocomplete="off" checked> 12h
               </label>
               <label class="btn btn-outline-primary pointer" onclick="historicalMempoolCard.switchTimeframe(3)">
@@ -262,6 +263,7 @@
               </label>
             </div>
             <div class="btn-group btn-group-toggle m-2" data-toggle="buttons">
+              <button type="button" class="btn btn-outline-secondary normal-text-color" disabled>y-axis</button>
               <label class="btn btn-outline-primary active pointer"
                 onclick="historicalMempoolCard.switchBySelector('byCount')">
                 <input type="radio" name="options" id="option1" autocomplete="off" checked> by count

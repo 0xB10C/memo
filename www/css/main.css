@@ -231,7 +231,8 @@ text.c3-axis-y2-label,
   --background: var(--white);
   --background-nav: var(--white);
   --background-footer: var(--light);
-  --text-color: var(--dark)
+  --text-color: var(--dark);
+  --text-color-disabled-button: black;
 }
 
 nav .nar .navbar,
@@ -248,6 +249,10 @@ div.card-body {
   color: var(--text-color);
   background-color: var(--background-card);
   border-color: transparent;
+}
+
+.btn.normal-text-color {
+  color: var(--text-color-disabled-button);
 }
 
 .c3-tooltip {
@@ -275,5 +280,6 @@ div.card-body {
   --background-nav: #222222;
   --background-card: #33333333;
   --background-footer: #000000de;
-  --text-color: var(--light)
+  --text-color: var(--light);
+  --text-color-disabled-button: --white;
 }
