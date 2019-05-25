@@ -403,7 +403,7 @@ const currentMempoolCard = {
     return position
   },
   displayTransactionData: function (fee, vsize, feeRate) {
-    $('#current-mempool-tx-data').show()
+    $('#current-mempool-tx-data').css("display", "flex");
     $('#current-mempool-tx-data-fee').html(fee)
     $('#current-mempool-tx-data-size').html(vsize)
     $('#current-mempool-tx-data-feerate').html(feeRate)
