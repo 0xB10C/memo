@@ -299,10 +299,10 @@ const currentMempoolCard = {
     // draw the tx the chart if it's unconfirmed
     let tx = state.currentMempool.data.currentTx;
     if (tx != null) {
-      if (tx.status.confirmed) {
-        $('#tx-eta-data').html(`Confirmed (block ${tx.status.block_height}, ${minutes_since_confirmation} minutes ago)`) // FIXME: tx-eta-data is not used anymore
+      if (tx.blockHeight) {
+        $('#tx-eta-data').html(`Confirmed (block ${tx.blockHeight}, ${minutes_since_confirmation} minutes ago)`) // FIXME: tx-eta-data is not used anymore
       } else {
-        const feeRate = Math.floor(tx.fee / (tx.weight / 4))
+        const feeRate = Math.floor(tx.fee / tx.vSize)
         currentMempoolCard.drawUserTxByFeeRate(feeRate)
       }
     }
@@ -341,17 +341,18 @@ const currentMempoolCard = {
     } else {
 
       try {
+        console.log(await getTxFromApi(inputTxid))
         state.currentMempool.data.currentTx = await getTxFromApi(inputTxid)
         let tx = state.currentMempool.data.currentTx
 
-        if (tx.status.confirmed) {
-          let minutes_since_confirmation = Math.floor((Date.now() - tx.status.block_time * 1000) / 1000 / 60)
-          let error = `The transaction is already confirmed and therefore not in the mempool. (block ${tx.status.block_height}, ${minutes_since_confirmation} minutes ago)`
+        if (tx.confirmations) {
+          let minutes_since_confirmation = Math.floor((Date.now() - tx.blockTime * 1000) / 1000 / 60)
+          let error = `The transaction is already confirmed and therefore not in the mempool. (block ${tx.blockHeight}, ${minutes_since_confirmation} minutes ago)`
           console.error(error)
           $('#invalid-feedback').html(error)
           $('#input-lookup-txid').addClass("is-invalid")
         } else { // tx is unconfirmed
-          const vSize = (tx.weight / 4) // see Issue #11  
+          const vSize = tx.vSize
           const feeRate = Math.floor(tx.fee / vSize)
           currentMempoolCard.drawUserTxByFeeRate(feeRate)
           currentMempoolCard.displayTransactionData(tx.fee, vSize, feeRate)
@@ -781,8 +782,8 @@ setInterval(function () {
 
 
 function getTxFromApi(txId) {
-  return axios.get(`https://blockstream.info/api/tx/${txId}`)
-    .then(res => res.data)
+  return axios.get(`https://api.bitaps.com/btc/v1/blockchain/transaction/${txId}`)
+    .then(res => res.data.data)
     .catch(e => {
       console.error('Error getting data from explorer:', e)
       throw new Error('Could not find your transaction in the bitcoin network. Wait a few minutes before trying again.')
