@@ -1,18 +1,19 @@
 language: go
 
 go:
-  - 1.12.x
+  - "1.12"
+
+dist: xenial
 
 git:
   depth: 1
 
-before_script:
-  - go get -v ./api
-  - go get -v ./memod
+env:
+  - GO111MODULE=on
+
+before_install:
+  - sudo apt-get update
+  - sudo apt install -y libzmq3-dev
 
 script:
-  - go build ./api
-  - go test ./api
-
-  - go build ./memod
-  - go test ./memod
+  - make

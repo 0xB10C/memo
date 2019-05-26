@@ -1,0 +1,9 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.12
+    steps:
+      - run: sudo apt install libzmq3-dev
+      - checkout
+      - run: make
