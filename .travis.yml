@@ -1,0 +1,16 @@
+language: go
+
+go:
+  - "1.12"
+
+git:
+  depth: 1
+
+env:
+  - GO111MODULE=on
+
+before_install:
+  - sudo apt install libzmq3-dev
+
+script:
+  - make
