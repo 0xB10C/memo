@@ -3,7 +3,7 @@ language: go
 go:
   - "1.12"
 
-dist: bionic
+dist: xenial
 
 git:
   depth: 1
@@ -12,7 +12,8 @@ env:
   - GO111MODULE=yes
 
 before_install:
-  - sudo apt install libzmq3-dev
+  - sudo apt-get update
+  - sudo apt install -y libzmq3-dev
 
 script:
   - make
