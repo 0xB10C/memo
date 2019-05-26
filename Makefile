@@ -5,13 +5,13 @@ GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 
 
-all: clean build test
+all: clean test build 
 build: 
-				GO111MODULE=on $(GOBUILD) -o ./api/api -v ./api/api.go 
-				GO111MODULE=on $(GOBUILD) -o ./memod/memod -v ./memod/memod.go 
+				cd api && $(GOBUILD) -o api -v api.go 
+				cd memod && $(GOBUILD) -o memod -v memod.go 
 test: 
-				$(GOTEST) -v ./api/
-				$(GOTEST) -v ./memod/
+				cd api && $(GOTEST) -v 
+				cd memod && $(GOTEST) -v 
 clean: 
 				rm -f ./api/api
 				rm -f ./memod/memod
