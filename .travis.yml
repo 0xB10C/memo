@@ -3,7 +3,7 @@ language: go
 go:
   - "1.12"
 
-dist: xenial
+dist: bionic
 
 git:
   depth: 1
