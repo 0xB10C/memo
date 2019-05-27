@@ -42,6 +42,10 @@
           data.push([new Date(timeAxis[i] * 1000), feerateAxis[i]])
         }
 
+        data.sort(function (a, b) {
+          return a[0] - b[0];
+        });
+
         g = new Dygraph(
           document.getElementById("graph"),
           data, {
@@ -51,7 +55,8 @@
             pointSize: 2,
             title: "entry time x feerate of all transactions currently in my mempool",
             showRangeSelector: true,
-            valueRange: [0.8, null]
+            valueRange: [0.8, null],
+            legend: "follow",
           });
       })
       .catch(function (error) {
