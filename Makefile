@@ -10,8 +10,8 @@ build:
 				cd api && $(GOBUILD) -o api -v api.go 
 				cd memod && $(GOBUILD) -o memod -v memod.go 
 test: 
-				cd api && $(GOTEST) -v 
-				cd memod && $(GOTEST) -v 
+				cd api && $(GOTEST) -v ./...
+				cd memod && $(GOTEST) -v ./...
 clean: 
 				rm -f ./api/api
 				rm -f ./memod/memod
