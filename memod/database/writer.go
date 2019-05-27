@@ -21,7 +21,6 @@ func WriteCurrentMempoolData(feerateMapJSON string, mempoolSizeInByte int, megab
 	}
 
 	return errors.New("Database pointer is nil")
-
 }
 
 // WriteNewBlockData writes data for a new block into the database
@@ -48,6 +47,22 @@ func WriteHistoricalMempoolData(countInBucketsJSON string, feeInBucketsJSON stri
 	if Database != nil {
 		sql := "INSERT INTO historicalMempool(timeframe, timestamp, countInBuckets, feeInBuckets, sizeInBuckets) VALUES (?, UTC_TIMESTAMP, ?, ?, ?)"
 		_, err := Database.Exec(sql, timeframe, countInBucketsJSON, feeInBucketsJSON, sizeInBucketsJSON)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	return errors.New("Database pointer is nil")
+}
+
+// WriteCurrentMempoolData writes the current mempool data into the database
+func WriteTimeInMempoolData(timeAxisJSON string, feerateAxisJSON string) error {
+	defer logger.TrackTime(time.Now(), "WriteTimeInMempoolData()")
+
+	if Database != nil {
+		sql := "UPDATE timeInMempool SET timeAxis = ?, feerateAxis = ?, timestamp = UTC_TIMESTAMP WHERE id = 1"
+		_, err := Database.Exec(sql, timeAxisJSON, feerateAxisJSON)
 		if err != nil {
 			return err
 		}

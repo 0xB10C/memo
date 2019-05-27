@@ -32,8 +32,9 @@ func setDefaults() {
 	viper.SetDefault("bitcoind.rest.responseTimeout", 30)
 
 	viper.SetDefault("mempool.enable", false)
-	viper.SetDefault("mempool.processing.processCurrentMempool", true)
-	viper.SetDefault("mempool.processing.processHistoricalMempool", true)
+	viper.SetDefault("mempool.processing.processCurrentMempool", false)
+	viper.SetDefault("mempool.processing.processHistoricalMempool", false)
+	viper.SetDefault("mempool.processing.processTimeInMempool", false)
 	viper.SetDefault("mempool.fetchInterval", 60)
 
 	viper.SetDefault("log.enableTrace", false)

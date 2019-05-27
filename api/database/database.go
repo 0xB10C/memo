@@ -126,3 +126,21 @@ func GetHistorical(timeframe int, by string) (mempoolStates []MempoolState, err 
 	}
 	return
 }
+
+// getTimeInMempool gets the TimeInMempool data from the database
+func GetTimeInMempool() (timestamp time.Time, timeAxis string, feerateAxis string, err error) {
+
+	sqlStatement := "SELECT timestamp, timeAxis, feerateAxis FROM timeInMempool WHERE id = 1"
+	row := DB.QueryRow(sqlStatement)
+
+	err = row.Scan(&timestamp, &timeAxis, &feerateAxis)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return timestamp, timeAxis, feerateAxis, err
+		} else {
+			panic(err)
+		}
+	}
+
+	return
+}
