@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="x-ua-compatible" content="ie=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.css" />
+  <title>Time In Mempool</title>
+  <style type="text/css">
+    #graph {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      top: 40px;
+      bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="graph"></div>
+
+  <script src=" https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.js"> </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"
+    integrity="sha256-mpnrJ5DpEZZkwkE1ZgkEQQJW/46CSEh/STrZKOB/qoM=" crossorigin="anonymous">
+  </script>
+
+  <script>
+    axios.get('https:/mempool.observer/api/timeInMempool')
+      .then(function (response) {
+
+        console.log(response.data)
+
+        let timeAxis = response.data.timeAxis
+        let feerateAxis = response.data.feerateAxis
+
+        data = []
+
+        for (var i in timeAxis) {
+          data.push([new Date(timeAxis[i] * 1000), feerateAxis[i]])
+        }
+
+        g = new Dygraph(
+          document.getElementById("graph"),
+          data, {
+            strokeWidth: 0.0,
+            drawPoints: true,
+            logscale: true,
+            pointSize: 2,
+            title: "Time x Feerate of all transactions in mempool",
+            showRangeSelector: true,
+          });
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
+  </script>
+</body>
+
+</html>

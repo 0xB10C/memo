@@ -1,16 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
-	"encoding/json"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
-	"github.com/0xb10c/memo/api/database"
 	"github.com/0xb10c/memo/api/config"
+	"github.com/0xb10c/memo/api/database"
 	"github.com/gin-contrib/cors"
-	
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -23,11 +22,10 @@ func main() {
 	corsConfig := cors.DefaultConfig()
 	if config.GetBool("api.production") {
 		corsConfig.AllowOrigins = []string{"https://mempool.observer/"}
-	}else{
+	} else {
 		corsConfig.AllowOrigins = []string{"*"}
 	}
 	router.Use(cors.New(corsConfig))
-
 
 	err := database.SetupDatabase()
 	if err != nil {
@@ -39,12 +37,12 @@ func main() {
 		api.GET("/mempool", getMempool)
 		api.GET("/recentBlocks", getRecentBlocks)
 		api.GET("/historicalMempool/:timeframe/:by", getHistoricalMempool)
+		api.GET("/timeInMempool", getTimeInMempool)
 	}
 
 	portString := ":" + config.GetString("api.port")
 	router.Run(portString)
 }
-
 
 func getMempool(c *gin.Context) {
 
@@ -57,23 +55,22 @@ func getMempool(c *gin.Context) {
 		return
 	}
 
-	// Possible REFACTOR: write to database as blob not JSON String to 
+	// Possible REFACTOR: write to database as blob not JSON String to
 	// skip the marshalling when writing and unmarshalling when reading
 	// from the database
- 	var feerateMap map[int]int
+	var feerateMap map[int]int
 	json.Unmarshal([]byte(byCount), &feerateMap)
 
 	var megabyteMarkers []int
 	json.Unmarshal([]byte(megabyteMarkersJSON), &megabyteMarkers)
 
 	c.JSON(http.StatusOK, gin.H{
-		"timestamp":					timestamp.Unix(),
-		"feerateMap": 				feerateMap,
-		"megabyteMarkers":		megabyteMarkers,
-		"mempoolSize":	 			mempoolSize,
+		"timestamp":       timestamp.Unix(),
+		"feerateMap":      feerateMap,
+		"megabyteMarkers": megabyteMarkers,
+		"mempoolSize":     mempoolSize,
 	})
 }
-
 
 func getRecentBlocks(c *gin.Context) {
 
@@ -88,7 +85,6 @@ func getRecentBlocks(c *gin.Context) {
 
 	c.JSON(http.StatusOK, blocks)
 }
-
 
 func getHistoricalMempool(c *gin.Context) {
 	timeframe, err := strconv.ParseInt(c.Param("timeframe"), 10, 0)
@@ -117,7 +113,29 @@ func getHistoricalMempool(c *gin.Context) {
 		return
 	}
 
-
 	c.JSON(http.StatusOK, mempoolStates)
 }
 
+func getTimeInMempool(c *gin.Context) {
+
+	timestamp, timeAxisStr, feerateAxisStr, err := database.GetTimeInMempool()
+	if err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Database error",
+		})
+		return
+	}
+
+	var timeAxis []int
+	json.Unmarshal([]byte(timeAxisStr), &timeAxis)
+
+	var feerateAxis []float64
+	json.Unmarshal([]byte(feerateAxisStr), &feerateAxis)
+
+	c.JSON(http.StatusOK, gin.H{
+		"timestamp":   timestamp,
+		"feerateAxis": feerateAxis,
+		"timeAxis":    timeAxis,
+	})
+}

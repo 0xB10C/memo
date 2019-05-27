@@ -8,7 +8,7 @@ type Fees struct {
 }
 
 type Transaction struct {
-	Fees              Fees          `son:"fees"`
+	Fees              Fees          `json:"fees"`
 	Size              int           `json:"size"`
 	Fee               float64       `json:"fee"`
 	Modifiedfee       float64       `json:"modifiedfee"`
@@ -31,4 +31,5 @@ type Transaction struct {
 type PartialTransaction struct {
 	Size int     `json:"size"`
 	Fee  float64 `json:"fee"`
+	Time int     `json:"time"`
 }

@@ -59,3 +59,20 @@ func EncodeHistoricalStatsToJSON(countInBuckets []int, feeInBuckets []float64, s
 
 	return string(countInBucketsJSON), string(feeInBucketsJSON), string(sizeInBucketsJSON), nil
 }
+
+// EncodeTimeInMempoolStatsToJSON encodes the time in mempool stats to JSON
+func EncodeTimeInMempoolStatsToJSON(timeAxis []int, feerateAxis []float64) (string, string, error) {
+	defer logger.TrackTime(time.Now(), "EncodeTimeInMempoolStatsToJSON()")
+
+	timeAxisJSON, err := json.Marshal(timeAxis)
+	if err != nil {
+		return "", "", err
+	}
+
+	feerateAxisJSON, err := json.Marshal(feerateAxis)
+	if err != nil {
+		return "", "", err
+	}
+
+	return string(timeAxisJSON), string(feerateAxisJSON), nil
+}

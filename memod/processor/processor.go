@@ -29,6 +29,9 @@ func ProcessMempool(mempool map[string]types.PartialTransaction) {
 		go currentMempool(mempool) // start _current mempool_ stat generation in a goroutine
 	}
 
+	if config.GetBool("mempool.processing.processTimeInMempool") {
+		go timeInMempool(mempool)
+	}
 }
 
 func currentMempool(mempool map[string]types.PartialTransaction) {
@@ -130,6 +133,23 @@ func historicalMempool(mempool map[string]types.PartialTransaction) {
 
 }
 
+func timeInMempool(mempool map[string]types.PartialTransaction) {
+	timeAxis, feerateAxis := generateTimeInMempoolStats(mempool)
+	feerateMapJSON, megabyteMarkersJSON, err := encoder.EncodeTimeInMempoolStatsToJSON(timeAxis, feerateAxis)
+	if err != nil {
+		logger.Error.Printf("Failed to encode generated data as JSON: %s", err.Error())
+		return
+	}
+
+	err = database.WriteTimeInMempoolData(feerateMapJSON, megabyteMarkersJSON)
+	if err != nil {
+		logger.Error.Printf("Failed to write Time in Mempool to database: %s", err.Error())
+		return
+	}
+
+	logger.Info.Println("Success writing Time in Mempool to database.")
+}
+
 /* generateCurrentMempoolStats()
 This function generates the _Current Mempool_ data. Which is:
 	- The size of the transactions in the mempool `mempoolSizeInByte`
@@ -206,11 +226,33 @@ func generateHistoricalMempoolStats(mempool map[string]types.PartialTransaction)
 	return
 }
 
-// finds the bucket index for a given feerate in feerateBuckets. the last bucket is a catch all larger-equal
+// finds the bucket index for a given feerate in feerateBuckets. the last bucket is a catch all larger-equal.
+// given a feerate of 19 it gives the bucket index for 22. (since it's bigger than 18)
+// buckets should be read like "inbetween or equal feerate [index-1] [index]"
 func findBucketForFeerate(feerate float64) int {
 	i := sort.Search(len(feerateBuckets), func(i int) bool { return feerateBuckets[i] >= int(feerate) })
 	if i < len(feerateBuckets) && feerateBuckets[i] >= int(feerate) {
 		return i
 	}
 	return len(feerateBuckets) - 1
+}
+
+func generateTimeInMempoolStats(mempool map[string]types.PartialTransaction) ([]int, []float64) {
+	/* We two slices:
+	- one with the timestamp the transaction entered the mempool
+	- one with the feerate it paid
+	*/
+
+	timeAxis := make([]int, 0)
+	feerateAxis := make([]float64, 0)
+
+	for _, tx := range mempool {
+		feerate := tx.Fee * cSATOSHIPERBITCOIN / float64(tx.Size)
+		feerateTruncated := float64(int(feerate*1000)) / 1000 // same as toFixed(3)
+
+		feerateAxis = append(feerateAxis, feerateTruncated)
+		timeAxis = append(timeAxis, tx.Time)
+	}
+
+	return timeAxis, feerateAxis
 }
