@@ -117,6 +117,8 @@ func fetchMempoolFromJSONRPC() ([]byte, error) {
 		"@" + config.GetString("bitcoind.jsonrpc.host") +
 		":" + config.GetString("bitcoind.jsonrpc.port")
 
+	logger.Trace.Println("Fetching mempool via JSON-RPC")
+
 	timeout := time.Duration(config.GetInt("bitcoind.jsonrpc.responseTimeout")) * time.Second
 	client := http.Client{
 		Timeout: timeout,
