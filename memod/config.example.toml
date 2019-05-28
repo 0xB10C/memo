@@ -9,15 +9,25 @@ passwd = ""               # FIXME:
 name = ""                 # FIXME:
 connection = "tcp"
 
-
+# Needed when fetching via REST interface
 [bitcoind.rest]
 protocol = "http"
 host = "localhost"
 port = "8332"
 responseTimeout = 30      # seconds
 
+# Needed when fetching via JSON-RPC interface
+[bitcoind.jsonrpc]
+protocol = "http"
+host = "localhost"
+port = "8332" # regtest 18443 # testnet 18332
+username = ""
+password = ""
+responseTimeout = 30 # seconds
+
 [mempool]
 enable = false            # enable mempool fetching
+fetchInterface = "REST"   # fetch mempool via REST or JSON-RPC
 fetchInterval = 60        # seconds
   [mempool.processing]
   processCurrentMempool = true

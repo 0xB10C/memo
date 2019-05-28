@@ -31,7 +31,13 @@ func setDefaults() {
 	viper.SetDefault("bitcoind.rest.port", "8332")
 	viper.SetDefault("bitcoind.rest.responseTimeout", 30)
 
+	viper.SetDefault("bitcoind.jsonrpc.protocol", "http")
+	viper.SetDefault("bitcoind.jsonrpc.host", "localhost")
+	viper.SetDefault("bitcoind.jsonrpc.port", "8332")
+	viper.SetDefault("bitcoind.jsonrpc.responseTimeout", 30)
+
 	viper.SetDefault("mempool.enable", false)
+	viper.SetDefault("mempool.fetchInterface", "REST")
 	viper.SetDefault("mempool.processing.processCurrentMempool", false)
 	viper.SetDefault("mempool.processing.processHistoricalMempool", false)
 	viper.SetDefault("mempool.processing.processTimeInMempool", false)
