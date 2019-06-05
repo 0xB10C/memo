@@ -72,3 +72,18 @@ func WriteTimeInMempoolData(timeAxisJSON string, feerateAxisJSON string) error {
 	return errors.New("Database pointer is nil")
 
 }
+
+func WriteCurrentTransactionStats(segwitPercentage float64, rbfPercentage float64) error {
+	defer logger.TrackTime(time.Now(), "WriteCurrentTransactionStats()")
+
+	if Database != nil {
+		sql := "INSERT INTO transactionsStats(timestamp, segwitPercentage, rbfPercentage) VALUES (UTC_TIMESTAMP, ?, ?)"
+		_, err := Database.Exec(sql, segwitPercentage, rbfPercentage)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	return errors.New("Database pointer is nil")
+}

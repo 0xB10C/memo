@@ -32,6 +32,9 @@ func ProcessMempool(mempool map[string]types.PartialTransaction) {
 	if config.GetBool("mempool.processing.processTimeInMempool") {
 		go timeInMempool(mempool)
 	}
+
+	go transactionStatsMempool(mempool)
+
 }
 
 func currentMempool(mempool map[string]types.PartialTransaction) {
@@ -150,6 +153,18 @@ func timeInMempool(mempool map[string]types.PartialTransaction) {
 	logger.Info.Println("Success writing Time in Mempool to database.")
 }
 
+func transactionStatsMempool(mempool map[string]types.PartialTransaction) {
+	segwitPercentage, rbfPercentage := generateTransactionStats(mempool)
+
+	err := database.WriteCurrentTransactionStats(segwitPercentage, rbfPercentage)
+	if err != nil {
+		logger.Error.Printf("Failed to write Current Mempool to database: %s", err.Error())
+		return
+	}
+
+	logger.Info.Println("Success writing Transaction Stats to database.")
+}
+
 /* generateCurrentMempoolStats()
 This function generates the _Current Mempool_ data. Which is:
 	- The size of the transactions in the mempool `mempoolSizeInByte`
@@ -255,4 +270,25 @@ func generateTimeInMempoolStats(mempool map[string]types.PartialTransaction) ([]
 	}
 
 	return timeAxis, feerateAxis
+}
+
+func generateTransactionStats(mempool map[string]types.PartialTransaction) (segwitPercentage float64, rbfPercentage float64) {
+
+	var segwitCount int
+	var rbfCount int
+
+	for txid, tx := range mempool {
+		if txid != tx.Wtxid {
+			segwitCount++
+		}
+		if tx.Bip125Replaceable {
+			rbfCount++
+		}
+	}
+
+	txCount := len(mempool)
+	segwitPercentage = float64(int(float64(segwitCount)/float64(txCount)*1000)) / 1000
+	rbfPercentage = float64(int(float64(rbfCount)/float64(txCount)*1000)) / 1000
+
+	return
 }
