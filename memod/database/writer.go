@@ -73,12 +73,12 @@ func WriteTimeInMempoolData(timeAxisJSON string, feerateAxisJSON string) error {
 
 }
 
-func WriteCurrentTransactionStats(segwitPercentage float64, rbfPercentage float64) error {
+func WriteCurrentTransactionStats(segwitCount int, rbfCount int, txCount int) error {
 	defer logger.TrackTime(time.Now(), "WriteCurrentTransactionStats()")
 
 	if Database != nil {
-		sql := "INSERT INTO transactionsStats(timestamp, segwitPercentage, rbfPercentage) VALUES (UTC_TIMESTAMP, ?, ?)"
-		_, err := Database.Exec(sql, segwitPercentage, rbfPercentage)
+		sql := "INSERT INTO transactionsStats(timestamp, segwitCount, rbfCount, txCount) VALUES (UTC_TIMESTAMP, ?, ?, ?)"
+		_, err := Database.Exec(sql, segwitCount, rbfCount, txCount)
 		if err != nil {
 			return err
 		}

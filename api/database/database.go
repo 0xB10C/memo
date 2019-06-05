@@ -127,7 +127,7 @@ func GetHistorical(timeframe int, by string) (mempoolStates []MempoolState, err 
 	return
 }
 
-// getTimeInMempool gets the TimeInMempool data from the database
+// GetTimeInMempool gets the TimeInMempool data from the database
 func GetTimeInMempool() (timestamp time.Time, timeAxis string, feerateAxis string, err error) {
 
 	sqlStatement := "SELECT timestamp, timeAxis, feerateAxis FROM timeInMempool WHERE id = 1"
@@ -140,6 +140,42 @@ func GetTimeInMempool() (timestamp time.Time, timeAxis string, feerateAxis strin
 		} else {
 			panic(err)
 		}
+	}
+
+	return
+}
+
+// GetTransactionStats gets the Transaction Stats data from the database
+func GetTransactionStats() (timestamps []int64, segwitCounts []int, rbfCounts []int, txCounts []int, err error) {
+
+	sqlStatement := "SELECT timestamp, segwitCount, rbfCount,	txCount FROM transactionsStats ORDER BY timestamp DESC LIMIT 180;"
+
+	timestamps = make([]int64, 0, 0)
+	segwitCounts = make([]int, 0, 0)
+	rbfCounts = make([]int, 0, 0)
+	txCounts = make([]int, 0, 0)
+
+	rows, err := DB.Query(sqlStatement)
+	if err != nil {
+		return timestamps, segwitCounts, rbfCounts, txCounts, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var timestamp time.Time
+		var segwitCount int
+		var rbfCount int
+		var txCount int
+
+		err = rows.Scan(&timestamp, &segwitCount, &rbfCount, &txCount)
+		if err != nil {
+			return timestamps, segwitCounts, rbfCounts, txCounts, err
+		}
+
+		timestamps = append(timestamps, timestamp.Unix())
+		segwitCounts = append(segwitCounts, segwitCount)
+		rbfCounts = append(rbfCounts, rbfCount)
+		txCounts = append(txCounts, txCount)
 	}
 
 	return
