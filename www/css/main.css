@@ -119,6 +119,11 @@ svg#brand-icon g.text>path {
   min-height: 450px;
 }
 
+
+#transaction-stats-chart {
+  min-height: 450px;
+}
+
 .pointer {
   cursor: pointer;
 }
@@ -169,6 +174,20 @@ svg#brand-icon g.text>path {
   stroke: var(--text-color);
   stroke-width: 1.5px;
 }
+
+#transaction-stats-chart.c3 svg g g.c3-legend-item text {
+  fill: var(--text-color);
+}
+
+#transaction-stats-chart.c3 svg g g.c3-chart g.c3-chart-lines path {
+  stroke-width: 3px;
+}
+
+.c3 line,
+.c3 path {
+  stroke: var(--text-color);
+}
+
 
 /* general chart css*/
 .red-line>line {

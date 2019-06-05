@@ -2,6 +2,8 @@
 const NEXT_BLOCK_LABELS = ["1 vMB", "2 vMB", "3 vMB"]
 
 var isTabActive = true;
+var updateInterval = 500000000 // 30000
+
 
 // State
 var state = {
@@ -36,9 +38,19 @@ var state = {
       timeLastUpdated: null,
     },
   },
+  transactionStats: {
+    chart: null,
+    elementId: "card-transaction-stats",
+    isScrolledIntoView: false,
+    data: {
+      type: "count",
+      processedStats: null,
+      timeLastUpdated: null,
+    },
+  },
 }
 
-var cards = [state.currentMempool, state.historicalMempool, state.pastBlocks]
+var cards = [state.currentMempool, state.historicalMempool, state.transactionStats, state.pastBlocks]
 
 window.onload = function () {
   // Add event listeners to the search bar
@@ -531,7 +543,7 @@ const historicalMempoolCard = {
 
           return `
             <div class="c3-tooltip"><table><tbody>
-              <tr><td colspan="2">${formattedTime}</td></tr>
+              <tr><td class="text-center" colspan="2">${formattedTime}</td></tr>
               <tr><td>${d[0].id} sat/vbyte</td><td>${value}</td></tr>
             </tbody></table></div>
             `
@@ -544,6 +556,149 @@ const historicalMempoolCard = {
       state.historicalMempool.chart = state.historicalMempool.chart.destroy();
     }
     state.historicalMempool.chart = c3.generate(chartSetting)
+
+  }
+}
+
+
+const transactionstatsCard = {
+  switchType: function (switchTo) {
+    if (state.transactionStats.data.type != switchTo && (switchTo == "count" || switchTo == "percentage")) {
+      state.transactionStats.data.type = switchTo;
+      drawChart(state.transactionStats.elementId)
+    }
+  },
+  updateCardLastUpdated: function () {
+    // calc seconds from milliseconds
+    const minutes = Math.floor((Date.now() - (state.transactionStats.data.timeLastUpdated)) / 1000 / 60)
+    document.getElementById('transaction-stats-last-update').innerHTML = (minutes)
+  },
+  processDataForChart: function (response) {
+    state.transactionStats.data.timeLastUpdated = new Date();
+
+    console.log(response)
+
+    let columnsCount = [
+      ['timestamps'].concat(response.timestamps.map(function (x) {
+        return new Date(x * 1000)
+      })),
+      ['Replace-By-Fee count'].concat(response.rbfCounts),
+      ['SegWit spending count'].concat(response.segwitCounts),
+      ['Unconfirmed Transaction count'].concat(response.txCounts)
+    ]
+
+    rbfPercentages = []
+    segWitPercentages = []
+
+    for (let index in response.timestamps) {
+      rbfPercentages.push(((response.rbfCounts[index] / response.txCounts[index]) * 100).toFixed(2))
+      segWitPercentages.push(((response.segwitCounts[index] / response.txCounts[index]) * 100).toFixed(2))
+    }
+
+
+    let columnsPercentage = [
+      ['timestamps'].concat(response.timestamps.map(function (x) {
+        return new Date(x * 1000)
+      })),
+      ['Replace-By-Fee percentage'].concat(rbfPercentages),
+      ['SegWit spending percentage'].concat(segWitPercentages),
+    ]
+
+    return {
+      columnsCount: columnsCount,
+      columnsPercentage: columnsPercentage,
+    }
+  },
+  draw: async function () {
+
+    let processed = state.transactionStats.data.processedStats
+    let chartType = state.transactionStats.data.type
+
+    if (processed == null) {
+      return
+    }
+
+    chartSetting = {
+      bindto: '#transaction-stats-chart',
+      data: {
+        x: "timestamps",
+        xFormat: '%Y-%m-%dT%H:%M:%S.%LZ',
+        columns: chartType == "count" ? processed.columnsCount : processed.columnsPercentage,
+        type: "spline",
+        order: null,
+      },
+      axis: {
+        x: {
+          type: 'timeseries',
+          tick: {
+            format: '%H:%M'
+          }
+        },
+        y: {
+          tick: chartType == "count" ? {
+            format: d3.format(".2s")
+          } : {},
+          min: -0,
+          padding: {
+            top: 20,
+            bottom: 0
+          }
+        }
+      },
+      size: {
+        height: 450 // css #transaction-stats-chart min-height: 450px needs to be changed too
+      },
+      legend: {
+        show: true
+      },
+      color: {
+        pattern: ["#ffa600", "#e62470", "#223399"]
+      },
+      point: {
+        show: false,
+      },
+      tooltip: {
+        contents: function (d) {
+          date = d[0].x
+          let day = "0" + date.getDate();
+          let month = "0" + (date.getMonth() + 1)
+          let year = date.getFullYear()
+          let hours = "0" + date.getHours();
+          let minutes = "0" + date.getMinutes();
+          let formattedTime = hours.substr(-2) + ':' + minutes.substr(-2) + " " + day.substr(-2) + "/" + month.substr(-2) + "/" + year
+
+          if (state.transactionStats.data.type == "count") {
+            let segWitPercentage = ((d[1].value / d[2].value) * 100).toFixed(2)
+            let rbfPercentage = ((d[0].value / d[2].value) * 100).toFixed(2)
+
+            return `
+            <div class="c3-tooltip"><table><tbody>
+              <tr><td class="text-center" colspan="2">${formattedTime}</td></tr>
+              <tr><td>Total Transaction</td><td>${d[2].value} tx</td></tr>
+              <tr><td>SegWit spending</td><td>${d[1].value} tx (${segWitPercentage}%)</td></tr>
+              <tr><td>BIP125-RBF signaling</td><td>${d[0].value} tx (${rbfPercentage}%)</td></tr>
+            </tbody></table></div>
+            `
+          } else if (state.transactionStats.data.type == "percentage") {
+            return `
+            <div class="c3-tooltip"><table><tbody>
+              <tr><td class="text-center" colspan="2">${formattedTime}</td></tr>
+              <tr><td>SegWit spending</td><td>${d[1].value} %</td></tr>
+              <tr><td>BIP125-RBF signaling</td><td>${d[0].value} %</td></tr>
+            </tbody></table></div>
+            `
+          }
+
+        },
+        horizontal: true
+      }
+    }
+
+    // properly destroy chart and generate new chart
+    if (state.transactionStats.chart) {
+      state.transactionStats.chart = state.transactionStats.chart.destroy();
+    }
+    state.transactionStats.chart = c3.generate(chartSetting)
 
   }
 }
@@ -728,12 +883,20 @@ function reloadData() {
       drawChart(state.pastBlocks.elementId)
     });
 
+  // reload transaction stats data
+  axios.get('https://mempool.observer/api/transactionStats') // TODO: Change to production
+    .then(function (response) {
+      state.transactionStats.data.processedStats = transactionstatsCard.processDataForChart(response.data)
+      drawChart(state.transactionStats.elementId)
+    });
+
+
   reloadHistoricalMempool()
 
   // reload data again in 30 seconds
   setTimeout(function () {
     reloadData()
-  }, 30000);
+  }, updateInterval);
 }
 
 function reloadHistoricalMempool() {
@@ -762,6 +925,11 @@ function drawChart(id) {
     if (state.pastBlocks.elementId == id && state.pastBlocks.isScrolledIntoView) {
       pastBlocksCard.draw()
       // console.log("Drawing pastBlocks chart")
+    }
+
+    if (state.transactionStats.elementId == id && state.transactionStats.isScrolledIntoView) {
+      transactionstatsCard.draw()
+      // console.log("Drawing transactionStats chart")
     }
 
   } else {

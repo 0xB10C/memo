@@ -189,7 +189,8 @@
           </div>
 
           <div class="col-md-6">
-            <div id="current-mempool-chart" class="my-3"> This chart hasn't been drawn yet. </div>
+            <div id="current-mempool-chart" class="my-3"> This chart hasn't been drawn yet. Maybe reloading the site
+              helps. </div>
             <div class="text-center">
               <span class="rounded-left"
                 style="background-image: linear-gradient(to right,#57e0fbB0, #55ff00B0);">&nbsp;0
@@ -233,7 +234,7 @@
           </div>
 
           <div class="col-md-12">
-            <div id="historical-mempool-chart"> This chart hasn't been drawn yet. </div>
+            <div id="historical-mempool-chart"> This chart hasn't been drawn yet. Maybe reloading the site helps. </div>
           </div>
 
           <div class="col-md-12 my-3 text-center">
@@ -280,6 +281,57 @@
       </div>
     </div>
 
+    <a id="historical-mempool" class="href-target"></a>
+    <div class="card my-4 shadow-sm bg-white" id="card-transaction-stats">
+      <div class="card-body">
+        <h3 class="card-title">SegWit and BIP125-RBF Statistics</h3>
+        <h5 class="card-subtitle mb-2 text-muted">How many unconfirmed transactions spend SegWit outputs? How many
+          are replaceable with BIP125 RBF?</h5>
+
+        <div class="row">
+          <div class="col-md-12 mb-4">
+            <p class="card-text">
+              This chart shows statistics on SegWit spending and BIP125 Replace-By-Fee singaling transactions in
+              the mempool. Data from the last three hours is displayed. The buttons below switch the display mode
+              between <i>percentage</i> and <i>count</i>.
+            </p>
+            <p class="card-text">
+              Replace-By-Fee (RBF) as proposed in <a
+                href="https://github.com/bitcoin/bips/blob/master/bip-0125.mediawiki">BIP 125</a> allows the replacement
+              of an an unconfirmed transaction with a new version of that transaction paying a higher fee.
+              By signaling RBF the spender indicates that he/she wants to be able to replace that transaction in the
+              future.
+            </p>
+          </div>
+
+          <div class="col-md-12">
+            <div id="transaction-stats-chart">This chart hasn't been drawn yet. Maybe reloading the site helps.</div>
+          </div>
+          <div class="col-md-12 my-3 text-center">
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+              <button type="button" class="btn btn-outline-secondary normal-text-color" disabled>show by</button>
+              <label class="btn btn-outline-primary pointer active" onclick="transactionstatsCard.switchType('count')">
+                <input type="radio" name="options" id="option1" autocomplete="off" checked> count
+              </label>
+              <label class="btn btn-outline-primary pointer" onclick="transactionstatsCard.switchType('percentage')">
+                <input type="radio" name="options" id="option2" autocomplete="off"> percentage
+              </label>
+            </div>
+          </div>
+
+
+        </div>
+
+      </div>
+      <div class="card-footer text-muted text-right">
+        <small>
+          last updated
+          <span id="transaction-stats-last-update">0</span>
+          minutes ago
+        </small>
+      </div>
+    </div>
+
     <a id="past-blocks" class="href-target"></a>
     <div class="card my-4 shadow-sm bg-white" id="card-past-blocks">
       <div class="card-body">
@@ -310,7 +362,7 @@
           </div>
 
           <div class="col-md-12">
-            <div id="past-blocks-chart"> This chart hasn't been drawn yet. </div>
+            <div id="past-blocks-chart"> This chart hasn't been drawn yet. Maybe reloading the site helps. </div>
           </div>
 
           <div class="col-md-12">
