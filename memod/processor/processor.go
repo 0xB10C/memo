@@ -156,11 +156,11 @@ func timeInMempool(mempool map[string]types.PartialTransaction) {
 }
 
 func transactionStatsMempool(mempool map[string]types.PartialTransaction) {
-	segwitPercentage, rbfPercentage := generateTransactionStats(mempool)
+	segwitCount, rbfCount, txCount := generateTransactionStats(mempool)
 
-	err := database.WriteCurrentTransactionStats(segwitPercentage, rbfPercentage)
+	err := database.WriteCurrentTransactionStats(segwitCount, rbfCount, txCount)
 	if err != nil {
-		logger.Error.Printf("Failed to write Current Mempool to database: %s", err.Error())
+		logger.Error.Printf("Failed to write Transaction Stats to database: %s", err.Error())
 		return
 	}
 
@@ -274,10 +274,7 @@ func generateTimeInMempoolStats(mempool map[string]types.PartialTransaction) ([]
 	return timeAxis, feerateAxis
 }
 
-func generateTransactionStats(mempool map[string]types.PartialTransaction) (segwitPercentage float64, rbfPercentage float64) {
-
-	var segwitCount int
-	var rbfCount int
+func generateTransactionStats(mempool map[string]types.PartialTransaction) (segwitCount int, rbfCount int, txCount int) {
 
 	for txid, tx := range mempool {
 		if txid != tx.Wtxid {
@@ -288,9 +285,9 @@ func generateTransactionStats(mempool map[string]types.PartialTransaction) (segw
 		}
 	}
 
-	txCount := len(mempool)
-	segwitPercentage = float64(int(float64(segwitCount)/float64(txCount)*1000)) / 1000
-	rbfPercentage = float64(int(float64(rbfCount)/float64(txCount)*1000)) / 1000
+	txCount = len(mempool)
+	//segwitPercentage = float64(int(float64(segwitCount)/float64(txCount)*1000)) / 1000
+	//rbfPercentage = float64(int(float64(rbfCount)/float64(txCount)*1000)) / 1000
 
 	return
 }

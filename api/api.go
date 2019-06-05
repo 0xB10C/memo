@@ -38,6 +38,7 @@ func main() {
 		api.GET("/recentBlocks", getRecentBlocks)
 		api.GET("/historicalMempool/:timeframe/:by", getHistoricalMempool)
 		api.GET("/timeInMempool", getTimeInMempool)
+		api.GET("/transactionStats", getTransactionStats)
 	}
 
 	portString := ":" + config.GetString("api.port")
@@ -137,5 +138,23 @@ func getTimeInMempool(c *gin.Context) {
 		"timestamp":   timestamp,
 		"feerateAxis": feerateAxis,
 		"timeAxis":    timeAxis,
+	})
+}
+
+func getTransactionStats(c *gin.Context) {
+	timestamps, segwitCounts, rbfCounts, txCounts, err := database.GetTransactionStats()
+	if err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Database error",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"timestamps":   timestamps,
+		"segwitCounts": segwitCounts,
+		"rbfCounts":    rbfCounts,
+		"txCounts":     txCounts,
 	})
 }
