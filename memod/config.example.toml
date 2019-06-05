@@ -32,6 +32,7 @@ fetchInterval = 60        # seconds
   [mempool.processing]
   processCurrentMempool = true
   processHistoricalMempool = true
+  processTransactionStats = true
 
 [log]
 enableTrace = false
