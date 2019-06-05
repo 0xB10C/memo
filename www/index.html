@@ -291,7 +291,7 @@
         <div class="row">
           <div class="col-md-12 mb-4">
             <p class="card-text">
-              This chart shows statistics on SegWit spending and BIP125 Replace-By-Fee singaling transactions in
+              This chart shows statistics on SegWit spending and BIP125 Replace-By-Fee signaling transactions in
               the mempool. Data from the last three hours is displayed. The buttons below switch the display mode
               between <i>percentage</i> and <i>count</i>.
             </p>
@@ -310,11 +310,12 @@
           <div class="col-md-12 my-3 text-center">
             <div class="btn-group btn-group-toggle" data-toggle="buttons">
               <button type="button" class="btn btn-outline-secondary normal-text-color" disabled>show by</button>
-              <label class="btn btn-outline-primary pointer active" onclick="transactionstatsCard.switchType('count')">
-                <input type="radio" name="options" id="option1" autocomplete="off" checked> count
+              <label class="btn btn-outline-primary pointer active"
+                onclick="transactionstatsCard.switchType('percentage')">
+                <input type="radio" name="options" id="option1" autocomplete="off" checked> percentage
               </label>
-              <label class="btn btn-outline-primary pointer" onclick="transactionstatsCard.switchType('percentage')">
-                <input type="radio" name="options" id="option2" autocomplete="off"> percentage
+              <label class="btn btn-outline-primary pointer" onclick="transactionstatsCard.switchType('count')">
+                <input type="radio" name="options" id="option2" autocomplete="off"> count
               </label>
             </div>
           </div>

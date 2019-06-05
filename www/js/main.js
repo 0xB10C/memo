@@ -2,7 +2,7 @@
 const NEXT_BLOCK_LABELS = ["1 vMB", "2 vMB", "3 vMB"]
 
 var isTabActive = true;
-var updateInterval = 500000000 // 30000
+var updateInterval = 30000
 
 
 // State
@@ -43,7 +43,7 @@ var state = {
     elementId: "card-transaction-stats",
     isScrolledIntoView: false,
     data: {
-      type: "count",
+      type: "percentage",
       processedStats: null,
       timeLastUpdated: null,
     },
@@ -575,8 +575,6 @@ const transactionstatsCard = {
   },
   processDataForChart: function (response) {
     state.transactionStats.data.timeLastUpdated = new Date();
-
-    console.log(response)
 
     let columnsCount = [
       ['timestamps'].concat(response.timestamps.map(function (x) {
