@@ -33,7 +33,9 @@ func ProcessMempool(mempool map[string]types.PartialTransaction) {
 		go timeInMempool(mempool)
 	}
 
-	go transactionStatsMempool(mempool)
+	if config.GetBool("mempool.processing.processTransactionStats") {
+		go transactionStatsMempool(mempool)
+	}
 
 }
 
