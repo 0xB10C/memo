@@ -29,7 +29,9 @@ type Transaction struct {
 // PartialTransaction is a part-struct of `Transaction` which contains
 // only the for-now-used values to be more memory efficient
 type PartialTransaction struct {
-	Size int     `json:"size"`
-	Fee  float64 `json:"fee"`
-	Time int     `json:"time"`
+	Size              int     `json:"size"`
+	Fee               float64 `json:"fee"`
+	Time              int     `json:"time"`
+	Wtxid             string  `json:"wtxid"`
+	Bip125Replaceable bool    `json:"bip125-replaceable"`
 }
