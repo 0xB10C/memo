@@ -269,6 +269,10 @@ div.card-body {
   color: var(--warning);
 }
 
+[data-theme="dark"] a:hover {
+  color: var(--danger);
+}
+
 .btn.btn-outline-white {
   color: var(--text-color);
   background-color: var(--background-card);
