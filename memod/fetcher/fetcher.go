@@ -157,6 +157,7 @@ func fetchMempoolFromJSONRPC() ([]byte, error) {
 
 // read the response body
 func readResponseBody(resp *http.Response) ([]byte, error) {
+	defer logger.TrackTime(time.Now(), "readResponseBody()")
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		logger.Error.Println(err.Error())
