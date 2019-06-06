@@ -1,5 +1,7 @@
 # memo - mempool.observer
 
+[![Build Status](https://travis-ci.com/0xB10C/memo.svg?branch=v2-master)](https://travis-ci.com/0xB10C/memo)
+
 <img align="right" width="280" src="https://raw.githubusercontent.com/0xB10C/memo/v2-master/www/img/brand-icon.png">
 
 [mempool.observer](https://mempool.observer) visualizes various statistics around my Bitcoin memory pool (mempool).
