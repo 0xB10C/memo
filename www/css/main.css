@@ -264,6 +264,11 @@ div.card-body {
   background: var(--background-card) !important;
 }
 
+[data-theme="dark"] .alert.alert-warning {
+  background-color: var(--background-card);
+  color: var(--warning);
+}
+
 .btn.btn-outline-white {
   color: var(--text-color);
   background-color: var(--background-card);
@@ -300,5 +305,5 @@ div.card-body {
   --background-card: #33333333;
   --background-footer: #000000de;
   --text-color: var(--light);
-  --text-color-disabled-button: --white;
+  --text-color-disabled-button: var(--white);
 }
