@@ -4,6 +4,9 @@ const NEXT_BLOCK_LABELS = ["1 vMB", "2 vMB", "3 vMB"]
 var isTabActive = true;
 var updateInterval = 30000
 
+// use the https://mempool.observer endpoint only when on https://mempool.observer/ 
+// otherwise use https://dev.mempool.observer (e.g. when on localhost)
+var apiHost = window.location.hostname == "mempool.observer" ? "https://mempool.observer" : "https://dev.mempool.observer"
 
 // State
 var state = {
@@ -53,6 +56,10 @@ var state = {
 var cards = [state.currentMempool, state.historicalMempool, state.transactionStats, state.pastBlocks]
 
 window.onload = function () {
+
+  console.log()
+
+
   // Add event listeners to the search bar
   document.getElementById('button-lookup-txid').addEventListener('click', currentMempoolCard.handleTxSearch)
   document.getElementById('input-lookup-txid').addEventListener("keyup", function (event) {
@@ -866,7 +873,7 @@ const pastBlocksCard = {
 function reloadData() {
 
   // reload mempool chart data
-  axios.get('https://mempool.observer/api/mempool')
+  axios.get(apiHost + '/api/mempool')
     .then(function (response) {
       state.currentMempool.data.processedMempool = currentMempoolCard.processDataForChart(response.data)
       currentMempoolCard.updateCard(state.currentMempool.data.processedMempool)
@@ -874,7 +881,7 @@ function reloadData() {
     });
 
   // reload past blocks data
-  axios.get('https://mempool.observer/api/recentBlocks')
+  axios.get(apiHost + '/api/recentBlocks')
     .then(function (response) {
       state.pastBlocks.data.processedBlocks = pastBlocksCard.processDataForChart(response.data)
       pastBlocksCard.setTimer()
@@ -882,7 +889,7 @@ function reloadData() {
     });
 
   // reload transaction stats data
-  axios.get('https://mempool.observer/api/transactionStats') // TODO: Change to production
+  axios.get(apiHost + '/api/transactionStats') // TODO: Change to production
     .then(function (response) {
       state.transactionStats.data.processedStats = transactionstatsCard.processDataForChart(response.data)
       drawChart(state.transactionStats.elementId)
@@ -898,7 +905,7 @@ function reloadData() {
 }
 
 function reloadHistoricalMempool() {
-  axios.get('https://mempool.observer/api/historicalMempool/' + state.historicalMempool.data.timeframe + "/" + state.historicalMempool.data.bySelector)
+  axios.get(apiHost + '/api/historicalMempool/' + state.historicalMempool.data.timeframe + "/" + state.historicalMempool.data.bySelector)
     .then(function (response) {
       state.historicalMempool.data.processedMempool = historicalMempoolCard.processDataForChart(response.data)
       drawChart(state.historicalMempool.elementId)
