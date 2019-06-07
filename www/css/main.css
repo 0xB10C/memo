@@ -102,6 +102,7 @@ svg#brand-icon g.text>path {
 #current-mempool-chart .hidden-feerate-grid text {
   transform: translate(0px, 9px);
   opacity: 0.5 !important;
+  fill: black;
 }
 
 #current-mempool-chart.c3 g.c3-axis.c3-axis-x g.tick {
