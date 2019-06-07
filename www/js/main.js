@@ -193,7 +193,8 @@ const currentMempoolCard = {
         blocks.push(response.megabyteMarkers[position])
         // add lines to show estimated next blocks on the mempool graph
         lines.push({
-          value: response.megabyteMarkers[position]
+          value: response.megabyteMarkers[position],
+          class: 'block-grid',
         })
       }
     }
@@ -203,6 +204,8 @@ const currentMempoolCard = {
     // Sum all txs to get the total number of tx in the mempool
     const sum = Object.values(rowData[1]).reduce((a, b) => a + b, 0)
     return {
+      "yTickCache": {},
+      "feerateMap": response.feerateMap,
       "mempoolSize": mempoolSize,
       "blocks": blocks,
       "colorPattern": colorPattern,
@@ -232,6 +235,36 @@ const currentMempoolCard = {
     }
 
     return colorPattern
+  },
+  calcYTick: function (yValue) {
+    processedMempool = state.currentMempool.data.processedMempool
+
+    // look if we have already processed this yValue (c3js does this multiple times somehow)
+    if (processedMempool.yTickCache[yValue] != null || yValue == 0) {
+      return yValue
+    }
+
+    var txCounter = 0
+    var feerateAtY = 0
+    for (var feerate in processedMempool.feerateMap) {
+      txCounter += processedMempool.feerateMap[feerate]
+      if (txCounter > yValue) {
+        feerateAtY = feerate
+        break;
+      }
+    }
+
+    // add a new, invisible line with the feerate as description
+    processedMempool.lines.push({
+      value: yValue,
+      class: 'hidden-feerate-grid',
+      text: feerateAtY + ' sat/vbyte',
+      position: 'middle',
+    })
+
+    processedMempool.yTickCache[yValue] = feerateAtY;
+
+    return yValue
   },
   draw: async function () {
     let processed = state.currentMempool.data.processedMempool
@@ -282,10 +315,12 @@ const currentMempoolCard = {
           },
           show: true,
           label: {
-            text: 'unconfirmed transactions'
+            text: 'unconfirmed tx count'
           },
           tick: {
-            format: d3.format(".2s")
+            format: function (y) {
+              return currentMempoolCard.calcYTick(y)
+            },
           },
         },
         y2: {
@@ -296,7 +331,7 @@ const currentMempoolCard = {
           },
           default: [0, processed.sum],
           label: {
-            text: 'estimated blocks'
+            text: ''
           },
           show: true,
           tick: {

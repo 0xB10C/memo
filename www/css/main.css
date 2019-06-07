@@ -91,6 +91,20 @@ svg#brand-icon g.text>path {
   stroke: var(--text-color);
 }
 
+#current-mempool-chart .block-grid {
+  opacity: 0.4 !important;
+}
+
+#current-mempool-chart .hidden-feerate-grid line {
+  opacity: 0.0 !important;
+}
+
+#current-mempool-chart .hidden-feerate-grid text {
+  transform: translate(0px, 9px);
+  opacity: 0.5 !important;
+  fill: black;
+}
+
 #current-mempool-chart.c3 g.c3-axis.c3-axis-x g.tick {
   display: none;
 }
@@ -99,9 +113,7 @@ svg#brand-icon g.text>path {
   visibility: hidden !important;
 }
 
-#current-mempool-chart.c3 .c3-ygrid-line line {
-  margin-left: 20px;
-}
+
 
 .c3-ygrid-line.red-line>text {
   fill: red;
