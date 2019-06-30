@@ -47,4 +47,5 @@ port = "28332"
   rawBlock  = true        # needed to write recentBlocks to database 
   hashTx    = false
   hashBlock = false
+  rawTx2    = false       # this needs a custom bitcoind patch https://github.com/0xB10C/bitcoin/tree/2019-06-rawtx2-zmq-for-memod to work 
 

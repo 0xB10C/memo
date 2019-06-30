@@ -20,6 +20,7 @@ func Start() {
 const rawBlock string = "rawblock"
 const hashBlock string = "hashblock"
 const rawTx string = "rawtx"
+const rawTx2 string = "rawtx2"
 const hashTx string = "hashtx"
 
 func setupZMQ() {
@@ -33,6 +34,9 @@ func setupZMQ() {
 
 	if config.GetBool("zmq.subscribeTo.rawTx") {
 		subscriber.SetSubscribe(rawTx)
+	}
+	if config.GetBool("zmq.subscribeTo.rawTx2") {
+		subscriber.SetSubscribe(rawTx2)
 	}
 	if config.GetBool("zmq.subscribeTo.hashTx") {
 		subscriber.SetSubscribe(hashTx)
@@ -67,11 +71,13 @@ func handleZMQMessage(zmqMessage []string) {
 	case rawBlock:
 		go handleRawBlock(payload)
 	case hashBlock:
-		handleHashBlock(payload)
+		go handleHashBlock(payload)
 	case rawTx:
-		handleRawTx(payload)
+		//go handleRawTx(payload)
+	case rawTx2:
+		go handleRawTxWithSizeAndFee(payload)
 	case hashTx:
-		handleHashTx(payload)
+		go handleHashTx(payload)
 	default:
 		logger.Warning.Println("Unhandled ZMQ topic", topic)
 	}
@@ -100,12 +106,38 @@ func handleHashBlock(payload string) {
 	//logger.Warning.Println("handleHashBlock() not Implemented")
 }
 
-func handleRawTx(payload string) {
-	logger.Warning.Println("handleRawTx() not Implemented")
+func handleRawTxWithSizeAndFee(payload string) {
+	payloadLength := len(payload)
+
+	tx, err := deserializeRawTx(payload[0 : payloadLength-16])
+	if err != nil {
+		logger.Error.Printf("Error handling raw tx: %v", err)
+	}
+
+	sizeBytes := []byte(payload[payloadLength-16 : payloadLength-8])
+	feeBytes := []byte(payload[payloadLength-8 : payloadLength])
+
+	sizeInByte := int64(binary.LittleEndian.Uint64(sizeBytes))
+	feeInSat := int64(binary.LittleEndian.Uint64(feeBytes))
+
+	feerate := float64(feeInSat) / float64(sizeInByte)
+
+	logger.Warning.Println(tx.TxHash(), feerate, tx.HasWitness())
 }
 
 func handleHashTx(payload string) {
 	//logger.Warning.Println("handleHashTx() not Implemented")
+}
+
+func deserializeRawTx(rawTx string) (tx *wire.MsgTx, err error) {
+	//defer logger.TrackTime(time.Now(), "deserializeRawTx()")
+	tx = wire.NewMsgTx(1)
+	r := strings.NewReader(rawTx)
+	err = tx.Deserialize(r)
+	if err != nil {
+		return
+	}
+	return
 }
 
 func deserializeRawBlock(rawBlock string) (block *wire.MsgBlock, err error) {
