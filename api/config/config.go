@@ -23,11 +23,10 @@ func init() {
 }
 
 func setDefaults() {
-	viper.SetDefault("database.host", "localhost")
-	viper.SetDefault("database.connection", "tcp")
+	viper.SetDefault("redis.host", "localhost")
+	viper.SetDefault("redis.connection", "redis")
 	viper.SetDefault("api.port", "23485")
 	viper.SetDefault("api.production", true)
-
 }
 
 // GetInt returns a config property as int
