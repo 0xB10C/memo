@@ -119,7 +119,7 @@ func getHistoricalMempool(c *gin.Context) {
 
 func getTimeInMempool(c *gin.Context) {
 
-	timestamp, timeAxisStr, feerateAxisStr, err := database.GetTimeInMempool()
+	timestamp, timeAxis, feerateAxis, err := database.GetTimeInMempool()
 	if err != nil {
 		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -127,12 +127,6 @@ func getTimeInMempool(c *gin.Context) {
 		})
 		return
 	}
-
-	var timeAxis []int
-	json.Unmarshal([]byte(timeAxisStr), &timeAxis)
-
-	var feerateAxis []float64
-	json.Unmarshal([]byte(feerateAxisStr), &feerateAxis)
 
 	c.JSON(http.StatusOK, gin.H{
 		"timestamp":   timestamp,
@@ -142,7 +136,7 @@ func getTimeInMempool(c *gin.Context) {
 }
 
 func getTransactionStats(c *gin.Context) {
-	timestamps, segwitCounts, rbfCounts, txCounts, err := database.GetTransactionStats()
+	tss, err := database.GetTransactionStats()
 	if err != nil {
 		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -151,10 +145,5 @@ func getTransactionStats(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"timestamps":   timestamps,
-		"segwitCounts": segwitCounts,
-		"rbfCounts":    rbfCounts,
-		"txCounts":     txCounts,
-	})
+	c.JSON(http.StatusOK, tss)
 }
