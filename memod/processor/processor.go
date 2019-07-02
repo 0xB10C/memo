@@ -65,68 +65,63 @@ func historicalMempool(mempool map[string]types.PartialTransaction) {
 	const timeframe30d = 5
 	const timeframe180d = 6
 
-	nu, err := database.ReadHistroricalMempoolNeedUpdate()
+	needsUpdate, err := database.ReadHistroricalMempoolNeedUpdate()
 	if err != nil {
 		logger.Error.Printf("Failed to get Needs Update data from database: %s", err.Error())
 	}
 
-	if nu.Update2h || nu.Update12h || nu.Update48h || nu.Update7d || nu.Update30d || nu.Update180d {
+	if needsUpdate.Update2h || needsUpdate.Update12h || needsUpdate.Update48h || needsUpdate.Update7d || needsUpdate.Update30d || needsUpdate.Update180d {
 
 		countInBuckets, feeInBuckets, sizeInBuckets := generateHistoricalMempoolStats(mempool)
-		countInBucketsJSON, feeInBucketsJSON, sizeInBucketsJSON, err := encoder.EncodeHistoricalStatsToJSON(countInBuckets, feeInBuckets, sizeInBuckets)
-		if err != nil {
-			logger.Error.Printf("Failed to encode generated data as JSON: %s", err.Error())
-			return
-		}
 
-		if nu.Update2h {
+		if needsUpdate.Update2h {
 			logger.Info.Println("Writing 2h Historical Mempool data.")
-			err = database.WriteHistoricalMempoolData(countInBucketsJSON, feeInBucketsJSON, sizeInBucketsJSON, timeframe2h)
+			err = database.WriteHistoricalMempoolData(countInBuckets, feeInBuckets, sizeInBuckets, timeframe2h)
 			if err != nil {
 				logger.Error.Printf("Failed to write Historical Mempool to database: %s", err.Error())
 				return
 			}
 		}
 
-		if nu.Update12h {
+		if needsUpdate.Update12h {
 			logger.Info.Println("Writing 12h Historical Mempool data.")
-			err = database.WriteHistoricalMempoolData(countInBucketsJSON, feeInBucketsJSON, sizeInBucketsJSON, timeframe12h)
+			err = database.WriteHistoricalMempoolData(countInBuckets, feeInBuckets, sizeInBuckets, timeframe12h)
 			if err != nil {
 				logger.Error.Printf("Failed to write Historical Mempool to database: %s", err.Error())
 				return
 			}
 		}
 
-		if nu.Update48h {
+		if needsUpdate.Update48h {
 			logger.Info.Println("Writing 48h Historical Mempool data.")
-			err = database.WriteHistoricalMempoolData(countInBucketsJSON, feeInBucketsJSON, sizeInBucketsJSON, timeframe48h)
+			err = database.WriteHistoricalMempoolData(countInBuckets, feeInBuckets, sizeInBuckets, timeframe48h)
 			if err != nil {
 				logger.Error.Printf("Failed to write Historical Mempool to database: %s", err.Error())
 				return
 			}
 		}
 
-		if nu.Update7d {
+		if needsUpdate.Update7d {
 			logger.Info.Println("Writing 7d Historical Mempool data.")
-			err = database.WriteHistoricalMempoolData(countInBucketsJSON, feeInBucketsJSON, sizeInBucketsJSON, timeframe7d)
+			err = database.WriteHistoricalMempoolData(countInBuckets, feeInBuckets, sizeInBuckets, timeframe7d)
 			if err != nil {
 				logger.Error.Printf("Failed to write Historical Mempool to database: %s", err.Error())
 				return
 			}
 		}
 
-		if nu.Update30d {
+		if needsUpdate.Update30d {
 			logger.Info.Println("Writing 30d Historical Mempool data.")
-			err = database.WriteHistoricalMempoolData(countInBucketsJSON, feeInBucketsJSON, sizeInBucketsJSON, timeframe30d)
+			err = database.WriteHistoricalMempoolData(countInBuckets, feeInBuckets, sizeInBuckets, timeframe30d)
 			if err != nil {
 				logger.Error.Printf("Failed to write Historical Mempool to database: %s", err.Error())
 				return
 			}
 		}
 
-		if nu.Update180d {
+		if needsUpdate.Update180d {
 			logger.Info.Println("Writing 180d Historical Mempool data.")
-			err = database.WriteHistoricalMempoolData(countInBucketsJSON, feeInBucketsJSON, sizeInBucketsJSON, timeframe180d)
+			err = database.WriteHistoricalMempoolData(countInBuckets, feeInBuckets, sizeInBuckets, timeframe180d)
 			if err != nil {
 				logger.Error.Printf("Failed to write Historical Mempool to database: %s", err.Error())
 				return
@@ -135,18 +130,12 @@ func historicalMempool(mempool map[string]types.PartialTransaction) {
 
 		logger.Info.Println("Success writing Historical Mempool to database.")
 	}
-
 }
 
 func timeInMempool(mempool map[string]types.PartialTransaction) {
 	timeAxis, feerateAxis := generateTimeInMempoolStats(mempool)
-	feerateMapJSON, megabyteMarkersJSON, err := encoder.EncodeTimeInMempoolStatsToJSON(timeAxis, feerateAxis)
-	if err != nil {
-		logger.Error.Printf("Failed to encode generated data as JSON: %s", err.Error())
-		return
-	}
 
-	err = database.WriteTimeInMempoolData(feerateMapJSON, megabyteMarkersJSON)
+	err := database.WriteTimeInMempoolData(timeAxis, feerateAxis)
 	if err != nil {
 		logger.Error.Printf("Failed to write Time in Mempool to database: %s", err.Error())
 		return
@@ -171,7 +160,7 @@ func transactionStatsMempool(mempool map[string]types.PartialTransaction) {
 This function generates the _Current Mempool_ data. Which is:
 	- The size of the transactions in the mempool `mempoolSizeInByte`
 	- A map mapping the transaction count to the feerate (as a whole
-		number). Named `feerateMap`.
+		needsUpdatember). Named `feerateMap`.
 	- A list positions in the mempool (tx count), when sorted by
 		feerate, which each mark one megabyte worth of transactions.
 		Positions starting from the top. Named `megabyteMarkers`.
@@ -214,7 +203,7 @@ func generateCurrentMempoolStats(mempool map[string]types.PartialTransaction) (m
 			megabyteBucket = megabyteBucket - entry.size
 			memlistPos--
 		} else { // if entry.size doesn't fit in the bucket
-			megabyteBucket = cMEGABYTE - entry.size               // start a new megabyte bucket minus the current entry.size
+			megabyteBucket = cMEGABYTE - entry.size               // start a new megabyte bucket mineedsUpdates the current entry.size
 			megabyteMarkers = append(megabyteMarkers, memlistPos) // append current position to the megabyteMarkers list
 			memlistPos--
 		}

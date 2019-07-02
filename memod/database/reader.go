@@ -1,9 +1,12 @@
 package database
 
 import (
+	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/0xb10c/memo/memod/logger"
+	"github.com/gomodule/redigo/redis"
 )
 
 type needsUpdate struct {
@@ -16,57 +19,64 @@ type needsUpdate struct {
 }
 
 func ReadHistroricalMempoolNeedUpdate() (nu needsUpdate, err error) {
-	sqlStatement := `SELECT
-	(select UNIX_TIMESTAMP(UTC_TIMESTAMP)-UNIX_TIMESTAMP(timestamp) from historicalMempool where timeframe = 1 ORDER BY timestamp DESC LIMIT 1) AS timediff2h,
-	(select UNIX_TIMESTAMP(UTC_TIMESTAMP)-UNIX_TIMESTAMP(timestamp) from historicalMempool where timeframe = 2 ORDER BY timestamp DESC LIMIT 1) AS timediff12h,
-	(select UNIX_TIMESTAMP(UTC_TIMESTAMP)-UNIX_TIMESTAMP(timestamp) from historicalMempool where timeframe = 3 ORDER BY timestamp DESC LIMIT 1) AS timediff48h,
-	(select UNIX_TIMESTAMP(UTC_TIMESTAMP)-UNIX_TIMESTAMP(timestamp) from historicalMempool where timeframe = 4 ORDER BY timestamp DESC LIMIT 1) AS timediff7d,
-	(select UNIX_TIMESTAMP(UTC_TIMESTAMP)-UNIX_TIMESTAMP(timestamp) from historicalMempool where timeframe = 5 ORDER BY timestamp DESC LIMIT 1) AS timediff30d,
-	(select UNIX_TIMESTAMP(UTC_TIMESTAMP)-UNIX_TIMESTAMP(timestamp) from historicalMempool where timeframe = 6 ORDER BY timestamp DESC LIMIT 1) AS timediff180d;`
+	defer logger.TrackTime(time.Now(), "ReadHistroricalMempoolNeedUpdate()")
+	c := Pool.Get()
+	defer c.Close()
 
-	row := Database.QueryRow(sqlStatement)
-	var timediff2h, timediff12h, timediff48h, timediff7d, timediff30d, timediff180d int
-
-	err = row.Scan(&timediff2h, &timediff12h, &timediff48h, &timediff7d, &timediff30d, &timediff180d)
+	lastUpdatedTimesStrings, err := redis.Strings(c.Do("MGET", "historicalMempool1:lastUpdated", "historicalMempool2:lastUpdated", "historicalMempool3:lastUpdated", "historicalMempool4:lastUpdated", "historicalMempool5:lastUpdated", "historicalMempool6:lastUpdated"))
 	if err != nil {
-		return nu, err
+		return
+	}
+
+	// convert responses from string to int64 unix timestamp and
+	// calculate the time difference between now and the last updated time
+	lastUpdatedTimeDiffs := make([]time.Duration, 0)
+	for _, lastUpdatedString := range lastUpdatedTimesStrings {
+		if n, err := strconv.Atoi(lastUpdatedString); err == nil {
+			lastUpdatedTime := time.Unix(int64(n), 0)
+			timeDiff := time.Duration(time.Now().Unix()-lastUpdatedTime.Unix()) * time.Second
+			lastUpdatedTimeDiffs = append(lastUpdatedTimeDiffs, timeDiff)
+		} else {
+			fmt.Println(lastUpdatedString, "is not an integer.")
+			lastUpdatedTimeDiffs = append(lastUpdatedTimeDiffs, time.Duration(1000)*time.Hour)
+		}
 	}
 
 	// Update 2h data every 4 minutes
-	if time.Duration(timediff2h)*time.Second >= 4*time.Minute {
+	if lastUpdatedTimeDiffs[0] >= 4*time.Minute {
 		nu.Update2h = true
 		logger.Trace.Println("2h Historical Mempool data needs to be updated")
 	}
 
 	// Update 12h data every 24 minutes
-	if time.Duration(timediff12h)*time.Second >= 24*time.Minute {
+	if lastUpdatedTimeDiffs[1] >= 24*time.Minute {
 		nu.Update12h = true
 		logger.Trace.Println("12h Historical Mempool data needs to be updated")
 	}
 
 	// Update 48h data every 96 minutes
-	if time.Duration(timediff48h)*time.Second >= 96*time.Minute {
+	if lastUpdatedTimeDiffs[2] >= 96*time.Minute {
 		nu.Update48h = true
 		logger.Trace.Println("48h Historical Mempool data needs to be updated")
 	}
 
 	// Update 7d data every 336 minutes
-	if time.Duration(timediff7d)*time.Second >= 336*time.Minute {
+	if lastUpdatedTimeDiffs[3] >= 336*time.Minute {
 		nu.Update7d = true
 		logger.Trace.Println("7d Historical Mempool data needs to be updated")
 	}
 
 	// Update 30d data every 1440 minutes
-	if time.Duration(timediff30d)*time.Second >= 1440*time.Minute {
+	if lastUpdatedTimeDiffs[4] >= 1440*time.Minute {
 		nu.Update30d = true
 		logger.Trace.Println("30d Historical Mempool data needs to be updated")
 	}
 
 	// Update 180d data every 8640 minutes
-	if time.Duration(timediff180d)*time.Second >= 8640*time.Minute {
+	if lastUpdatedTimeDiffs[5] >= 8640*time.Minute {
 		nu.Update180d = true
 		logger.Trace.Println("180d Historical Mempool data needs to be updated")
 	}
 
-	return nu, nil
+	return
 }

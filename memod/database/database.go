@@ -1,39 +1,52 @@
 package database
 
 import (
-	"database/sql"
-
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/gomodule/redigo/redis"
 
 	"github.com/0xb10c/memo/memod/config"
 	"github.com/0xb10c/memo/memod/logger"
 )
 
-var Database *sql.DB
+var (
+	Pool *redis.Pool
+)
 
-// Setup the database connection
-func Setup() (*sql.DB, error) {
+func newPool() *redis.Pool {
 
-	dbUser := config.GetString("database.user")
-	dbPasswd := config.GetString("database.passwd")
-	dbHost := config.GetString("database.host")
-	dbName := config.GetString("database.name")
-	dbConnection := config.GetString("database.connection")
-	connectionString := dbUser + ":" + dbPasswd + "@" + dbConnection + "(" + dbHost + ")" + "/" + dbName
+	dbUser := config.GetString("redis.user")
+	dbPasswd := config.GetString("redis.passwd")
+	dbHost := config.GetString("redis.host")
+	dbPort := config.GetString("redis.port")
+	dbConnection := config.GetString("redis.connection")
 
-	db, err := sql.Open("mysql", connectionString)
-	if err != nil {
-		return nil, err
+	connectionString := dbConnection + "://" + dbUser + ":" + dbPasswd + "@" + dbHost + ":" + dbPort
+
+	return &redis.Pool{
+		MaxIdle:   80,
+		MaxActive: 12000, // max number of connections
+		Dial: func() (redis.Conn, error) {
+			c, err := redis.DialURL(connectionString)
+			if err != nil {
+				return c, err
+			}
+			return c, err
+		},
 	}
 
-	// Ping the database once since Open() doesn't open a connection
-	err = db.Ping()
+}
+
+func SetupRedis() (err error) {
+	Pool = newPool()
+
+	c := Pool.Get() // get a new connection
+	defer c.Close()
+
+	_, err = c.Do("PING")
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	logger.Info.Println("Setup database connection")
+	logger.Info.Println("Setup redis database connection pool")
 
-	Database = db
-	return Database, nil
+	return nil
 }
