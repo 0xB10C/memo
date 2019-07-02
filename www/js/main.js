@@ -8,6 +8,8 @@ var updateInterval = 30000
 // otherwise use https://dev.mempool.observer (e.g. when on localhost)
 var apiHost = window.location.hostname == "mempool.observer" ? "https://mempool.observer" : "https://dev.mempool.observer"
 
+//var apiHost = "http://localhost:23485"
+
 // State
 var state = {
   currentMempool: {
@@ -519,7 +521,6 @@ const historicalMempoolCard = {
       return
     }
 
-
     chartSetting = {
       bindto: '#historical-mempool-chart',
       data: {
@@ -618,31 +619,31 @@ const transactionstatsCard = {
   processDataForChart: function (response) {
     state.transactionStats.data.timeLastUpdated = new Date();
 
+    // We process data for the two display modi: byCount and byPercentage
+
     let columnsCount = [
-      ['timestamps'].concat(response.timestamps.map(function (x) {
-        return new Date(x * 1000)
-      })),
-      ['Replace-By-Fee count'].concat(response.rbfCounts),
-      ['SegWit spending count'].concat(response.segwitCounts),
-      ['Unconfirmed Transaction count'].concat(response.txCounts)
+      ['timestamps'],
+      ['Replace-By-Fee count'],
+      ['SegWit spending count'],
+      ['Unconfirmed Transaction count']
     ]
-
-    rbfPercentages = []
-    segWitPercentages = []
-
-    for (let index in response.timestamps) {
-      rbfPercentages.push(((response.rbfCounts[index] / response.txCounts[index]) * 100).toFixed(2))
-      segWitPercentages.push(((response.segwitCounts[index] / response.txCounts[index]) * 100).toFixed(2))
-    }
-
 
     let columnsPercentage = [
-      ['timestamps'].concat(response.timestamps.map(function (x) {
-        return new Date(x * 1000)
-      })),
-      ['Replace-By-Fee percentage'].concat(rbfPercentages),
-      ['SegWit spending percentage'].concat(segWitPercentages),
+      ['timestamps'],
+      ['Replace-By-Fee percentage'],
+      ['SegWit spending percentage'],
     ]
+
+    response.forEach(function(element) {
+      columnsCount[0].push(new Date(element.timestamp * 1000))
+      columnsCount[1].push(element.rbfCount)
+      columnsCount[2].push(element.segwitCount)
+      columnsCount[3].push(element.txCount)
+
+      columnsPercentage[0].push(new Date(element.timestamp * 1000))
+      columnsPercentage[1].push(((element.rbfCount/ element.txCount)*100).toFixed(2))
+      columnsPercentage[2].push(((element.segwitCount / element.txCount)*100).toFixed(2))
+    });
 
     return {
       columnsCount: columnsCount,
@@ -759,6 +760,7 @@ const pastBlocksCard = {
     let regions = []
 
     for (blockIndex in response) {
+      
       let timestamp = response[blockIndex].timestamp * 1000
       let height = response[blockIndex].height
 
@@ -770,7 +772,6 @@ const pastBlocksCard = {
         value: new Date(timestamp),
         text: "Block " + height,
       })
-
     }
 
     lines.push({
@@ -924,7 +925,7 @@ function reloadData() {
     });
 
   // reload transaction stats data
-  axios.get(apiHost + '/api/transactionStats') // TODO: Change to production
+  axios.get(apiHost + '/api/transactionStats')
     .then(function (response) {
       state.transactionStats.data.processedStats = transactionstatsCard.processDataForChart(response.data)
       drawChart(state.transactionStats.elementId)
