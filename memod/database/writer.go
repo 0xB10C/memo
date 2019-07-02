@@ -1,7 +1,8 @@
 package database
 
 import (
-	"errors"
+	"encoding/json"
+	"strconv"
 	"time"
 
 	"github.com/0xb10c/memo/memod/logger"
@@ -10,80 +11,136 @@ import (
 // WriteCurrentMempoolData writes the current mempool data into the database
 func WriteCurrentMempoolData(feerateMapJSON string, mempoolSizeInByte int, megabyteMarkersJSON string) error {
 	defer logger.TrackTime(time.Now(), "writeCurrentMempoolData()")
+	c := Pool.Get()
+	defer c.Close()
 
-	if Database != nil {
-		sql := "UPDATE current_mempool SET byCount = ?, positionsInGreedyBlocks = ?, timestamp = UTC_TIMESTAMP, mempoolSize = ? WHERE id = 1"
-		_, err := Database.Exec(sql, feerateMapJSON, megabyteMarkersJSON, mempoolSizeInByte)
-		if err != nil {
-			return err
-		}
-		return nil
+	prefix := "currentMempool"
+
+	c.Send("MULTI")
+	c.Send("SET", prefix+":feerateMap", feerateMapJSON)
+	c.Send("SET", prefix+":mempoolSizeInByte", mempoolSizeInByte)
+	c.Send("SET", prefix+":megabyteMarkers", megabyteMarkersJSON)
+	c.Send("SET", prefix+":utcTimestamp", time.Now().Unix())
+	_, err := c.Do("EXEC")
+	if err != nil {
+		return err
 	}
 
-	return errors.New("Database pointer is nil")
+	return nil
 }
 
 // WriteNewBlockData writes data for a new block into the database
 func WriteNewBlockData(height int, numTx int, sizeWithWitness int, weight int) error {
 	defer logger.TrackTime(time.Now(), "writeNewBlockData()")
+	c := Pool.Get()
+	defer c.Close()
+	listName := "recentBlocks"
 
-	if Database != nil {
-		sql := "REPLACE INTO pastBlocks SET height = ?, txCount = ?, size= ?, weight = ?, timestamp = UTC_TIMESTAMP"
+	rb := recentBlock{height, sizeWithWitness, time.Now().Unix(), numTx, weight}
 
-		_, err := Database.Exec(sql, height, numTx, sizeWithWitness, weight)
-		if err != nil {
-			return err
-		}
-		return nil
+	rbJSON, err := json.Marshal(rb)
+	if err != nil {
+		return err
 	}
 
-	return errors.New("Database pointer is nil")
+	_, err = c.Do("LPUSH", listName, rbJSON)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // WriteHistoricalMempoolData writes the histoical mempool data into the database
-func WriteHistoricalMempoolData(countInBucketsJSON string, feeInBucketsJSON string, sizeInBucketsJSON string, timeframe int) error {
+func WriteHistoricalMempoolData(countInBuckets []int, feeInBuckets []float64, sizeInBuckets []int, timeframe int) error {
 	defer logger.TrackTime(time.Now(), "WriteHistoricalMempoolData()")
+	c := Pool.Get()
+	defer c.Close()
 
-	if Database != nil {
-		sql := "INSERT INTO historicalMempool(timeframe, timestamp, countInBuckets, feeInBuckets, sizeInBuckets) VALUES (?, UTC_TIMESTAMP, ?, ?, ?)"
-		_, err := Database.Exec(sql, timeframe, countInBucketsJSON, feeInBucketsJSON, sizeInBucketsJSON)
-		if err != nil {
-			return err
-		}
-		return nil
+	countInBucketsJSON, err := json.Marshal(historicalMempoolData{countInBuckets, time.Now().Unix()})
+	if err != nil {
+		return err
 	}
 
-	return errors.New("Database pointer is nil")
+	feeInBucketsJSON, err := json.Marshal(historicalMempoolData{feeInBuckets, time.Now().Unix()})
+	if err != nil {
+		return err
+	}
+
+	sizeInBucketsJSON, err := json.Marshal(historicalMempoolData{sizeInBuckets, time.Now().Unix()})
+	if err != nil {
+		return err
+	}
+
+	listName := "historicalMempool" + strconv.Itoa(timeframe)
+
+	_, err = c.Do("LPUSH", listName+":countInBuckets", countInBucketsJSON)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Do("LPUSH", listName+":feeInBuckets", feeInBucketsJSON)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Do("LPUSH", listName+":sizeInBuckets", sizeInBucketsJSON)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Do("SET", listName+":lastUpdated", time.Now().Unix())
+
+	return nil
 }
 
-// WriteCurrentMempoolData writes the current mempool data into the database
-func WriteTimeInMempoolData(timeAxisJSON string, feerateAxisJSON string) error {
+// WriteTimeInMempoolData writes the time-in-mempool data into the database
+func WriteTimeInMempoolData(timeAxis []int, feerateAxis []float64) error {
 	defer logger.TrackTime(time.Now(), "WriteTimeInMempoolData()")
+	c := Pool.Get()
+	defer c.Close()
+	prefix := "timeInMempool"
 
-	if Database != nil {
-		sql := "UPDATE timeInMempool SET timeAxis = ?, feerateAxis = ?, timestamp = UTC_TIMESTAMP WHERE id = 1"
-		_, err := Database.Exec(sql, timeAxisJSON, feerateAxisJSON)
-		if err != nil {
-			return err
-		}
-		return nil
+	timeAxisJSON, err := json.Marshal(timeAxis)
+	if err != nil {
+		return err
 	}
 
-	return errors.New("Database pointer is nil")
+	feerateAxisJSON, err := json.Marshal(feerateAxis)
+	if err != nil {
+		return err
+	}
 
+	c.Send("MULTI")
+	c.Send("SET", prefix+":timeAxis", timeAxisJSON)
+	c.Send("SET", prefix+":feerateAxis", feerateAxisJSON)
+	c.Send("SET", prefix+":utcTimestamp", time.Now().Unix())
+	_, err = c.Do("EXEC")
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
+// WriteCurrentTransactionStats writes the current transaction stats into the database
 func WriteCurrentTransactionStats(segwitCount int, rbfCount int, txCount int) error {
 	defer logger.TrackTime(time.Now(), "WriteCurrentTransactionStats()")
+	c := Pool.Get()
+	defer c.Close()
 
-	if Database != nil {
-		sql := "INSERT INTO transactionsStats(timestamp, segwitCount, rbfCount, txCount) VALUES (UTC_TIMESTAMP, ?, ?, ?)"
-		_, err := Database.Exec(sql, segwitCount, rbfCount, txCount)
-		if err != nil {
-			return err
-		}
-		return nil
+	ts := transactionStat{segwitCount, rbfCount, txCount, time.Now().Unix()}
+	tsJSON, err := json.Marshal(ts)
+	if err != nil {
+		return err
 	}
 
-	return errors.New("Database pointer is nil")
+	listName := "transactionStats"
+
+	_, err = c.Do("LPUSH", listName, tsJSON)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

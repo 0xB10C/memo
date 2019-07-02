@@ -2,12 +2,13 @@
 # This example config contains all avaliable configuration options.
 # Options are assigned their default or left blank with a FIXME: mark.
 
-[database]
+[redis]
 host = ""                 # FIXME:
+port = ""                 # FIXME:
 user = ""                 # FIXME:
 passwd = ""               # FIXME:
-name = ""                 # FIXME:
-connection = "tcp"
+connection = "redis"
+
 
 # Needed when fetching via REST interface
 [bitcoind.rest]

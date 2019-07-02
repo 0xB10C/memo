@@ -23,8 +23,8 @@ func init() {
 }
 
 func setDefaults() {
-	viper.SetDefault("database.host", "localhost")
-	viper.SetDefault("database.connection", "tcp")
+	viper.SetDefault("redis.host", "localhost")
+	viper.SetDefault("redis.connection", "redis")
 
 	viper.SetDefault("bitcoind.rest.protocol", "http")
 	viper.SetDefault("bitcoind.rest.host", "localhost")

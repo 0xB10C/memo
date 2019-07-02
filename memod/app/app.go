@@ -21,15 +21,13 @@ func Run() {
 	signal.Notify(exitSignals, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	go handleExitSig(exitSignals, shouldExit)
 
-	db, err := database.Setup()
+	err := database.SetupRedis()
 	if err != nil {
 		logger.Error.Printf("Failed to setup database connection: %s", err.Error())
 		shouldExit <- true
 	} else {
-		defer db.Close()
+		startWorkers()
 	}
-
-	startWorkers()
 
 	<-shouldExit // wait till memod should exit
 	logger.Info.Println("Memod exiting")
