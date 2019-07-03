@@ -1,5 +1,6 @@
 package types
 
+/*
 type Fees struct {
 	Base       float64 `json:"base"`
 	Modified   float64 `json:"modified"`
@@ -25,11 +26,12 @@ type Transaction struct {
 	Spentby           []interface{} `json:"spentby"`
 	Bip125Replaceable bool          `json:"bip125-replaceable"`
 }
+*/
 
 // PartialTransaction is a part-struct of `Transaction` which contains
 // only the for-now-used values to be more memory efficient
 type PartialTransaction struct {
-	Size              int     `json:"size"`
+	Size              int     `json:"vsize"`
 	Fee               float64 `json:"fee"`
 	Time              int     `json:"time"`
 	Wtxid             string  `json:"wtxid"`

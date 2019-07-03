@@ -18,7 +18,7 @@ const cMEGABYTE = 1000000
 // cSATOSHIPERBITCOIN: satoshi per bitcoin
 const cSATOSHIPERBITCOIN = 100000000
 
-// ProcessMempool retives the mempool and starts various processing functions on it
+// ProcessMempool retrives the mempool and starts various processing functions on it
 func ProcessMempool(mempool map[string]types.PartialTransaction) {
 	if config.GetBool("mempool.processing.processHistoricalMempool") {
 		go historicalMempool(mempool)
@@ -58,7 +58,7 @@ func historicalMempool(mempool map[string]types.PartialTransaction) {
 	const timeframe30d = 5
 	const timeframe180d = 6
 
-	needsUpdate, err := database.ReadHistroricalMempoolNeedUpdate()
+	needsUpdate, err := database.ReadHistoricalMempoolNeedUpdate()
 	if err != nil {
 		logger.Error.Printf("Failed to get Needs Update data from database: %s", err.Error())
 	}
@@ -227,7 +227,7 @@ func generateHistoricalMempoolStats(mempool map[string]types.PartialTransaction)
 
 // finds the bucket index for a given feerate in feerateBuckets. the last bucket is a catch all larger-equal.
 // given a feerate of 19 it gives the bucket index for 22. (since it's bigger than 18)
-// buckets should be read like "inbetween or equal feerate [index-1] [index]"
+// buckets should be read like "in between or equal feerate [index-1] [index]"
 func findBucketForFeerate(feerate float64) int {
 	i := sort.Search(len(feerateBuckets), func(i int) bool { return feerateBuckets[i] >= int(feerate) })
 	if i < len(feerateBuckets) && feerateBuckets[i] >= int(feerate) {
