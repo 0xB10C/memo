@@ -200,6 +200,9 @@ svg#brand-icon g.text>path {
   stroke: var(--text-color);
 }
 
+.grid-10-min>line {
+  stroke: #0000002f !important;
+}
 
 /* general chart css*/
 .red-line>line {
