@@ -8,7 +8,6 @@ import (
 
 	"github.com/0xb10c/memo/memod/config"
 	"github.com/0xb10c/memo/memod/database"
-	"github.com/0xb10c/memo/memod/encoder"
 	"github.com/0xb10c/memo/memod/logger"
 	"github.com/0xb10c/memo/memod/types"
 )
@@ -41,16 +40,10 @@ func ProcessMempool(mempool map[string]types.PartialTransaction) {
 
 func currentMempool(mempool map[string]types.PartialTransaction) {
 	feerateMap, mempoolSizeInByte, megabyteMarkers := generateCurrentMempoolStats(mempool)
-	feerateMapJSON, megabyteMarkersJSON, err := encoder.EncodeCurrentMempoolStatsToJSON(feerateMap, megabyteMarkers)
-	if err != nil {
-		logger.Error.Printf("Failed to encode generated data as JSON: %s", err.Error())
-		return
-	}
 
-	err = database.WriteCurrentMempoolData(feerateMapJSON, mempoolSizeInByte, megabyteMarkersJSON)
+	err := database.WriteCurrentMempoolData(feerateMap, mempoolSizeInByte, megabyteMarkers)
 	if err != nil {
 		logger.Error.Printf("Failed to write Current Mempool to database: %s", err.Error())
-		return
 	}
 
 	logger.Info.Println("Success writing Current Mempool to database.")

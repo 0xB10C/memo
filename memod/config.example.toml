@@ -9,7 +9,6 @@ user = ""                 # FIXME:
 passwd = ""               # FIXME:
 connection = "redis"
 
-
 # Needed when fetching via REST interface
 [bitcoind.rest]
 protocol = "http"
@@ -43,7 +42,7 @@ colorizeOutput = true
 enable = false            # enable the zmq interface
 host = "localhost"        # currently only tcp connections are supported 
 port = "28332"
-  [zmq.subscribeTo]       # default all to false
+  [zmq.subscribeTo]       
   rawTx     = false
   rawBlock  = true        # needed to write recentBlocks to database 
   hashTx    = false

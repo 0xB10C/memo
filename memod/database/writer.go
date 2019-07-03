@@ -9,10 +9,20 @@ import (
 )
 
 // WriteCurrentMempoolData writes the current mempool data into the database
-func WriteCurrentMempoolData(feerateMapJSON string, mempoolSizeInByte int, megabyteMarkersJSON string) error {
+func WriteCurrentMempoolData(feerateMap map[int]int, mempoolSizeInByte int, megabyteMarkers []int) error {
 	defer logger.TrackTime(time.Now(), "writeCurrentMempoolData()")
 	c := Pool.Get()
 	defer c.Close()
+
+	feerateMapJSON, err := json.Marshal(feerateMap)
+	if err != nil {
+		return err
+	}
+
+	megabyteMarkersJSON, err := json.Marshal(megabyteMarkers)
+	if err != nil {
+		return err
+	}
 
 	prefix := "currentMempool"
 
@@ -21,7 +31,7 @@ func WriteCurrentMempoolData(feerateMapJSON string, mempoolSizeInByte int, megab
 	c.Send("SET", prefix+":mempoolSizeInByte", mempoolSizeInByte)
 	c.Send("SET", prefix+":megabyteMarkers", megabyteMarkersJSON)
 	c.Send("SET", prefix+":utcTimestamp", time.Now().Unix())
-	_, err := c.Do("EXEC")
+	_, err = c.Do("EXEC")
 	if err != nil {
 		return err
 	}
