@@ -55,7 +55,7 @@ var state = {
   },
 }
 
-var cards = [state.currentMempool, state.historicalMempool, state.transactionStats, state.pastBlocks]
+var cards = [state.currentMempool, state.historicalMempool,  state.pastBlocks, state.transactionStats]
 
 window.onload = function () {
 
@@ -603,7 +603,6 @@ const historicalMempoolCard = {
   }
 }
 
-
 const transactionstatsCard = {
   switchType: function (switchTo) {
     if (state.transactionStats.data.type != switchTo && (switchTo == "count" || switchTo == "percentage")) {
@@ -772,6 +771,20 @@ const pastBlocksCard = {
         value: new Date(timestamp),
         text: "Block " + height,
       })
+    }
+
+
+    // add 10 minute grid lines
+
+    var truncatedMin = parseInt(new Date().getMinutes()/10) * 10 // set the last digit from the minute value to zero
+    var gridTime = (new Date(new Date().setMinutes(truncatedMin))).setSeconds(0)
+
+    while (gridTime > response[9].timestamp * 1000) {
+      lines.push({
+        value: gridTime,
+        class: "grid-10-min"
+      })
+      gridTime -= 10*60*1000;
     }
 
     lines.push({
