@@ -18,7 +18,7 @@ type needsUpdate struct {
 	Update180d bool
 }
 
-func ReadHistroricalMempoolNeedUpdate() (nu needsUpdate, err error) {
+func ReadHistoricalMempoolNeedUpdate() (nu needsUpdate, err error) {
 	defer logger.TrackTime(time.Now(), "ReadHistroricalMempoolNeedUpdate()")
 	c := Pool.Get()
 	defer c.Close()
