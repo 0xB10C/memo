@@ -9,6 +9,5 @@ require (
 	github.com/gin-gonic/gin v1.4.0
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/gomodule/redigo v2.0.0+incompatible
-	github.com/google/logger v1.0.1
 	github.com/spf13/viper v1.3.2
 )

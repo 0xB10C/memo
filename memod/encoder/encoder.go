@@ -22,20 +22,3 @@ func DecodeFetchedMempoolBody(body []byte) (map[string]types.PartialTransaction,
 
 	return mempool, nil
 }
-
-// EncodeCurrentMempoolStatsToJSON encodes the current mempool stats to JSON
-func EncodeCurrentMempoolStatsToJSON(feerateMap map[int]int, megabyteMarkers []int) (string, string, error) {
-	defer logger.TrackTime(time.Now(), "EncodeCurrentMempoolStatsToJSON()")
-
-	feerateMapJSON, err := json.Marshal(feerateMap)
-	if err != nil {
-		return "", "", err
-	}
-
-	megabyteMarkersJSON, err := json.Marshal(megabyteMarkers)
-	if err != nil {
-		return "", "", err
-	}
-
-	return string(feerateMapJSON), string(megabyteMarkersJSON), nil
-}
