@@ -22,7 +22,7 @@ memo/
 └── www/          # Statically served HTML, JS and CSS files
 ```
 
-The wiki cointains two architecture overview's: One of the [whole project](https://github.com/0xB10C/memo/wiki/Infrastructure-memo-v2). And one specifically for [memod](https://github.com/0xB10C/memo/wiki/memod-architecture).
+There exists a overview of my [infrastructure setup](https://github.com/0xB10C/memo/wiki/Infrastructure-memo-v2) for mempool.observer.
 
 
 ## Project History
@@ -46,8 +46,4 @@ I'm open for ideas and feedback.
 
 ## Licencse
 This project and all it's files are licensed under a GNU Affero General Public License.
-
----
-
->"What's going to happen to Bitcoin?" is the wrong question. The right question is "What are you going to contribute?" &mdash; <cite>[Greg Maxwell](https://github.com/gmaxwell)</cite>
 
