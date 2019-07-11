@@ -2,10 +2,17 @@ package database
 
 import (
 	"encoding/json"
+	"fmt"
+	"math/rand"
 	"strconv"
 	"time"
 
+	"github.com/0xb10c/memo/memod/config"
+
+	"github.com/gomodule/redigo/redis"
+
 	"github.com/0xb10c/memo/memod/logger"
+	"github.com/0xb10c/memo/memod/types"
 )
 
 // WriteCurrentMempoolData writes the current mempool data into the database
@@ -46,7 +53,7 @@ func WriteNewBlockData(height int, numTx int, sizeWithWitness int, weight int) e
 	defer c.Close()
 	listName := "recentBlocks"
 
-	rb := recentBlock{height, sizeWithWitness, time.Now().Unix(), numTx, weight}
+	rb := types.RecentBlock{Height: height, Size: sizeWithWitness, Timestamp: time.Now().Unix(), TxCount: numTx, Weight: weight}
 
 	rbJSON, err := json.Marshal(rb)
 	if err != nil {
@@ -67,17 +74,17 @@ func WriteHistoricalMempoolData(countInBuckets []int, feeInBuckets []float64, si
 	c := Pool.Get()
 	defer c.Close()
 
-	countInBucketsJSON, err := json.Marshal(historicalMempoolData{countInBuckets, time.Now().Unix()})
+	countInBucketsJSON, err := json.Marshal(types.HistoricalMempoolData{DataInBuckets: countInBuckets, Timestamp: time.Now().Unix()})
 	if err != nil {
 		return err
 	}
 
-	feeInBucketsJSON, err := json.Marshal(historicalMempoolData{feeInBuckets, time.Now().Unix()})
+	feeInBucketsJSON, err := json.Marshal(types.HistoricalMempoolData{DataInBuckets: feeInBuckets, Timestamp: time.Now().Unix()})
 	if err != nil {
 		return err
 	}
 
-	sizeInBucketsJSON, err := json.Marshal(historicalMempoolData{sizeInBuckets, time.Now().Unix()})
+	sizeInBucketsJSON, err := json.Marshal(types.HistoricalMempoolData{DataInBuckets: sizeInBuckets, Timestamp: time.Now().Unix()})
 	if err != nil {
 		return err
 	}
@@ -104,42 +111,13 @@ func WriteHistoricalMempoolData(countInBuckets []int, feeInBuckets []float64, si
 	return nil
 }
 
-// WriteTimeInMempoolData writes the time-in-mempool data into the database
-func WriteTimeInMempoolData(timeAxis []int, feerateAxis []float64) error {
-	defer logger.TrackTime(time.Now(), "WriteTimeInMempoolData()")
-	c := Pool.Get()
-	defer c.Close()
-	prefix := "timeInMempool"
-
-	timeAxisJSON, err := json.Marshal(timeAxis)
-	if err != nil {
-		return err
-	}
-
-	feerateAxisJSON, err := json.Marshal(feerateAxis)
-	if err != nil {
-		return err
-	}
-
-	c.Send("MULTI")
-	c.Send("SET", prefix+":timeAxis", timeAxisJSON)
-	c.Send("SET", prefix+":feerateAxis", feerateAxisJSON)
-	c.Send("SET", prefix+":utcTimestamp", time.Now().Unix())
-	_, err = c.Do("EXEC")
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // WriteCurrentTransactionStats writes the current transaction stats into the database
 func WriteCurrentTransactionStats(segwitCount int, rbfCount int, txCount int) error {
 	defer logger.TrackTime(time.Now(), "WriteCurrentTransactionStats()")
 	c := Pool.Get()
 	defer c.Close()
 
-	ts := transactionStat{segwitCount, rbfCount, txCount, time.Now().Unix()}
+	ts := types.TransactionStat{SegwitCount: segwitCount, RbfCount: rbfCount, TxCount: txCount, Timestamp: time.Now().Unix()}
 	tsJSON, err := json.Marshal(ts)
 	if err != nil {
 		return err
@@ -148,6 +126,96 @@ func WriteCurrentTransactionStats(segwitCount int, rbfCount int, txCount int) er
 	listName := "transactionStats"
 
 	_, err = c.Do("LPUSH", listName, tsJSON)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// WriteMempoolEntries writes a txid and it's feerate to the database
+func WriteMempoolEntries(me types.MempoolEntry) error {
+	//defer logger.TrackTime(time.Now(), "WriteMempoolEntries()")
+	c := Pool.Get()
+	defer c.Close()
+
+	meJSON, err := json.Marshal(me)
+	if err != nil {
+		return fmt.Errorf("could not marshal the mempoolEntry to JSON: %s", err.Error())
+	}
+
+	listName := "mempoolEntries"
+
+	// insert the mempool entry into a redis sorted list
+	// the list is sorted by timestamps in ascending order.
+	_, err = c.Do("ZADD", listName, me.EntryTime, meJSON)
+	if err != nil {
+		return fmt.Errorf("could not ZADD the mempoolEntry JSON to %s: %s", listName, err.Error())
+	}
+
+	if config.GetBool("zmq.saveMempoolEntries.enable") {
+		err = writeMempoolEntriesSQLite(me)
+		if err != nil {
+			return fmt.Errorf("could not write the mempoolEntry to SQLite %s", err.Error())
+		}
+	}
+
+	// only keep the last ~500k transactions
+	// check every 0.1% of all insertions
+	if rand.Intn(1000) == 42 {
+		count, err := redis.Int64(c.Do("ZCOUNT", listName, "-inf", "+inf"))
+		if err != nil {
+			return fmt.Errorf("could not do ZCOUNT on %s: %s", listName, err.Error())
+		}
+		if count > 500000 {
+			removeIndex := count - 500000
+			_, err := c.Do("ZREMRANGEBYRANK", listName, "0", removeIndex)
+			if err != nil {
+				return fmt.Errorf("could not do ZREMRANGEBYRANK on %s: %s", listName, err.Error())
+			}
+		}
+	}
+
+	return nil
+}
+
+func writeMempoolEntriesSQLite(me types.MempoolEntry) error {
+	spendsJSON, err := json.Marshal(me.Spends)
+	if err != nil {
+		return fmt.Errorf("could not marshal mempoolEntry.Spends to JSON: %s", err.Error())
+	}
+
+	paystoJSON, err := json.Marshal(me.PaysTo)
+	if err != nil {
+		return fmt.Errorf("could not marshal mempoolEntry.PaysTo to JSON: %s", err.Error())
+	}
+
+	multisigJSON, err := json.Marshal(me.Multisig)
+	if err != nil {
+		return fmt.Errorf("could not marshal mempoolEntry.Multisig to JSON: %s", err.Error())
+	}
+
+	_, err = SQLiteDB.Exec("INSERT INTO mempoolEntries(entryTime, txid, fee, size, inputs, outputs, locktime, outSum, spendsSegWit, spendsMultisig, bip69compliant, signalsRBF, spends, paysto, multisigs, opreturndata) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		me.EntryTime, me.TxID, me.Fee, me.Size, me.InputCount, me.OutputCount, me.Locktime, me.OutputSum, me.SpendsSegWit, me.SpendsMultisig, me.IsBIP69, me.SignalsRBF, spendsJSON, paystoJSON, multisigJSON, me.OPReturnData)
+	if err != nil {
+		return fmt.Errorf("error while writing to SQLite: %s", err.Error())
+	}
+	return nil
+}
+
+// WriteFeerateAPIEntry writes a new feerate API entry into the database
+func WriteFeerateAPIEntry(entry types.FeeRateAPIEntry) error {
+	defer logger.TrackTime(time.Now(), "WriteFeerateAPIEntry()")
+	c := Pool.Get()
+	defer c.Close()
+	listName := "feerateAPIEntries"
+
+	entryJSON, err := json.Marshal(entry)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Do("LPUSH", listName, entryJSON)
 	if err != nil {
 		return err
 	}

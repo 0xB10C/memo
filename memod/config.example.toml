@@ -29,10 +29,15 @@ responseTimeout = 30 # seconds
 enable = false            # enable mempool fetching
 fetchInterface = "REST"   # fetch mempool via REST or JSON-RPC
 fetchInterval = 60        # seconds
+callSaveMempool = true    # calls the savemempool RPC on average after every fourth fetch  
   [mempool.processing]
   processCurrentMempool = true
   processHistoricalMempool = true
   processTransactionStats = true
+
+[feeratefetcher]
+enable = false
+fetchInterval = 180
 
 [log]
 enableTrace = false

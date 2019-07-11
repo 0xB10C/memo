@@ -1,6 +1,6 @@
 package processor
 
-/* processes */
+/* processes the mempool and generates statistics */
 
 import (
 	"sort"
@@ -26,10 +26,6 @@ func ProcessMempool(mempool map[string]types.PartialTransaction) {
 
 	if config.GetBool("mempool.processing.processCurrentMempool") {
 		go currentMempool(mempool) // start _current mempool_ stat generation in a goroutine
-	}
-
-	if config.GetBool("mempool.processing.processTimeInMempool") {
-		go timeInMempool(mempool)
 	}
 
 	if config.GetBool("mempool.processing.processTransactionStats") {
@@ -123,18 +119,6 @@ func historicalMempool(mempool map[string]types.PartialTransaction) {
 
 		logger.Info.Println("Success writing Historical Mempool to database.")
 	}
-}
-
-func timeInMempool(mempool map[string]types.PartialTransaction) {
-	timeAxis, feerateAxis := generateTimeInMempoolStats(mempool)
-
-	err := database.WriteTimeInMempoolData(timeAxis, feerateAxis)
-	if err != nil {
-		logger.Error.Printf("Failed to write Time in Mempool to database: %s", err.Error())
-		return
-	}
-
-	logger.Info.Println("Success writing Time in Mempool to database.")
 }
 
 func transactionStatsMempool(mempool map[string]types.PartialTransaction) {
@@ -236,26 +220,6 @@ func findBucketForFeerate(feerate float64) int {
 	return len(feerateBuckets) - 1
 }
 
-func generateTimeInMempoolStats(mempool map[string]types.PartialTransaction) ([]int, []float64) {
-	/* We two slices:
-	- one with the timestamp the transaction entered the mempool
-	- one with the feerate it paid
-	*/
-
-	timeAxis := make([]int, 0)
-	feerateAxis := make([]float64, 0)
-
-	for _, tx := range mempool {
-		feerate := tx.Fee * cSATOSHIPERBITCOIN / float64(tx.Size)
-		feerateTruncated := float64(int(feerate*1000)) / 1000 // same as toFixed(3)
-
-		feerateAxis = append(feerateAxis, feerateTruncated)
-		timeAxis = append(timeAxis, tx.Time)
-	}
-
-	return timeAxis, feerateAxis
-}
-
 func generateTransactionStats(mempool map[string]types.PartialTransaction) (segwitCount int, rbfCount int, txCount int) {
 
 	for txid, tx := range mempool {
@@ -268,8 +232,6 @@ func generateTransactionStats(mempool map[string]types.PartialTransaction) (segw
 	}
 
 	txCount = len(mempool)
-	//segwitPercentage = float64(int(float64(segwitCount)/float64(txCount)*1000)) / 1000
-	//rbfPercentage = float64(int(float64(rbfCount)/float64(txCount)*1000)) / 1000
 
 	return
 }

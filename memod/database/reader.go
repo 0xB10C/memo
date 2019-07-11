@@ -9,7 +9,7 @@ import (
 	"github.com/gomodule/redigo/redis"
 )
 
-type needsUpdate struct {
+type NeedsUpdate struct {
 	Update2h   bool
 	Update12h  bool
 	Update48h  bool
@@ -18,7 +18,7 @@ type needsUpdate struct {
 	Update180d bool
 }
 
-func ReadHistoricalMempoolNeedUpdate() (nu needsUpdate, err error) {
+func ReadHistoricalMempoolNeedUpdate() (nu NeedsUpdate, err error) {
 	defer logger.TrackTime(time.Now(), "ReadHistroricalMempoolNeedUpdate()")
 	c := Pool.Get()
 	defer c.Close()
