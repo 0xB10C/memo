@@ -6,9 +6,11 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/0xb10c/memo/api/cache"
 	"github.com/0xb10c/memo/api/config"
 	"github.com/0xb10c/memo/api/database"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,20 +27,25 @@ func main() {
 	} else {
 		corsConfig.AllowOrigins = []string{"*"}
 	}
+
 	router.Use(cors.New(corsConfig))
+	router.Use(gzip.Gzip(gzip.DefaultCompression))
 
 	err := database.SetupDatabase()
 	if err != nil {
 		panic(fmt.Errorf("Failed to setup database: %v", err))
 	}
 
+	go cache.SetupCache()
+
 	api := router.Group("/api")
 	{
 		api.GET("/mempool", getMempool)
 		api.GET("/recentBlocks", getRecentBlocks)
 		api.GET("/historicalMempool/:timeframe/:by", getHistoricalMempool)
-		api.GET("/timeInMempool", getTimeInMempool)
 		api.GET("/transactionStats", getTransactionStats)
+		api.GET("/getMempoolEntries", getCachedMempoolEntries)
+		api.GET("/getRecentFeerateAPIData", getRecentFeerateAPIEntries)
 	}
 
 	portString := ":" + config.GetString("api.port")
@@ -117,24 +124,6 @@ func getHistoricalMempool(c *gin.Context) {
 	c.JSON(http.StatusOK, mempoolStates)
 }
 
-func getTimeInMempool(c *gin.Context) {
-
-	timestamp, timeAxis, feerateAxis, err := database.GetTimeInMempool()
-	if err != nil {
-		fmt.Println(err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Database error",
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"timestamp":   timestamp,
-		"feerateAxis": feerateAxis,
-		"timeAxis":    timeAxis,
-	})
-}
-
 func getTransactionStats(c *gin.Context) {
 	tss, err := database.GetTransactionStats()
 	if err != nil {
@@ -146,4 +135,44 @@ func getTransactionStats(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, tss)
+}
+
+func getMempoolEntries(c *gin.Context) {
+	mes, err := database.GetMempoolEntries()
+	if err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Database error",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, mes)
+}
+
+func getRecentFeerateAPIEntries(c *gin.Context) {
+
+	entries, err := database.GetRecentFeerateAPIEntries()
+	if err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Database error",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, entries)
+}
+
+func getCachedMempoolEntries(c *gin.Context) {
+	entries, err := database.GetMempoolEntriesCache()
+	if err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Database error",
+		})
+		return
+	}
+	c.Header("Content-Type", "application/json; charset=utf-8")
+	c.String(http.StatusOK, entries)
 }
