@@ -1,0 +1,76 @@
+.tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: white;
+  width: 300px;
+}
+
+.feerate-line {
+  fill: none;
+  stroke-width: 4px;
+  stroke-linecap: round;
+  stroke: #2279b3;
+  filter: drop-shadow(0px 0px 4px #3498db);
+}
+
+#chart {
+  width: 100%;
+  min-height: 960px;
+  height: 80vh;
+  position: relative;
+}
+
+.btn-group-vertical {
+  width: 100%;
+}
+
+#chart>div {
+  position: absolute;
+}
+
+svg {
+  pointer-events: none;
+}
+
+circle {
+  stroke-width: 4px;
+  opacity: 0.5;
+  fill: none;
+}
+
+.hidden {
+  display: none;
+}
+
+main {
+  margin-top: 80px;
+}
+
+p {
+  font-size: 1.15rem;
+  font-weight: 300;
+  text-align: justify;
+}
+
+#alert-mobile {
+  display: none;
+} 
+
+.loading-spinner {
+  width: 8rem;
+  height: 8rem;
+  margin-top: -4rem;
+  margin-left: -4rem;
+  border: 4px solid #d00000;
+  border-top: 8px solid #b10c00;
+  border-radius: 50%;
+  left: 50%;
+  top: 50%;
+  animation: rotate 1s linear 0s 15;
+  transition-property: transform;
+}
+
+@keyframes rotate {
+  from {transform:rotate(0deg);}
+  to {transform:rotate(360deg);}
+}

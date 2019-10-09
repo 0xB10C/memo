@@ -6,9 +6,9 @@ var updateInterval = 30000
 
 // use the https://mempool.observer endpoint only when on https://mempool.observer/ 
 // otherwise use https://dev.mempool.observer (e.g. when on localhost)
-var apiHost = window.location.hostname == "mempool.observer" ? "https://mempool.observer" : "https://dev.mempool.observer"
-
-//var apiHost = "http://localhost:23485"
+// var apiHost = window.location.hostname == "mempool.observer" ? "https://mempool.observer" : "https://dev.mempool.observer"
+// var apiHost = "http://localhost:23485"
+const apiHost = "https://" + window.location.hostname
 
 // State
 var state = {
@@ -58,9 +58,6 @@ var state = {
 var cards = [state.currentMempool, state.historicalMempool,  state.pastBlocks, state.transactionStats]
 
 window.onload = function () {
-
-  console.log()
-
 
   // Add event listeners to the search bar
   document.getElementById('button-lookup-txid').addEventListener('click', currentMempoolCard.handleTxSearch)

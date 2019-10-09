@@ -79,7 +79,7 @@
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
           aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-          <i class="fas fa-bars"></i>
+          <span>&#9776;</span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -91,10 +91,16 @@
               <a class="nav-link" href="#historical-mempool">Historical</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#transaction-stats">SegWit and RBF</a>
+              <a class="nav-link" href="#past-blocks">Blocks</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#past-blocks">Blocks</a>
+              <a class="nav-link" href="#transaction-stats">SegWit and RBF</a>
+            </li>
+            <li class="nav-item" >
+              <span class="nav" style="border-left: 1px solid #0000002f; height: 85%;margin: 0.3rem;"></span>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/monitor">Transaction Monitor <span class="badge badge-danger" style="margin-bottom: 2px;">New</span></a>
             </li>
           </ul>
           <button class="btn my-2 my-sm-0 btn-light btn-outline-white"
@@ -401,34 +407,39 @@
 
   <footer class="footer">
     <div class="container">
+      <hr>
       <div class="row text-center">
-        <div class="col-sm">
-          <span class="text-muted">Copyright 2019</span>
+        <div class="col-sm mb-3">
+          <a style="color: #b10c00" href="https://github.com/0xB10C/memo">github/0xb10c/memo</a><br>
+          <span class="text-muted">Copyright 2019</span><br>
         </div>
-
-        <div class="col-sm">
-          <span class="text-muted">developed by
-            <a href="https://twitter.com/0xb10c">0xb10c</a> <sup><a href="https://b10c.me/about">(hire me)</a></sup>
-            and
-            <a href="https://twitter.com/timothyylim">timothyylim</a>
+        <div class="col-sm mb-3">
+          <span>
+            <span class="text-muted">development is supported by</span><br>
+            <a href="mailto:0xb10c+sponsor@gmail.com?subject=Development sponsorship for mempool.observer">
+              <img class="img-fluid" alt="sponsor logo" src="/img/sponsor-placeholder.png"></img>
+            </a>
           </span>
-        </div>
-        <div class="col-sm">
-          <span class="text-muted">source on </span>
-          <a href="https://github.com/0xB10C/memo">github/0xb10c/memo</a>
+          </div>
+        <div class="col-sm mb-3">
+          <div style="width:33%; float:left; padding: 4px;">
+            <a href="https://twitter.com/0xb10c"><img width=48 height=48 src="/img/0xb10c.png" alt="0xB10C logo" align="right"></a>
+          </div>
+          <div style="width:66%; float:right; padding: 4px; line-height: 1.2rem;" class="text-left">
+            <span>
+              <a style="color: #b10c00" href="https://twitter.com/0xb10c">@0xB10C</a> - <a style="color: #b10c00" href="https://b10c.me/">b10c.me</a> - <a style="color: #b10c00" href="https://b10c.me/projects">donate</a><br>
+            </span>
+            <span class="text-muted">freelance bitcoin developer</span><br>
+            <br>
+          </div>
         </div>
       </div>
     </div>
   </footer>
-
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
-  </script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
-  </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.min.js"
-    integrity="sha256-k9RyZhvMj2bg0fd8L3IE41t0HpTXnivMoePN/Ksq250=" crossorigin="anonymous"></script>
+  
+  <script src="/js/3rd-party/jquery-3.3.1.slim.min.js"></script>
+  <script src="/js/3rd-party/bootstrap.min.js"></script>
+  <script src="/js/3rd-party/d3.v5.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"
     integrity="sha256-mpnrJ5DpEZZkwkE1ZgkEQQJW/46CSEh/STrZKOB/qoM=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.14/c3.min.js"

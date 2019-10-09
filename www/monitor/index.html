@@ -1,0 +1,273 @@
+<!DOCTYPE html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="theme-color" content="#ffffff"/>
+  <link rel="icon" sizes="256x256" href="/img/og_preview.png">
+  <meta name="description" content="The Bitcoin Transaction Monitor provides deeper insights about the usage of the Bitcoin network by showing transactions by time and feerate.">
+  <meta name="author" content="0xB10C">
+  <meta property="og:title" content="Bitcoin Transaction Monitor - mempool.observer" />
+  <meta property="og:description" content="The Bitcoin Transaction Monitor provides deeper insights about the usage of the Bitcoin network by showing transactions by time and feerate." />
+  <meta property="og:image" content="/img/twitter-card.png" />
+  <meta property="og:url" content="https://mempool.observer/monitor" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://mempool.observer/img/twitter-card.png" />
+  <meta name="twitter:site" content="@mempoolobserver" />
+  <meta name="twitter:creator" content="@0xb10c" />
+  <title>Bitcoin Transaction Monitor - mempool.observer</title>
+
+  <link href="/css/3rd-party/bootstrap.min.css" rel="stylesheet">
+  <link href="/css/main.css" rel="stylesheet">
+  <link href="/css/monitor.css" rel="stylesheet">
+  <link href="/css/tri-state-switch.css" rel="stylesheet">
+</head>
+
+<body>
+  <header>
+    <nav class="navbar navbar-expand-md navbar-bg fixed-top shadow-sm">
+      <div class="container">
+        <a class="navbar-brand" href="/">
+          <!--- img/brand-icon.svg (add id="brand-icon" )-->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 143.05 37.854" id="brand-icon">
+            <g class="text" aria-label="mem" style="line-height:.01%" fill="#1a1a1a" font-family="Laksaman"
+              font-size="25.4" font-weight="400" letter-spacing="0" word-spacing="0">
+              <path
+                d="M14.656 5.991q2.26 0 3.429 1.702 1.168 1.702 1.168 4.343v7.214H17.73v-7.188q0-2.134-.863-3.455-.839-1.346-2.617-1.346-1.447 0-2.59 1.143-1.143 1.143-1.143 2.591v8.255H8.992v-7.874q0-4.115-3.277-4.115-1.499 0-2.718 1.296-1.219 1.295-1.219 2.819v7.874H.254V9.471q0-1.143-.254-3.2h1.397q.254.787.305 2.311 1.473-2.59 4.369-2.59 2.641 0 3.937 2.895 1.524-2.896 4.648-2.896zM23.807 12.875q.077 2.463 1.474 3.962 1.422 1.499 3.784 1.499 2.21 0 4.547-.915l.127 1.245q-2.26.94-4.826.94-2.921 0-4.775-1.804-1.855-1.829-1.855-4.699 0-3.073 1.778-5.08 1.804-2.032 4.7-2.032 5.46 0 5.587 6.884zm9.017-1.27q-.05-1.982-1.219-3.15-1.143-1.194-3.022-1.194-1.88 0-3.15 1.245-1.27 1.219-1.55 3.099zM51.912 5.991q2.261 0 3.43 1.702 1.168 1.702 1.168 4.343v7.214h-1.524v-7.188q0-2.134-.864-3.455-.838-1.346-2.616-1.346-1.448 0-2.59 1.143-1.144 1.143-1.144 2.591v8.255h-1.524v-7.874q0-4.115-3.276-4.115-1.499 0-2.718 1.296-1.22 1.295-1.22 2.819v7.874h-1.523V9.471q0-1.143-.254-3.2h1.397q.254.787.304 2.311 1.474-2.59 4.37-2.59 2.64 0 3.936 2.895 1.524-2.896 4.648-2.896z"
+                style="line-height:1.25;-inkscape-font-specification:Laksaman" />
+            </g>
+            <g class="text" style="line-height:.01%">
+              <path
+                d="M56.985 30.177q0 2.896-1.854 4.852-1.829 1.955-4.699 1.955-2.896 0-4.724-1.93-1.83-1.956-1.83-4.877 0-2.895 1.855-4.851 1.854-1.956 4.699-1.956 2.87 0 4.699 1.956 1.854 1.956 1.854 4.851zm-6.553 5.537q2.21 0 3.607-1.6 1.422-1.6 1.422-3.937 0-2.337-1.397-3.937-1.397-1.6-3.632-1.6-2.21 0-3.632 1.6-1.397 1.6-1.397 3.937 0 2.337 1.397 3.937 1.422 1.6 3.632 1.6z"
+                style="line-height:1.25;-inkscape-font-specification:Laksaman" fill="#1a1a1a" aria-label="o"
+                font-family="Laksaman" font-size="25.4" font-weight="400" letter-spacing="0" word-spacing="0" />
+            </g>
+            <g fill="#c83737" stroke-width="1.832">
+              <path fill-rule="evenodd"
+                d="M58.854 37.627c.407-13.135.434-19.647 0-32.156-.017-.51 1.457 0 1.457 0v32.156s-1.473.51-1.457 0z" />
+              <g aria-label="oo" style="line-height:.01%" font-family="sans-serif" font-weight="400" letter-spacing="0"
+                word-spacing="0">
+                <path
+                  d="M67.158 22.76q3.115 0 5.218 2.097 2.104 2.068 2.104 5.314 0 3.274-2.076 5.342-2.104 2.068-5.246 2.068-3.114 0-5.218-2.097t-2.104-5.313q0-3.246 2.104-5.314 2.104-2.097 5.218-2.097zm5.956 7.41q0-2.498-1.721-4.078-1.721-1.608-4.235-1.608-2.513 0-4.234 1.58-1.722 1.58-1.722 4.107 0 2.498 1.722 4.107 1.72 1.58 4.234 1.58 2.514 0 4.235-1.58 1.72-1.609 1.72-4.107zM67.158 5.595q3.115 0 5.218 2.096 2.104 2.068 2.104 5.314 0 3.274-2.076 5.342-2.104 2.068-5.246 2.068-3.114 0-5.218-2.097-2.104-2.096-2.104-5.313 0-3.246 2.104-5.314 2.104-2.096 5.218-2.096zm5.956 7.41q0-2.499-1.721-4.079-1.721-1.608-4.235-1.608-2.513 0-4.234 1.58-1.722 1.58-1.722 4.107 0 2.499 1.722 4.107 1.72 1.58 4.234 1.58 2.514 0 4.235-1.58 1.72-1.608 1.72-4.107z" />
+              </g>
+              <path
+                d="M64.251 17.276c.818.446 1.976.798 2.937.8 2.875 0 5.33-2.533 5.33-5.077-.024-1.094-.132-1.441-.669-2.147.146 1.93-1.301 4.327-3.323 5.52-1.287.756-2.769.669-4.275.904zM64.251 34.453c.818.446 1.976.797 2.937.8 2.875 0 5.33-2.533 5.33-5.077-.024-1.095-.132-1.442-.669-2.147.146 1.929-1.301 4.327-3.323 5.519-1.287.756-2.769.67-4.275.905z" />
+              <path fill-rule="evenodd"
+                d="M62.096 24.735c-.333-2.914-.345-3.415 0-6.155.058-.456 1.363-.458 1.315 0-.33 3.1-.337 3.074 0 6.14.05.458-1.003.339-1.315.015z" />
+            </g>
+            <g class="text" aria-label="ool" style="line-height:.01%" fill="#1a1a1a" font-family="Laksaman"
+              font-size="25.4" font-weight="400" letter-spacing="0" word-spacing="0">
+              <path
+                d="M89.22 12.852q0 2.896-1.854 4.852-1.829 1.956-4.7 1.956-2.895 0-4.723-1.93-1.83-1.957-1.83-4.878 0-2.895 1.855-4.851 1.854-1.956 4.699-1.956 2.87 0 4.699 1.956 1.854 1.956 1.854 4.851zm-6.553 5.538q2.21 0 3.607-1.6 1.422-1.6 1.422-3.938 0-2.336-1.397-3.937-1.397-1.6-3.632-1.6-2.21 0-3.632 1.6-1.397 1.6-1.397 3.937 0 2.337 1.397 3.937 1.422 1.6 3.632 1.6zM104.4 12.852q0 2.896-1.854 4.852-1.828 1.956-4.699 1.956-2.895 0-4.724-1.93-1.829-1.957-1.829-4.878 0-2.895 1.854-4.851 1.855-1.956 4.7-1.956 2.87 0 4.698 1.956 1.855 1.956 1.855 4.851zm-6.553 5.538q2.21 0 3.607-1.6 1.423-1.6 1.423-3.938 0-2.336-1.397-3.937-1.397-1.6-3.633-1.6-2.21 0-3.632 1.6-1.397 1.6-1.397 3.937 0 2.337 1.397 3.937 1.423 1.6 3.632 1.6zM112.393 18.39l-.153 1.27q-4.826-.229-4.826-6.884V0h1.524v12.243q0 1.448.127 2.438.127.99.458 1.905.355.915 1.066 1.372.712.432 1.804.432z"
+                style="line-height:1.25;-inkscape-font-specification:Laksaman" />
+            </g>
+            <g class="text" aria-label="server" style="line-height:.01%" fill="#1a1a1a" font-family="Laksaman"
+              font-size="25.4" font-weight="400" letter-spacing="0" word-spacing="0">
+              <path
+                d="M80.09 24.28q-1.067 0-1.778.61-.71.583-.71 1.549 0 .71.736 1.397.762.685 2.133 1.168 3.48 1.194 3.48 3.835 0 1.778-1.346 2.794-1.32.991-3.353.991-1.88 0-3.658-1.041l.56-1.22q1.828.991 3.225.991 3.048 0 3.048-2.413 0-.889-.737-1.6-.71-.737-2.133-1.169-3.48-1.066-3.48-3.53 0-1.651 1.22-2.642 1.244-.99 3.073-.99 2.006 0 3.2.889l-.61 1.295q-1.143-.914-2.87-.914zM87.808 29.893q.076 2.464 1.473 3.962 1.422 1.499 3.784 1.499 2.21 0 4.547-.914l.127 1.244q-2.26.94-4.826.94-2.921 0-4.775-1.803-1.854-1.83-1.854-4.7 0-3.073 1.778-5.08 1.803-2.031 4.699-2.031 5.46 0 5.588 6.883zm9.017-1.27q-.051-1.981-1.22-3.15-1.143-1.193-3.022-1.193-1.88 0-3.15 1.244-1.27 1.22-1.55 3.099zM107.48 24.33q-.153-.05-.457-.05-1.677 0-2.845 1.371-1.143 1.346-1.143 3.632v6.985h-1.524v-8.737q0-2.87-.381-4.242h1.295q.407.813.407 2.59 1.219-2.87 3.911-2.87.356 0 .737.077zM120.718 23.289l-5.842 12.98h-1.321l-5.614-12.98h1.524l4.801 11.38 4.928-11.38zM123.377 29.893q.077 2.464 1.474 3.962 1.422 1.499 3.784 1.499 2.21 0 4.547-.914l.127 1.244q-2.26.94-4.826.94-2.921 0-4.775-1.803-1.855-1.83-1.855-4.7 0-3.073 1.778-5.08 1.804-2.031 4.7-2.031 5.46 0 5.587 6.883zm9.017-1.27q-.05-1.981-1.219-3.15-1.143-1.193-3.022-1.193-1.88 0-3.15 1.244-1.27 1.22-1.55 3.099zM143.05 24.33q-.153-.05-.457-.05-1.677 0-2.845 1.371-1.143 1.346-1.143 3.632v6.985h-1.524v-8.737q0-2.87-.381-4.242h1.295q.407.813.407 2.59 1.219-2.87 3.911-2.87.356 0 .737.077z"
+                style="line-height:1.25;-inkscape-font-specification:Laksaman" />
+            </g>
+          </svg>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+          aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span>&#9776;</span> 
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="/#current-mempool">Current<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/#historical-mempool">Historical</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/#past-blocks">Blocks</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/#transaction-stats">SegWit and RBF</a>
+            </li>
+            <li class="nav-item" >
+              <span class="nav" style="border-left: 1px solid #0000002f; height: 85%;margin: 0.3rem;"></span>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/monitor">Transaction Monitor</a>
+            </li>
+          </ul>
+          </button>
+        </div>
+
+      </div>
+    </nav>
+  </header>
+
+  <main id="main" role="main" class="py-6">
+    <div class="container">
+      <h1 class="display-4">
+        Bitcoin Transaction Monitor
+      </h1>
+      <p>
+          Whenever you, an exchange or somebody else sends a Bitcoin transaction, it gets broadcasted to all nodes in the Bitcoin network.
+          Each broadcast transaction is represented by a dot on the scatterplot below. 
+          The transactions are arranged on the x-axis by the time of arrival at my Bitcoin node.
+          The y-axis represents the feerate (fee per size) the transaction pays. 
+        </p>
+        <p>
+          The plot reveals activity patters of wallets, exchanges and users transacting on the Bitcoin network. 
+          Some patterns are only visible on certain days or at certain times. 
+          To reduce the noise you can apply filters, set the dot radius and highlight transactions based on their properties.
+          Additionally feerate estimates from various sources can be overlayed. 
+          Hovering over a transaction reveals more information about that transaction, and clicking opens a new tab with the transaction in a blockchain explorer.
+      </p>
+
+      <p>
+        I've written a <a href="https://b10c.me/Bitcoin-Transaction-Monitor-FAQ/">FAQ</a> addressing some additional questions you might have.
+      </p>
+    </div>
+
+    <div class="container">
+      <div class="alert alert-warning text-justified" id="alert-mobile" role="alert">
+        Seems like you are visiting with a mobile device. You might have a better experience with a bigger screen and a mouse. Landscape mode might also help.
+      </div>
+      <noscript>
+        <div class="alert alert-danger text-center">
+          This the chart requires JavaScript to load...
+        </div>  
+      </noscript>
+    </div>
+
+    <div class="container-fluid">
+      <div id="chart"></div>
+      <div class="text-center my-2">
+        <span class="lead">Bitcoin transactions plotted by <i>arrival time</i> x <i>feerate</i></span><br>
+        <span class="small font-weight-light"><span id="span-transaction-loaded">0</span> transactions loaded from the last <span id="span-minute-range">0</span> minutes</span><br>
+        <span class="small font-weight-light"><span id="span-transaction-drawn">0</span> drawn (<span id="span-transaction-drawn-p">0</span>%) with <span id="span-transaction-outofbounds"></span> out-of-bounds</span><br>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="col-md-12 my-3 px-0">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="p-3">
+              <h4>Radius</h4>
+              <select id="select-radius" class="custom-select" autocomplete="off">
+                <option value="0">Uniform</option>
+                <option value="1" selected>Size</option>
+                <option value="2">Inputs</option>
+                <option value="3">Outputs</option>
+                <option value="4">Inputs and Outputs</option>
+                <option value="5">Inputs per Outputs</option>
+                <option value="6">Outputs per Inputs</option>
+                <option value="7">Output value</option>
+                <option value="8">Dust outputs</option>
+                <option value="9">OP_RETURN length</option>
+              </select>
+              <p class="my-2 small font-weight-light" id="span-radius-description">The radius is calculated based on transaction vsize.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-3">
+              <h4>Highlight</h4>
+              <select id="select-highlight" class="custom-select" autocomplete="off">
+                <option value="0" selected>No highlight</option>
+                <option value="1">Highlight SegWit spending</option>
+                <option value="2">Highlight Multisig spending</option>
+                <option value="3">Highlight Locktime</option>
+                <option value="4">Highlight RBF signaling</option>
+                <option value="5">Highlight OP_RETURN</option>
+                <option value="6">Highlight BIP-69 compliant</option>
+              </select>
+              <p class="my-2 small font-weight-light" id="span-highlight-description">No transactions are highlighted.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-3">
+              <h4>Feerate Estimator</h4>
+              <select id="select-estimator" class="custom-select" autocomplete="off">
+                <option value="0" selected>No Estimator</option>
+                <option value="1">Bitcoiner.live</option>
+                <option value="2">BitGo</option>
+                <option value="3">Bitpay Insight</option>
+                <option value="4">Blockchain.info</option>
+                <option value="5">Blockchair</option>
+                <option value="6">BlockCypher</option>
+                <option value="7">Blockstream.info</option>
+                <option value="8">BTC.com</option>
+                <option value="9">earn.com</option>
+                <option value="10">Ledger Live</option>
+                <option value="11">Mycelium</option>
+                <option value="12">Trezor</option>
+                <option value="13">WasabiWallet</option>
+              </select>
+              <p class="my-2 small font-weight-light" id="span-estimator-description">No feerate estimator overlayed.</p>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="p-3">
+              <h4>Filter</h4>
+              <p>
+                You can filter out transactions based on their properties.
+                By default, all filters are inactive, which results in all transaction being shown.
+              </p>
+              <div class="container my-3 px-0">
+                <div class="row my-3" id="filters-row">
+                  <!--filled with js-->
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="btn-group" role="group" aria-label="Basic example">
+                  <a href="#chart" class="btn btn-outline-secondary btn-sm">scroll to chart</a>
+                  <a href="/monitor" class="btn btn-outline-secondary btn-sm">reset filter</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <hr>
+      <div class="row text-center">
+        <div class="col-sm mb-3">
+          <a style="color: #b10c00" href="https://github.com/0xB10C/memo">github/0xb10c/memo</a><br>
+          <span class="text-muted">Copyright 2019</span><br>
+        </div>
+        <div class="col-sm mb-3">
+          <span>
+            <span class="text-muted">development is supported by</span><br>
+            <a href="mailto:0xb10c+sponsor@gmail.com?subject=Development sponsorship for mempool.observer">
+              <img class="img-fluid" alt="sponsor logo" src="/img/sponsor-placeholder.png"></img>
+            </a>
+          </span>
+          </div>
+        <div class="col-sm mb-3">
+          <div style="width:33%; float:left; padding: 4px;">
+            <a href="https://twitter.com/0xb10c"><img width=48 height=48 src="/img/0xb10c.png" alt="0xB10C logo" align="right"></a>
+          </div>
+          <div style="width:66%; float:right; padding: 4px; line-height: 1.2rem;" class="text-left">
+            <span>
+              <a style="color: #b10c00" href="https://twitter.com/0xb10c">@0xB10C</a> - <a style="color: #b10c00" href="https://b10c.me/">b10c.me</a> - <a style="color: #b10c00" href="https://b10c.me/projects">donate</a><br>
+            </span>
+            <span class="text-muted">freelance bitcoin developer</span><br>
+            <br>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!--script src="/js/3rd-party/jquery-3.3.1.slim.min.js"></script-->
+  <script src="/js/3rd-party/bootstrap.min.js"></script>
+  <script src="/js/3rd-party/d3.v5.min.js"></script>
+  <script src="/js/monitor/monitor-draw.js"></script>
+  <script src="/js/monitor/monitor-filter.js"></script>
+  <script src="/js/monitor/monitor.js"></script>
+</body>
+
+</html>
