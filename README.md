@@ -8,22 +8,17 @@
 Seemingly stuck and longtime-unconfirmed transactions can be quite annoying for users transacting on the Bitcoin network.
 The idea of mempool.observer is to provide users with information about unconfirmed transactions and transaction fees.
 
-> This is v2-master of memo. 
-> A full project refresh.
-
 ## Project Structure
 
 Folder Structure
 ```
 memo/
-├── api/          # Go module functioning as an API returning JSON
-├── database/     # Database creation scripts
-├── memod/        # Go module functioning as a worker deamon wirting data to database
+├── api/          # Go code that compiles to a binary API returning JSON from a Redis instance
+├── memod/        # Go code that compiles to a binary worker daemon writing data to a Redis instance
 └── www/          # Statically served HTML, JS and CSS files
 ```
 
 There exists a overview of my [infrastructure setup](https://github.com/0xB10C/memo/wiki/Infrastructure-memo-v2) for mempool.observer.
-
 
 ## Project History
 
@@ -36,14 +31,19 @@ Later this year the bitcoin transaction fees rose and I had quite some traffic.
 The high fees were caused by a huge transaction flood as the price rose to $20k.
 I regularly had problems with long running scripts due to querying and processing the huge mempool on a low end VPS.
 Due to time constrains I wasn't able to improve the performance.
-This resulted in mempool.observer v1 dieing the not-maintained-death sometime in 2018.
+This resulted in mempool.observer version 1 dieing the not-maintained-death sometime in 2018.
 
-I've focused full time on Bitcoin in spring 2019 and spend a part of that time to work on v2.
-V2 is a full rewrite of mempool.observer - only the idea, license and the quote from Maxwell remained.
-The goal is to offer way more than v1 did, but build on a foundation with performance and maintainability in mind.
+I've focused full time on Bitcoin in spring 2019 and spend a part of that time to work on version 2.
+Version 2 is a full rewrite of mempool.observer - only the idea, license and the quote from Maxwell remained.
+The goal is to offer way more than version 1 did, but build on a foundation with performance and maintainability in mind.
 I'm open for ideas and feedback.
 
+## Self-Hosting
 
-## Licencse
+Self-hosting memo is possible, but there is no detailed setup and maintenance documentation written yet.
+You might need to do some exploration on your own to get everything working.
+Keep in mind, that you need a customized Bitcoin Core version to run the Bitcoin Transaction Monitor.
+
+## Licence
 This project and all it's files are licensed under a GNU Affero General Public License.
 
