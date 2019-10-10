@@ -5,7 +5,7 @@ package fetcher
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"strings"
 	"time"
@@ -38,11 +38,19 @@ func getMempool() {
 	mempool, err := encoder.DecodeFetchedMempoolBody(body) // decode fetched response body
 	if err != nil {
 		logger.Error.Printf("Failed to decode response body as JSON: %s", err.Error())
-		return
+		return // we return here to stop the execution
 	}
 
 	processor.ProcessMempool(mempool)
 
+	if config.GetBool("mempool.callSaveMempool") {
+		if rand.Intn(100) <= 25 { // Only call savemempool every 4th call
+			err = saveMempoolJSONRPC()
+			if err != nil {
+				logger.Error.Printf("Failed to save mempool: %s", err.Error())
+			}
+		}
+	}
 }
 
 func fetchMempool() (body []byte, err error) {
@@ -69,29 +77,9 @@ func fetchMempool() (body []byte, err error) {
 	}
 }
 
-// fetches the current mempool
-func fetchMempoolFromREST() ([]byte, error) {
+// fetches the current mempool from the Bitcoin Core REST API
+func fetchMempoolFromREST() (body []byte, err error) {
 	defer logger.TrackTime(time.Now(), "fetchMempoolFromREST()")
-
-	resp, err := getMempoolContentsREST()
-	if err != nil {
-		return nil, err
-	}
-
-	body, err := readResponseBody(resp)
-	if err != nil {
-		return nil, err
-	}
-
-	return body, nil
-}
-
-// make a HTTP GET Request to the Bitcoin Core REST API
-func getMempoolContentsREST() (*http.Response, error) {
-	timeout := time.Duration(config.GetInt("bitcoind.rest.responseTimeout")) * time.Second
-	client := http.Client{
-		Timeout: timeout,
-	}
 
 	urlPrefix := config.GetString("bitcoind.rest.protocol") +
 		"://" + config.GetString("bitcoind.rest.host") +
@@ -100,24 +88,19 @@ func getMempoolContentsREST() (*http.Response, error) {
 
 	logger.Trace.Println("Fetching mempool contents from ", urlPrefix+urlSuffix)
 
-	resp, err := client.Get(urlPrefix + urlSuffix)
+	body, err = makeHTTPGETReq(urlPrefix+urlSuffix, config.GetInt("bitcoind.rest.responseTimeout"))
 	if err != nil {
-		return nil, err
+		return
 	}
 
-	return resp, nil
+	return
 }
 
 func fetchMempoolFromJSONRPC() ([]byte, error) {
 	defer logger.TrackTime(time.Now(), "fetchMempoolFromJSONRPC()")
-
-	rpcURL := config.GetString("bitcoind.jsonrpc.protocol") +
-		"://" + config.GetString("bitcoind.jsonrpc.username") +
-		":" + config.GetString("bitcoind.jsonrpc.password") +
-		"@" + config.GetString("bitcoind.jsonrpc.host") +
-		":" + config.GetString("bitcoind.jsonrpc.port")
-
 	logger.Trace.Println("Fetching mempool via JSON-RPC")
+
+	rpcURL := getJSONRPCURL()
 
 	timeout := time.Duration(config.GetInt("bitcoind.jsonrpc.responseTimeout")) * time.Second
 	client := http.Client{
@@ -127,7 +110,6 @@ func fetchMempoolFromJSONRPC() ([]byte, error) {
 	bodyReq := strings.NewReader("{\"jsonrpc\": \"1.0\", \"id\":\"memod-via-rpc\", \"method\": \"getrawmempool\", \"params\": [true] }")
 	req, err := http.NewRequest("POST", rpcURL, bodyReq)
 	if err != nil {
-		logger.Error.Println(err)
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "text/plain")
@@ -155,14 +137,46 @@ func fetchMempoolFromJSONRPC() ([]byte, error) {
 	return body, nil
 }
 
-// read the response body
-func readResponseBody(resp *http.Response) ([]byte, error) {
-	defer logger.TrackTime(time.Now(), "readResponseBody()")
-	body, err := ioutil.ReadAll(resp.Body)
+func getJSONRPCURL() (rpcURL string) {
+	return config.GetString("bitcoind.jsonrpc.protocol") +
+		"://" + config.GetString("bitcoind.jsonrpc.username") +
+		":" + config.GetString("bitcoind.jsonrpc.password") +
+		"@" + config.GetString("bitcoind.jsonrpc.host") +
+		":" + config.GetString("bitcoind.jsonrpc.port")
+}
+
+func saveMempoolJSONRPC() (err error) {
+	defer logger.TrackTime(time.Now(), "saveMempoolJSONRPC()")
+	logger.Trace.Println("Saving mempool via JSON-RPC")
+
+	client := http.Client{Timeout: 5 * time.Second}
+	rpcURL := getJSONRPCURL()
+
+	bodyReq := strings.NewReader("{\"jsonrpc\": \"1.0\", \"id\":\"memod-via-rpc\", \"method\": \"savemempool\" }")
+	req, err := http.NewRequest("POST", rpcURL, bodyReq)
 	if err != nil {
-		logger.Error.Println(err.Error())
+		return
+	}
+	req.Header.Set("Content-Type", "text/plain")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
 	}
 	defer resp.Body.Close()
 
-	return body, nil
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("JSON-RPC Request failed with status code %d %s", resp.StatusCode, http.StatusText(resp.StatusCode))
+	}
+
+	body, err := readResponseBody(resp)
+	if err != nil {
+		return err
+	}
+
+	if string(body) != "{\"result\":null,\"error\":null,\"id\":\"memod-via-rpc\"}\n" {
+		return fmt.Errorf("JSON-RPC Request failed with response %s", string(body))
+	}
+
+	return nil
 }

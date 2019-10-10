@@ -1,6 +1,7 @@
 package config
 
 import (
+	"flag"
 	"fmt"
 
 	"github.com/spf13/viper"
@@ -11,6 +12,11 @@ import (
 // to read `log.enableTrace`.
 
 func init() {
+	// do not try to load a config file when running tests
+	if flag.Lookup("test.v") != nil {
+		return
+	}
+
 	setDefaults()
 
 	viper.SetConfigType("toml")
@@ -38,11 +44,14 @@ func setDefaults() {
 
 	viper.SetDefault("mempool.enable", false)
 	viper.SetDefault("mempool.fetchInterface", "REST")
+	viper.SetDefault("mempool.callSaveMempool", true)
 	viper.SetDefault("mempool.processing.processCurrentMempool", false)
 	viper.SetDefault("mempool.processing.processHistoricalMempool", false)
-	viper.SetDefault("mempool.processing.processTimeInMempool", false)
 	viper.SetDefault("mempool.processing.processTransactionStats", false)
 	viper.SetDefault("mempool.fetchInterval", 60)
+
+	viper.SetDefault("feeratefetcher.enable", false)
+	viper.SetDefault("feeratefetcher.fetchInterval", 180)
 
 	viper.SetDefault("log.enableTrace", false)
 	viper.SetDefault("log.colorizeOutput", true)
@@ -54,6 +63,8 @@ func setDefaults() {
 	viper.SetDefault("zmq.subscribeTo.rawBlock", false)
 	viper.SetDefault("zmq.subscribeTo.hashTx", false)
 	viper.SetDefault("zmq.subscribeTo.hashBlock", false)
+	viper.SetDefault("zmq.saveMempoolEntries.enable", false) // saves mempool entries to a SQLite database
+	viper.SetDefault("zmq.saveMempoolEntries.dbPath", "/tmp/mempool-entries.sqlite")
 }
 
 // GetInt returns a config property as int

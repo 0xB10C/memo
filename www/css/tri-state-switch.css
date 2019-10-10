@@ -1,0 +1,110 @@
+
+
+input[type=range].tri-state-switch.tri-state-switch-eyes {
+  background-image: url("/img/slider-eyes.png");
+}
+
+input[type=range].tri-state-switch.tri-state-switch-equal {
+  background-image: url("/img/slider-equal.png");
+}
+
+input[type=range].tri-state-switch {
+  padding: 0px !important;
+  background-size: 150px 32px;
+  height: 31px;
+  max-width: 150px;
+  min-width: 150px;
+  -webkit-appearance: none;
+  width: 100%;
+  background-position: center;
+}
+
+input[type=range].tri-state-switch:focus {
+  outline: none;
+  border: 1px solid lightslategray; 
+  outline: none;
+  box-shadow:  none;
+  outline: 0 none;
+}
+
+input[type=range].tri-state-switch::-moz-focus-outer {
+  border: 0;
+}
+
+input[type=range].tri-state-switch::-webkit-slider-runnable-track {
+  width: 100%;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+}
+input[type=range].tri-state-switch::-webkit-slider-thumb {
+  border: none;
+  height: 31px;
+  width: 50px;
+  background: #b1b1b1;
+  opacity: 0.5;
+  cursor: drag;
+  -webkit-appearance: none;
+  margin-top: -1px;
+  mix-blend-mode: multiply;
+  filter: blur(1px);
+}
+
+input[type=range].tri-state-switch:focus::-webkit-slider-runnable-track {
+  background: transparent;
+}
+
+input[type=range].tri-state-switch::-moz-range-track {
+  width: 100%;
+  cursor: pointer;
+  background: transparent;
+}
+
+input[type=range].tri-state-switch::-moz-range-thumb {
+  height: 31px;
+  width: 50px;
+  background: #b1b1b1;
+  opacity: 0.5;
+  cursor: drag;
+  border-radius: 0rem;
+  border: none;
+  mix-blend-mode: multiply;
+  filter: blur(1px);
+}
+
+input[type=range].tri-state-switch::-ms-track {
+  width: 100%;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+
+input[type=range].tri-state-switch::-ms-fill-lower {
+  background: transparent;
+  border: none;
+}
+
+input[type=range].tri-state-switch::-ms-fill-upper {
+  background: transparent;
+  border: none;
+}
+
+input[type=range].tri-state-switch::-ms-thumb {
+  margin-top: 1px;
+  height: 31px;
+  width: 50px;
+  background: #868686;
+  opacity: 0.2;
+  cursor: drag;
+}
+
+input[type=range].tri-state-switch:focus::-ms-fill-lower {
+  background: transparent;
+  border: none;
+}
+
+input[type=range].tri-state-switch:focus::-ms-fill-upper {
+  background: transparent;
+  border: none;
+}

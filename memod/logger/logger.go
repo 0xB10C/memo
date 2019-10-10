@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"flag"
 	"io/ioutil"
 	"log"
 	"os"
@@ -21,6 +22,10 @@ var (
 )
 
 func init() {
+	// do not init a logger when running tests
+	if flag.Lookup("test.v") != nil {
+		return
+	}
 
 	traceHandle := ioutil.Discard
 	if config.GetBool("log.enableTrace") {
@@ -43,6 +48,10 @@ func init() {
 
 // TrackTime tracks the time a function takes till return and logs it to Trace
 func TrackTime(start time.Time, funcname string) {
+	// do not print tracked time in tests
+	if flag.Lookup("test.v") != nil {
+		return
+	}
 	elapsed := time.Since(start)
 	Trace.Println(funcname + " took " + elapsed.String())
 }

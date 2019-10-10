@@ -19,6 +19,12 @@ a.href-target {
   margin-top: -65px;
 }
 
+.vertical-center{
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
+}
+
 
 /* navbar */
 
@@ -35,7 +41,7 @@ a.href-target {
 svg#brand-icon g.text,
 svg#brand-icon g.text>path {
   -webkit-transition: opacity 0.05s ease-in-out;
-  transition: opacity 0.05s ease-in-out 0.18s;
+  transition: opacity 0.05s ease-in-out;
   opacity: 1;
   fill: var(--text-color);
 }
@@ -251,15 +257,9 @@ text.c3-axis-y2-label,
   bottom: 0;
   width: 100%;
   height: 60px;
-  line-height: 20px;
   background-color: var(--footer-background) !important;
 }
 
-@media (min-width: 992px) {
-  .footer {
-    line-height: 60px;
-  }
-}
 
 :root {
   --background: var(--white);

@@ -1,18 +1,18 @@
 package database
 
 import (
-	"encoding/json"
 	"errors"
 	"strconv"
 	"time"
 
 	"github.com/0xb10c/memo/api/config"
+	"github.com/0xb10c/memo/api/types"
 	"github.com/gomodule/redigo/redis"
+	jsoniter "github.com/json-iterator/go"
 )
 
-var (
-	Pool *redis.Pool
-)
+var Pool *redis.Pool
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 func newPool() *redis.Pool {
 	dbUser := config.GetString("redis.user")
@@ -81,7 +81,7 @@ func GetMempool() (timestamp time.Time, feerateMapJSON string, megabyteMarkersJS
 	return
 }
 
-func GetRecentBlocks() (blocks []RecentBlock, err error) {
+func GetRecentBlocks() (blocks []types.RecentBlock, err error) {
 	c := Pool.Get()
 	defer c.Close()
 
@@ -90,9 +90,9 @@ func GetRecentBlocks() (blocks []RecentBlock, err error) {
 		return
 	}
 
-	blocks = make([]RecentBlock, 0)
+	blocks = make([]types.RecentBlock, 0)
 	for index := range reJSON {
-		block := RecentBlock{}
+		block := types.RecentBlock{}
 		err = json.Unmarshal([]byte(reJSON[index]), &block)
 		if err != nil {
 			return
@@ -110,7 +110,7 @@ type MempoolState struct {
 	DataInBuckets     []float64 `json:"dataInBuckets"`
 }
 
-func GetHistorical(timeframe int, by string) (hmds []HistoricalMempoolData, err error) {
+func GetHistorical(timeframe int, by string) (hmds []types.HistoricalMempoolData, err error) {
 	c := Pool.Get()
 	defer c.Close()
 
@@ -149,9 +149,9 @@ func GetHistorical(timeframe int, by string) (hmds []HistoricalMempoolData, err 
 		return
 	}
 
-	hmds = make([]HistoricalMempoolData, 0)
+	hmds = make([]types.HistoricalMempoolData, 0)
 	for index := range hmdsJSON {
-		hmd := HistoricalMempoolData{}
+		hmd := types.HistoricalMempoolData{}
 		err = json.Unmarshal([]byte(hmdsJSON[index]), &hmd)
 		if err != nil {
 			return
@@ -162,38 +162,8 @@ func GetHistorical(timeframe int, by string) (hmds []HistoricalMempoolData, err 
 	return
 }
 
-// GetTimeInMempool gets the TimeInMempool data from the database
-func GetTimeInMempool() (timestamp int64, timeAxis []int, feerateAxis []float64, err error) {
-	c := Pool.Get()
-	defer c.Close()
-
-	prefix := "timeInMempool"
-
-	response, err := redis.Strings(c.Do("MGET", prefix+":timeAxis", prefix+":feerateAxis", prefix+":utcTimestamp"))
-	if err != nil {
-		return
-	}
-
-	err = json.Unmarshal([]byte(response[0]), &timeAxis)
-	if err != nil {
-		return
-	}
-
-	err = json.Unmarshal([]byte(response[1]), &feerateAxis)
-	if err != nil {
-		return
-	}
-
-	err = json.Unmarshal([]byte(response[2]), &timestamp)
-	if err != nil {
-		return
-	}
-
-	return
-}
-
 // GetTransactionStats gets the Transaction Stats data from the database
-func GetTransactionStats() (tss []TransactionStat, err error) {
+func GetTransactionStats() (tss []types.TransactionStat, err error) {
 	c := Pool.Get()
 	defer c.Close()
 
@@ -209,14 +179,85 @@ func GetTransactionStats() (tss []TransactionStat, err error) {
 		Timestamp   int64 `json:"timestamp"`
 	}
 
-	tss = make([]TransactionStat, 0)
+	tss = make([]types.TransactionStat, 0)
 	for index := range tssJSON {
-		ts := TransactionStat{}
+		ts := types.TransactionStat{}
 		err = json.Unmarshal([]byte(tssJSON[index]), &ts)
 		if err != nil {
 			return
 		}
 		tss = append(tss, ts)
+	}
+
+	return
+}
+
+// GetMempoolEntries gets the last x mempool Entries from the database
+func GetMempoolEntries() (mes []types.MempoolEntry, err error) {
+	c := Pool.Get()
+	defer c.Close()
+
+	// gets recent entries from 0 to 19999 (20k)
+	mesJSON, err := redis.Strings(c.Do("ZREVRANGE", "mempoolEntries", 0, 29999))
+	if err != nil {
+		return
+	}
+
+	mes = make([]types.MempoolEntry, 0)
+	for index := range mesJSON {
+		me := types.MempoolEntry{}
+		err = json.Unmarshal([]byte(mesJSON[index]), &me)
+		if err != nil {
+			return
+		}
+		mes = append(mes, me)
+	}
+
+	return
+}
+
+// SetMempoolEntriesCache SETs the response of a recent GetMempoolEntries() as a cache
+func SetMempoolEntriesCache(mesJSON string) (err error) {
+	c := Pool.Get()
+	defer c.Close()
+
+	_, err = c.Do("SET", "cache:mempoolEntries", mesJSON)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// GetMempoolEntriesCache GET the cached response of a recent GetMempoolEntries() call
+func GetMempoolEntriesCache() (mesJSON string, err error) {
+	c := Pool.Get()
+	defer c.Close()
+
+	mesJSON, err = redis.String(c.Do("GET", "cache:mempoolEntries"))
+	if err != nil {
+		return
+	}
+	return
+}
+
+// GetRecentFeerateAPIEntries returns the recent feeRate API entrys from Redis
+func GetRecentFeerateAPIEntries() (entries []types.FeeRateAPIEntry, err error) {
+	c := Pool.Get()
+	defer c.Close()
+
+	entrysJSON, err := redis.Strings(c.Do("LRANGE", "feerateAPIEntries", 0, 100))
+	if err != nil {
+		return
+	}
+
+	entries = make([]types.FeeRateAPIEntry, 0)
+	for index := range entrysJSON {
+		entry := types.FeeRateAPIEntry{}
+		err = json.Unmarshal([]byte(entrysJSON[index]), &entry)
+		if err != nil {
+			return
+		}
+		entries = append(entries, entry)
 	}
 
 	return
