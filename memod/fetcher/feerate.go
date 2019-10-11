@@ -113,7 +113,7 @@ func getBitgoCom(cBitgoCom chan types.FeeAPIResponse3) {
 		cBitgoCom <- types.FeeAPIResponse3{0, 0, 0}
 		return
 	}
-	result := gjson.GetMany(string(body), "feeByBlockTarget.1", "feeByBlockTarget.3", "feeByBlockTarget.6")
+	result := gjson.GetMany(string(body), "feeByBlockTarget.2", "feeByBlockTarget.4", "feeByBlockTarget.6")
 	highFee, medFee, lowFee := result[0].Float()/1000, result[1].Float()/1000, result[2].Float()/1000
 
 	cBitgoCom <- types.FeeAPIResponse3{highFee, medFee, lowFee}
