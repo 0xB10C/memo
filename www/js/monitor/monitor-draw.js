@@ -456,7 +456,7 @@ async function drawFeerateAPILines(xMin){
   const descriptions = {
     0: "No feerate estimator overlayed.", // none
     1: "Feerates for a confirmation in half an hour, one hour and two hours are shown.", // bitcoinerlive
-    2: "Feerates for a confirmation in one, three and six blocks shown.", // bitgocom
+    2: "Feerates for a confirmation in two, four and six blocks shown.", // bitgocom
     3: "Feerates for a confirmation in two, three and six blocks shown.", // bitpaycom
     4: "Feerates for a priority and regular confirmation shown.", // blockchaininfo
     5: "The recommended feerate is shown. Feerate estimation data retrieved from <a href=\"https://blockchair.com/\">blockchair.com</a>.", // blockchaircom
