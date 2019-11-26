@@ -1,8 +1,8 @@
-[![Build Status](https://travis-ci.com/0xB10C/memo.svg?branch=v2-master)](https://travis-ci.com/0xB10C/memo)
+[![Build Status](https://travis-ci.com/0xB10C/memo.svg?branch=master)](https://travis-ci.com/0xB10C/memo)
 
 # memo - mempool.observer
 
-<img align="right" width="280" src="https://raw.githubusercontent.com/0xB10C/memo/v2-master/www/img/brand-icon.png">
+<img align="right" width="280" src="https://raw.githubusercontent.com/0xB10C/memo/master/www/img/brand-icon.png">
 
 [mempool.observer](https://mempool.observer) visualizes various statistics around my Bitcoin memory pool (mempool).
 Seemingly stuck and longtime-unconfirmed transactions can be quite annoying for users transacting on the Bitcoin network.
@@ -18,7 +18,7 @@ memo/
 └── www/          # Statically served HTML, JS and CSS files
 ```
 
-There exists a overview of my [infrastructure setup](https://github.com/0xB10C/memo/wiki/Infrastructure-memo-v2) for mempool.observer.
+There exists a overview of my [infrastructure setup](https://www.plectica.com/maps/RCXWDOYD9) for mempool.observer.
 
 ## Project History
 
