@@ -195,8 +195,8 @@ func writeMempoolEntriesSQLite(me types.MempoolEntry) error {
 		return fmt.Errorf("could not marshal mempoolEntry.Multisig to JSON: %s", err.Error())
 	}
 
-	_, err = SQLiteDB.Exec("INSERT INTO mempoolEntries(entryTime, txid, fee, size, inputs, outputs, locktime, outSum, spendsSegWit, spendsMultisig, bip69compliant, signalsRBF, spends, paysto, multisigs, opreturndata) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-		me.EntryTime, me.TxID, me.Fee, me.Size, me.InputCount, me.OutputCount, me.Locktime, me.OutputSum, me.SpendsSegWit, me.SpendsMultisig, me.IsBIP69, me.SignalsRBF, spendsJSON, paystoJSON, multisigJSON, me.OPReturnData)
+	_, err = SQLiteDB.Exec("INSERT INTO mempoolEntries(entryTime, txid, fee, size, version, inputs, outputs, locktime, outSum, spendsSegWit, spendsMultisig, bip69compliant, signalsRBF, spends, paysto, multisigs, opreturndata) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		me.EntryTime, me.TxID, me.Fee, me.Size, me.Version, me.InputCount, me.OutputCount, me.Locktime, me.OutputSum, me.SpendsSegWit, me.SpendsMultisig, me.IsBIP69, me.SignalsRBF, spendsJSON, paystoJSON, multisigJSON, me.OPReturnData)
 	if err != nil {
 		return fmt.Errorf("error while writing to SQLite: %s", err.Error())
 	}
