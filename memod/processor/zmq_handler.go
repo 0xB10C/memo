@@ -110,6 +110,7 @@ func HandleRawTxWithSizeAndFee(payload string) {
 	me.TxID = tx.Hash
 	me.Fee = feeInSat
 	me.Size = sizeInByte
+	me.Version = tx.Version
 	me.InputCount = tx.GetNumInputs()
 	me.OutputCount = tx.GetNumOutputs()
 	me.Locktime = tx.GetLocktime()

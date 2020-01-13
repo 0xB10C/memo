@@ -25,6 +25,7 @@ type MempoolEntry struct {
 	TxID           string         `json:"txid"`
 	Fee            int64          `json:"fee"`
 	Size           int64          `json:"size"`
+	Version        int32          `json:"version"`
 	InputCount     int            `json:"inputCount"`
 	OutputCount    int            `json:"outputCount"`
 	Locktime       uint32         `json:"locktime"`

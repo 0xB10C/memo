@@ -42,6 +42,10 @@ let gFilters = {
     if ((filter.state == filterStates.greaterEqual && tx.locktime >= filter.input.value) || (filter.state == filterStates.lessEqual && tx.locktime <= filter.input.value) || (filter.state == filterStates.equal && tx.locktime == filter.input.value)){ return true } return false
   }},
 
+  version:{title:"Version", id:"version", state: filterStates.greaterEqual, type:"withinput", queryStringCode: "v", input: {value: "1", type: "number", step: 1, min: 1, label: "version", queryStringCode: "vi"}, isVisibleFunc: function (filter, tx) {
+    if ((filter.state == filterStates.greaterEqual && tx.version >= filter.input.value) || (filter.state == filterStates.lessEqual && tx.version <= filter.input.value) || (filter.state == filterStates.equal && tx.version == parseInt(filter.input.value))){ return true } return false
+  }},
+
   seperatorInputs: {title: "Inputs", type:"separator"},
 
   inputcount:{title:"Input count", id:"inputcount", state: filterStates.greaterEqual, type:"withinput", queryStringCode: "f", input: {value: "0", type: "number", step: 1, min: 0, label: "input count", queryStringCode: "fi"}, isVisibleFunc: function (filter, tx) {
