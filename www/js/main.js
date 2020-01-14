@@ -1,14 +1,9 @@
 // Constants
 const NEXT_BLOCK_LABELS = ["1 vMB", "2 vMB", "3 vMB"]
+const updateInterval = 30000
+const apiHost = "https://" + window.location.hostname
 
 var isTabActive = true;
-var updateInterval = 30000
-
-// use the https://mempool.observer endpoint only when on https://mempool.observer/ 
-// otherwise use https://dev.mempool.observer (e.g. when on localhost)
-// var apiHost = window.location.hostname == "mempool.observer" ? "https://mempool.observer" : "https://dev.mempool.observer"
-// var apiHost = "http://localhost:23485"
-const apiHost = "https://" + window.location.hostname
 
 // State
 var state = {
@@ -38,6 +33,9 @@ var state = {
     elementId: "card-past-blocks",
     isScrolledIntoView: false,
     data: {
+      notifyOnNewBlock: false,
+      lastBlockHeight: null,
+      notificationAudio: null,
       processedBlocks: null,
       timer: null,
       timeLastUpdated: null,
@@ -85,6 +83,25 @@ window.onload = function () {
     $('body').attr('data-theme', 'dark')
   }
 
+  const checkboxNofifyOnNewBlock = document.getElementById('checkbox_notify_new_block')
+  checkboxNofifyOnNewBlock.addEventListener('change', (event) => {
+    if (event.target.checked) {
+      new Audio('/mp3/definite.mp3').play(); // plays audio once
+
+      if (!("Notification" in window)) {
+        alert("This browser does not support desktop notification");
+        return;
+      }
+
+      if (Notification.permission !== 'denied') {
+          Notification.requestPermission();
+      }
+      
+      state.pastBlocks.data.notifyOnNewBlock = true;
+    } else {
+      state.pastBlocks.data.notifyOnNewBlock = false;
+    }
+  })
 
   // init data reload loop
   reloadData()
@@ -770,9 +787,14 @@ const pastBlocksCard = {
       })
     }
 
+    let currentBlockHeight = response[response.length-1].height
+    if (state.pastBlocks.data.notifyOnNewBlock && state.pastBlocks.data.lastBlockHeight != null && state.pastBlocks.data.lastBlockHeight < currentBlockHeight){
+      notifyNewBlock(currentBlockHeight)
+      state.pastBlocks.data.lastBlockHeight = currentBlockHeight
+    }
+    state.pastBlocks.data.lastBlockHeight = currentBlockHeight
 
     // add 10 minute grid lines
-
     var truncatedMin = parseInt(new Date().getMinutes()/10) * 10 // set the last digit from the minute value to zero
     var gridTime = (new Date(new Date().setMinutes(truncatedMin))).setSeconds(0)
 
@@ -1007,4 +1029,15 @@ function getTxFromApi(txId) {
       console.error('Error getting data from explorer:', e)
       throw new Error('Could not find your transaction in the bitcoin network. Wait a few minutes before trying again.')
     })
+}
+
+function notifyNewBlock(height){
+  if (Notification.permission === "granted") {
+    new Notification(`Block #${height} found!`, {
+      body: "A new Bitcoin block has just been found.",
+      icon: '/img/og_preview.png',
+    });
+  }
+
+  new Audio('/mp3/definite.mp3').play();
 }
