@@ -46,6 +46,7 @@ func main() {
 		api.GET("/transactionStats", getTransactionStats)
 		api.GET("/getMempoolEntries", getCachedMempoolEntries)
 		api.GET("/getRecentFeerateAPIData", getRecentFeerateAPIEntries)
+		api.GET("/getBlockEntries", getBlockEntries)
 	}
 
 	portString := ":" + config.GetString("api.port")
@@ -83,6 +84,19 @@ func getMempool(c *gin.Context) {
 func getRecentBlocks(c *gin.Context) {
 
 	blocks, err := database.GetRecentBlocks()
+	if err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Database error",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, blocks)
+}
+
+func getBlockEntries(c *gin.Context) {
+	blocks, err := database.GetBlockEntries()
 	if err != nil {
 		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{

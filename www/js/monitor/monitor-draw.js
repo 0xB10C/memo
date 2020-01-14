@@ -8,6 +8,7 @@ var gCanvasCtx = null
 var gData = null
 var gQuadtree = null
 var gRecentFeerateAPIData
+var gBlockEntriesData
 
 var gFeerateAPILines
 var gLoadingSpinner
@@ -33,6 +34,19 @@ var yScaledValue = function (d) {return yScale(yValue(d))}
 let color1 = "#b10c00"
 let color2 = "lightgray"
 
+let blockInclusionColorMap = {
+  0: '#e630b9',
+  1: '#2d8da5',
+  2: '#638f28',
+  3: '#f62e64',
+  4: '#3480ed',
+  5: '#299366',
+  6: '#b87228',
+  7: '#c149f1',
+  8: '#2b9089',
+  9: '#918328'
+}
+
 // coloring functions for the dots 
 var cPlain = function (d) {return "#b10c00";}
 var cFeerate = function (d) {return feerateColorScale(yValue(d));}
@@ -45,6 +59,27 @@ var cOpReturn = function (d) {return d.opreturnLength ? color1 : color2;}
 var cBIP69 = function (d) {return d.isBIP69 ? color1 : color2;}
 var cMultisig = function (d) {return d.spendsMultisig ? color1 : color2;}
 var cLNUnilateralClose = function (d) {return (d.locktime >= 500000000 && d.locktime < 600000000) ? color1 : "transparent";}
+var cBlockInclusion = function(d) {
+  if (d.block != null) {
+    return blockInclusionColorMap[d.block % 10]
+  }
+
+  const shortTXID = d.txid.substring(0, 16)
+  for (const block of gBlockEntriesData) {
+
+    // skip if the block was found before the transaction was broadcast
+    if (block.timestamp < d.entryTime) {
+      continue
+    }
+
+    if (binarySearch(block.shortTXIDs, shortTXID) != -1) {
+      d.block = block.height
+      return blockInclusionColorMap[block.height % 10]
+    }
+
+  }
+  return color2
+ }
 
 // radius functions for the dots
 var rUniform = function (d) {return 2}
@@ -99,6 +134,7 @@ async function redraw() {
     .style("opacity", 0);
   
   data = await loadEntryData()
+  dataBlocks = await loadBlockEntriesData()
 
   var xMin = d3.min(data, function (d) {return xValue(d)})
   var xMax = d3.max(data, function (d) {return xValue(d)})
@@ -375,6 +411,10 @@ async function redraw() {
           currentColorFunction = cVersion2;
           descriptionFilter.html("Version 2 transactions are highlighted.");
           break;
+        case "9": // block inclusion
+          currentColorFunction = cBlockInclusion;
+          descriptionFilter.html("Transactions are highlighted according to the block they were include in.");
+          break;
       }
       drawTransactions(data)
     }, 10);
@@ -450,9 +490,30 @@ async function drawTransactions(data){
   document.getElementById("span-transaction-drawn").innerText = countDrawn
   document.getElementById("span-transaction-drawn-p").innerText = ((countDrawn / count)*100).toFixed(2);
   document.getElementById("span-transaction-outofbounds").innerText = countOutOfBounds
+  drawBlocks(dataBlocks);
   fillQuadtree(data)
 }
 
+async function drawBlocks(data) {
+  if (currentColorFunction == cBlockInclusion) {
+    data.forEach(function(d){
+      let x = xScale(d.timestamp*1000)
+      gCanvasCtx.beginPath();
+      gCanvasCtx.moveTo(x, height());
+      gCanvasCtx.lineTo(x, 0);
+      gCanvasCtx.globalAlpha = 0.2;
+      gCanvasCtx.stroke();
+      gCanvasCtx.globalAlpha = 0.7;
+      gCanvasCtx.fillStyle = "black";
+      gCanvasCtx.save();
+      gCanvasCtx.translate(x-4, height()-3);
+      gCanvasCtx.rotate(-90 * (Math.PI / 180));
+      gCanvasCtx.textAlign = "left";
+      gCanvasCtx.fillText(`Block ${d.height}`, 0, 0);
+      gCanvasCtx.restore();    
+    });
+  }
+}
 
 async function drawFeerateAPILines(xMin){
   gRecentFeerateAPIData = await loadRecentFeerateAPIData()
@@ -604,4 +665,20 @@ function isTransactionVisible(tx){
   }
 
   return true
+}
+
+function binarySearch(items, value){
+  var firstIndex  = 0,
+    lastIndex   = items.length - 1,
+    middleIndex = Math.floor((lastIndex + firstIndex)/2);
+
+  while(items[middleIndex] != value && firstIndex < lastIndex){
+    if (value < items[middleIndex]){
+      lastIndex = middleIndex - 1;
+    } else if (value > items[middleIndex]){
+      firstIndex = middleIndex + 1;
+    }
+    middleIndex = Math.floor((lastIndex + firstIndex)/2);
+  }
+  return (items[middleIndex] != value) ? -1 : middleIndex;
 }

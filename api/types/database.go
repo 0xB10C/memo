@@ -40,3 +40,12 @@ type MempoolEntry struct {
 	Spends         map[string]int `json:"spends"`
 	PaysTo         map[string]int `json:"paysTo"`
 }
+
+// BlockEntry holds the height, the first-seen timestamp and 
+// shortended TXIDs. It's used in the Bitcoin Transaction Monitor
+// to mark transactions by block they were included in.
+type BlockEntry struct {
+	Height     int      `json:"height"`
+	Timestamp  int64    `json:"timestamp"`
+	ShortTXIDs []string `json:"shortTXIDs"`
+}
