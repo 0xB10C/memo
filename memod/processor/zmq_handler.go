@@ -36,6 +36,22 @@ func HandleRawBlock(payload string) {
 	if err != nil {
 		logger.Error.Printf("Error writing block to database: %v", err)
 	}
+
+	// According to https://rusnak.io/longest-txid-prefix-collision-in-bitcoin/ (updated 2019)
+	// the longest TXID collision is 15 hex bytes long. Choosing a short txid of 16 here should
+	// be way more than enough. Compared to the blog post, TXIDs are here only compared to the 30k
+	// transactions displayed in the Bitcoin Transaction Monitor.
+	const shortTXIDLength int = 16
+	shortTXIDs := make([]string, 0, len(block.Transactions))
+	for _, tx := range block.Transactions {
+		shortTXIDs = append(shortTXIDs, tx.TxHash().String()[0:shortTXIDLength])
+	}
+
+	err = database.WriteNewBlockEntry(height, shortTXIDs)
+	if err != nil {
+		logger.Error.Printf("Error writing block entries to database: %v", err)
+	}
+
 	logger.Info.Printf("Success writing new block %d with %d transactions, size %d, weight %d", height, numTx, sizeWithWitness, weight)
 }
 

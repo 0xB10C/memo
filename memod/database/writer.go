@@ -68,6 +68,37 @@ func WriteNewBlockData(height int, numTx int, sizeWithWitness int, weight int) e
 	return nil
 }
 
+// WriteNewBlockEntry writes a BlockEntry into the Redis database.
+func WriteNewBlockEntry(height int, shortTXIDs []string) error {
+	defer logger.TrackTime(time.Now(), "WriteNewBlockEntry()")
+	c := Pool.Get()
+	defer c.Close()
+	listName := "blockEntries"
+
+	be := types.BlockEntry{Height: height, Timestamp: time.Now().Unix(), ShortTXIDs: shortTXIDs}
+
+	beJSON, err := json.Marshal(be)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Do("LPUSH", listName, beJSON)
+	if err != nil {
+		return err
+	}
+
+	// only keep the last ~200 blocks
+	// check 10% of all insertions
+	if rand.Intn(10) == 4 {
+		_, err := c.Do("LTRIM", listName, "0", 200)
+		if err != nil {
+			return fmt.Errorf("could not do LTRIM on %s: %s", listName, err.Error())
+		}
+	}
+
+	return nil
+}
+
 // WriteHistoricalMempoolData writes the histoical mempool data into the database
 func WriteHistoricalMempoolData(countInBuckets []int, feeInBuckets []float64, sizeInBuckets []int, timeframe int) error {
 	defer logger.TrackTime(time.Now(), "WriteHistoricalMempoolData()")

@@ -81,6 +81,7 @@ func GetMempool() (timestamp time.Time, feerateMapJSON string, megabyteMarkersJS
 	return
 }
 
+// GetRecentBlocks returns the 10 most recent blocks.
 func GetRecentBlocks() (blocks []types.RecentBlock, err error) {
 	c := Pool.Get()
 	defer c.Close()
@@ -94,6 +95,30 @@ func GetRecentBlocks() (blocks []types.RecentBlock, err error) {
 	for index := range reJSON {
 		block := types.RecentBlock{}
 		err = json.Unmarshal([]byte(reJSON[index]), &block)
+		if err != nil {
+			return
+		}
+		blocks = append(blocks, block)
+	}
+
+	return
+}
+
+
+// GetBlockEntries returns the 20 most recent blocks with short TXIDs.
+func GetBlockEntries() (blocks []types.BlockEntry, err error) {
+	c := Pool.Get()
+	defer c.Close()
+
+	beJSON, err := redis.Strings(c.Do("LRANGE", "blockEntries", 0, 20))
+	if err != nil {
+		return
+	}
+
+	blocks = make([]types.BlockEntry, 0)
+	for index := range beJSON {
+		block := types.BlockEntry{}
+		err = json.Unmarshal([]byte(beJSON[index]), &block)
 		if err != nil {
 			return
 		}
