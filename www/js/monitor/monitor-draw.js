@@ -39,6 +39,8 @@ var cFeerate = function (d) {return feerateColorScale(yValue(d));}
 var cSegWit = function (d) {return d.spendsSegWit ? color1 : color2;}
 var cLocktime = function (d) {return d.locktime > 0 ?  (d.locktime >= 500000000? "green" : color1) : color2;}
 var cRBF = function (d) {return d.signalsRBF ? color1 : color2;}
+var cVersion1 = function (d) {return d.version == 1 ? color1 : color2}
+var cVersion2 = function (d) {return d.version == 2 ? color1 : color2}
 var cOpReturn = function (d) {return d.opreturnLength ? color1 : color2;}
 var cBIP69 = function (d) {return d.isBIP69 ? color1 : color2;}
 var cMultisig = function (d) {return d.spendsMultisig ? color1 : color2;}
@@ -365,6 +367,14 @@ async function redraw() {
           currentColorFunction = cMultisig;
           descriptionFilter.html("Transactions spending Multisig are highlighted.");
           break;
+        case "7": // version1
+          currentColorFunction = cVersion1;
+          descriptionFilter.html("Version 1 transactions are highlighted.");
+          break;
+        case "8": // version2
+          currentColorFunction = cVersion2;
+          descriptionFilter.html("Version 2 transactions are highlighted.");
+          break;
       }
       drawTransactions(data)
     }, 10);
@@ -555,6 +565,7 @@ function formatTooltip(d){
       ${formatTooltipTableRow("Feerate", yValue(d).toFixed(2) + " sat/vbyte")}
       ${formatTooltipTableRow("Size", d.size + " vbyte")}
       ${formatTooltipTableRow("Fee", d.fee + " sat")}
+      ${formatTooltipTableRow("Version", d.version)}
       ${formatTooltipTableRow("Inputs", formatTooltipDicts(d.spends))}
       ${formatTooltipTableRow("Outputs", formatTooltipDicts(d.paysTo))}
       ${formatTooltipTableRow("Output amount", d.outputValue / 100000000 + " BTC")}
