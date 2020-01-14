@@ -31,6 +31,20 @@ async function loadRecentFeerateAPIData(){
   return gRecentFeerateAPIData
 }
 
+async function loadBlockEntriesData(){  
+  if ( gBlockEntriesData == null ) {
+    await d3.json(gApiHost + "/api/getBlockEntries").then(function (data) { 
+      for (const block of data) {
+        block.shortTXIDs.sort(function(a, b) {
+          return a > b;
+        });
+      }
+      gBlockEntriesData = data
+    });
+  }
+  return gBlockEntriesData
+}
+
 function scrollEventHandler() {
   // handle scroll offset over 60px from top to animate the mempool observer icon
   let navbar = document.getElementsByClassName("navbar")
@@ -148,6 +162,8 @@ window.onload = function () {
   readInitalQueryString()
   drawFilters()
   loadRecentFeerateAPIData() // preload current feerate API data
+  loadBlockEntriesData() // preload current block entries data
+
   redraw().then(function(){
     // Draw for the first time to initialize.
     disableEveryInput(false);
