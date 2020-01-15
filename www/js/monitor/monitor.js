@@ -35,9 +35,7 @@ async function loadBlockEntriesData(){
   if ( gBlockEntriesData == null ) {
     await d3.json(gApiHost + "/api/getBlockEntries").then(function (data) { 
       for (const block of data) {
-        block.shortTXIDs.sort(function(a, b) {
-          return a > b;
-        });
+        block.shortTXIDs.sort();        
       }
       gBlockEntriesData = data
     });
