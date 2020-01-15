@@ -80,6 +80,27 @@ var cBlockInclusion = function(d) {
   }
   return color2
  }
+ var cUnconfirmed = function(d) {
+  if (d.block != null) {
+    return color2
+  }
+
+  const shortTXID = d.txid.substring(0, 16)
+  for (const block of gBlockEntriesData) {
+
+    // skip if the block was found before the transaction was broadcast
+    if (block.timestamp < d.entryTime) {
+      continue
+    }
+
+    if (binarySearch(block.shortTXIDs, shortTXID) != -1) {
+      d.block = block.height
+      return color2
+    }
+
+  }
+  return color1
+ }
 
 // radius functions for the dots
 var rUniform = function (d) {return 2}
@@ -414,6 +435,10 @@ async function redraw() {
         case "9": // block inclusion
           currentColorFunction = cBlockInclusion;
           descriptionFilter.html("Transactions are highlighted according to the block they were include in.");
+          break;
+        case "10": // unconfirmed
+          currentColorFunction = cUnconfirmed;
+          descriptionFilter.html("Unconfirmed transactions are highlighted.");
           break;
       }
       drawTransactions(data)
