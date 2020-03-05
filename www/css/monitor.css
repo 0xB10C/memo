@@ -5,12 +5,25 @@
   width: 300px;
 }
 
-.feerate-line {
+.feerate-line-high {
   fill: none;
   stroke-width: 4px;
   stroke-linecap: round;
-  stroke: #2279b3;
-  filter: drop-shadow(0px 0px 4px #3498db);
+  stroke: #000f;
+}
+
+.feerate-line-med {
+  fill: none;
+  stroke-width: 3px;
+  stroke-linecap: round;
+  stroke: #000c;
+}
+
+.feerate-line-low {
+  fill: none;
+  stroke-width: 2px;
+  stroke-linecap: round;
+  stroke: #0009;
 }
 
 #chart {

@@ -602,7 +602,7 @@ async function drawFeerateAPILines(xMin){
 
     gFeerateAPILines.append("path")
       .datum(gRecentFeerateAPIData)
-      .attr("class", "feerate-line")
+      .attr("class", "feerate-line-high")
       .attr("d", highLine)
       .attr("transform", "translate(" + margin.left + ", 0)");
   } 
@@ -616,7 +616,7 @@ async function drawFeerateAPILines(xMin){
 
     gFeerateAPILines.append("path")
       .datum(gRecentFeerateAPIData)
-      .attr("class", "feerate-line")
+      .attr("class", "feerate-line-med")
       .attr("d",medLine) 
       .attr("transform", "translate(" + margin.left + ", 0)");
   } 
@@ -630,14 +630,14 @@ async function drawFeerateAPILines(xMin){
 
     gFeerateAPILines.append("path")
       .datum(gRecentFeerateAPIData)
-      .attr("class", "feerate-line")
+      .attr("class", "feerate-line-low")
       .attr("d",lowLine)
       .attr("transform", "translate(" + margin.left + ", 0)");
   } 
 }
 
 function isFeerateDefined(feerate){
-  return !isNaN(feerate) && feerate > 0
+  return !isNaN(feerate) && feerate > 1
 }
 
 
