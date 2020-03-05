@@ -42,6 +42,7 @@ func getFeerates() {
 	cMyceliumIo := make(chan types.FeeAPIResponse3)
 	cBitcoinerLive := make(chan types.FeeAPIResponse3)
 	cBlockstreamInfo := make(chan types.FeeAPIResponse3)
+	cMempoolSpace := make(chan types.FeeAPIResponse3)
 
 	go getBTCCom(cBTCCom)
 	go getBlockchairCom(cBlockchairCom)
@@ -56,6 +57,7 @@ func getFeerates() {
 	go getMyceliumIo(cMyceliumIo)
 	go getBitcoinerLive(cBitcoinerLive)
 	go getBlockstreamInfo(cBlockstreamInfo)
+	go getMempoolSpace(cMempoolSpace)
 
 	respBTCCom := <-cBTCCom
 	respBlockchairCom := <-cBlockchairCom
@@ -71,6 +73,7 @@ func getFeerates() {
 	respMyceliumIo := <-cMyceliumIo
 	respBitcoinerLive := <-cBitcoinerLive
 	respBlockstreamInfo := <-cBlockstreamInfo
+	respMempoolSpace := <-cMempoolSpace
 
 	entry := types.FeeRateAPIEntry{
 		Timestamp:          time.Now().Unix(),
@@ -88,6 +91,7 @@ func getFeerates() {
 		MyceliumIo:         respMyceliumIo,
 		BitcoinerLive:      respBitcoinerLive,
 		BlockstreamInfo:    respBlockstreamInfo,
+		MempoolSpace:       respMempoolSpace,
 	}
 
 	database.WriteFeerateAPIEntry(entry)
@@ -333,4 +337,17 @@ func getLedgerCom(cLedgerCom chan types.FeeAPIResponse3) {
 	result := gjson.GetMany(string(body), "1", "3", "6")
 	highFee, medFee, lowFee := result[0].Float()/1000, result[1].Float()/1000, result[2].Float()/1000
 	cLedgerCom <- types.FeeAPIResponse3{highFee, medFee, lowFee}
+}
+
+func getMempoolSpace(cMempoolSpace chan types.FeeAPIResponse3) {
+	url := "https://mempool.space/api/v1/fees/recommended"
+	body, err := makeHTTPGETReq(url, 5)
+	if err != nil {
+		logger.Error.Printf("Could not fetch mempool.space: %v", err.Error())
+		cMempoolSpace <- types.FeeAPIResponse3{0, 0, 0}
+		return
+	}
+	result := gjson.GetMany(string(body), "fastestFee", "halfHourFee", "hourFee")
+	highFee, medFee, lowFee := result[0].Float(), result[1].Float(), result[2].Float()
+	cMempoolSpace <- types.FeeAPIResponse3{highFee, medFee, lowFee}
 }

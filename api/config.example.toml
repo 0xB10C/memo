@@ -3,9 +3,8 @@ port = "23485" # this needs to be a string
 production = true
 
 
-[database]
+[redis]
 host = ""  # FIXME:
-user = ""  # FIXME:
-passwd = ""  # FIXME:
-name = ""  # FIXME:
-connection = "tcp"
+port = "6379"
+passwd = ""
+connection = "redis"

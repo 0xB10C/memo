@@ -34,4 +34,5 @@ type FeeRateAPIEntry struct {
 	MyceliumIo         FeeAPIResponse3 `json:"myceliumio"`
 	BitcoinerLive      FeeAPIResponse3 `json:"bitcoinerlive"`
 	BlockstreamInfo    FeeAPIResponse3 `json:"blockstreaminfo"`
+	MempoolSpace       FeeAPIResponse3 `json:"mempoolspace"`
 }

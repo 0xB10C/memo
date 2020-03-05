@@ -563,7 +563,8 @@ async function drawFeerateAPILines(xMin){
     10: "Feerates for a confirmation in one, three and six blocks shown.", // ledgercom
     11: "Feerates for two, four and ten blocks are shown.", // myceliumio
     12: "Feerates for two, four and six blocks are shown.", // trezorio
-    13: "Feerates for two, four and six blocks are shown." // wasabiwalletioEcon
+    13: "Feerates for two, four and six blocks are shown.", // wasabiwalletioEcon
+    14: "The fastest, a half an hour and an hour feerate are shown.", // mempoolspace
   }
 
   const idToName = {
@@ -580,7 +581,8 @@ async function drawFeerateAPILines(xMin){
     10: "ledgercom", 
     11: "myceliumio", 
     12: "trezorio", 
-    13: "wasabiwalletioEcon" 
+    13: "wasabiwalletioEcon", 
+    14: "mempoolspace",
   }
 
   selected = idToName[selectedId]
