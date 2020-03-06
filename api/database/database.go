@@ -104,7 +104,6 @@ func GetRecentBlocks() (blocks []types.RecentBlock, err error) {
 	return
 }
 
-
 // GetBlockEntries returns the 20 most recent blocks with short TXIDs.
 func GetBlockEntries() (blocks []types.BlockEntry, err error) {
 	c := Pool.Get()
@@ -265,20 +264,20 @@ func GetMempoolEntriesCache() (mesJSON string, err error) {
 	return
 }
 
-// GetRecentFeerateAPIEntries returns the recent feeRate API entrys from Redis
+// GetRecentFeerateAPIEntries returns the recent feeRate API entries from Redis
 func GetRecentFeerateAPIEntries() (entries []types.FeeRateAPIEntry, err error) {
 	c := Pool.Get()
 	defer c.Close()
 
-	entrysJSON, err := redis.Strings(c.Do("LRANGE", "feerateAPIEntries", 0, 100))
+	entriesJSON, err := redis.Strings(c.Do("LRANGE", "feerateAPIEntries", 0, 400))
 	if err != nil {
 		return
 	}
 
 	entries = make([]types.FeeRateAPIEntry, 0)
-	for index := range entrysJSON {
+	for index := range entriesJSON {
 		entry := types.FeeRateAPIEntry{}
-		err = json.Unmarshal([]byte(entrysJSON[index]), &entry)
+		err = json.Unmarshal([]byte(entriesJSON[index]), &entry)
 		if err != nil {
 			return
 		}
