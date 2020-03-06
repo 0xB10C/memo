@@ -598,7 +598,7 @@ async function drawFeerateAPILines(xMin){
       .defined(function(d) {return isFeerateDefined(d[selected].high) && new Date(d.timestamp*1000) >= xMin})
       .x(function(d) { return xScale(new Date(d.timestamp*1000)); })
       .y(function(d) { return yScale(d[selected].high); })
-      .curve(d3.curveMonotoneX)
+      .curve(d3.curveStep)
 
     gFeerateAPILines.append("path")
       .datum(gRecentFeerateAPIData)
@@ -612,7 +612,7 @@ async function drawFeerateAPILines(xMin){
       .defined(function(d) {return isFeerateDefined(d[selected].med) && new Date(d.timestamp*1000) >= xMin})
       .x(function(d) { return xScale(new Date(d.timestamp*1000)); })
       .y(function(d) { return yScale(d[selected].med); }) 
-      .curve(d3.curveMonotoneX)
+      .curve(d3.curveStep)
 
     gFeerateAPILines.append("path")
       .datum(gRecentFeerateAPIData)
@@ -626,7 +626,7 @@ async function drawFeerateAPILines(xMin){
       .defined(function(d) {return isFeerateDefined(d[selected].low) && new Date(d.timestamp*1000) >= xMin})
       .x(function(d) { return xScale(new Date(d.timestamp*1000)); })
       .y(function(d) { return yScale(d[selected].low); })
-      .curve(d3.curveMonotoneX)
+      .curve(d3.curveStep)
 
     gFeerateAPILines.append("path")
       .datum(gRecentFeerateAPIData)

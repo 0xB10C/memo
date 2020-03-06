@@ -7,23 +7,23 @@
 
 .feerate-line-high {
   fill: none;
-  stroke-width: 4px;
+  stroke-width: 10px;
   stroke-linecap: round;
-  stroke: #000f;
+  stroke: rgb(31, 63, 245);
 }
 
 .feerate-line-med {
   fill: none;
-  stroke-width: 3px;
+  stroke-width: 9px;
   stroke-linecap: round;
-  stroke: #000c;
+  stroke: rgb(37, 175, 255);
 }
 
 .feerate-line-low {
   fill: none;
-  stroke-width: 2px;
+  stroke-width: 8px;
   stroke-linecap: round;
-  stroke: #0009;
+  stroke: rgb(31, 245, 234);
 }
 
 #chart {
