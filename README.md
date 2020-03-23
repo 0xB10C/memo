@@ -8,18 +8,6 @@
 Seemingly stuck and longtime-unconfirmed transactions can be quite annoying for users transacting on the Bitcoin network.
 The idea of mempool.observer is to provide users with information about unconfirmed transactions and transaction fees.
 
-## Project Structure
-
-Folder Structure
-```
-memo/
-├── api/          # Go code that compiles to a binary API returning JSON from a Redis instance
-├── memod/        # Go code that compiles to a binary worker daemon writing data to a Redis instance
-└── www/          # Statically served HTML, JS and CSS files
-```
-
-There exists a overview of my [infrastructure setup](https://www.plectica.com/maps/RCXWDOYD9) for mempool.observer.
-
 ## Project History
 
 I've started building the first version of mempool.observer mid 2017 as my first Bitcoin related project.

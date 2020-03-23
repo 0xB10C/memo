@@ -4,14 +4,15 @@ GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 
+BINARY_API=memo-api
+BINARY_DAEMON=memo-daemon
 
 all: clean test build 
 build: 
-				cd api && $(GOBUILD) -o api -v api.go 
-				cd memod && $(GOBUILD) -o memod -v memod.go 
+	$(GOBUILD) -o $(BINARY_API) -v cmd/api/api.go 
+	$(GOBUILD) -o $(BINARY_DAEMON) -v cmd/daemon/daemon.go 
 test: 
-				cd api && $(GOTEST) -v ./...
-				cd memod && $(GOTEST) -v ./...
+	$(GOTEST) -v ./...
 clean: 
-				rm -f ./api/api
-				rm -f ./memod/memod
+	rm -f $(BINARY_API) 
+	rm -f $(BINARY_DAEMON)

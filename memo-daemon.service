@@ -1,0 +1,18 @@
+[Unit]
+Description=memo-deamon - mempool observer deamon
+Wants=network.target
+After=network.target
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=5s
+
+# FIXME: path to binary
+ExecStart=/path/to/memo-deamon
+
+# FIXME: path to config.toml directory
+WorkingDirectory=/path/to/
+
+[Install]
+WantedBy=multi-user.target
