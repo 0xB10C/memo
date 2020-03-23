@@ -2,6 +2,7 @@ package zmq
 
 import (
 	"github.com/0xb10c/memo/config"
+	"github.com/0xb10c/memo/database"
 	"github.com/0xb10c/memo/logger"
 	"github.com/0xb10c/memo/processor"
 
@@ -14,7 +15,7 @@ const rawTx string = "rawtx"
 const rawTx2 string = "rawtx2"
 const hashTx string = "hashtx"
 
-func SetupZMQ() {
+func SetupZMQ(pool *database.RedisPool) {
 
 	zmqHost := config.GetString("zmq.host")
 	zmqPort := config.GetString("zmq.port")
@@ -41,32 +42,32 @@ func SetupZMQ() {
 
 	defer subscriber.Close() // cancel subscribe
 
-	loopZMQ(subscriber)
+	loopZMQ(subscriber, pool)
 }
 
-func loopZMQ(subscriber *zmq4.Socket) {
+func loopZMQ(subscriber *zmq4.Socket, pool *database.RedisPool) {
 	for {
 		msg, err := subscriber.RecvMessage(0)
 		if err != nil {
 			logger.Error.Println(err)
 		}
-		handleZMQMessage(msg)
+		handleZMQMessage(msg, pool)
 	}
 }
 
-func handleZMQMessage(zmqMessage []string) {
+func handleZMQMessage(zmqMessage []string, pool *database.RedisPool) {
 	topic := zmqMessage[0]
 	payload := zmqMessage[1]
 
 	switch topic {
 	case rawBlock:
-		go processor.HandleRawBlock(payload)
+		go processor.HandleRawBlock(payload, pool)
 	case hashBlock:
 		go processor.HandleHashBlock(payload)
 	case rawTx:
 		go processor.HandleRawTx(payload)
 	case rawTx2:
-		go processor.HandleRawTxWithSizeAndFee(payload)
+		go processor.HandleRawTxWithSizeAndFee(payload, pool)
 	case hashTx:
 		go processor.HandleHashTx(payload)
 	default:

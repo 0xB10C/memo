@@ -7,14 +7,11 @@ import (
 
 	"github.com/0xb10c/memo/api/types"
 	"github.com/gomodule/redigo/redis"
-	jsoniter "github.com/json-iterator/go"
 )
 
-var json = jsoniter.ConfigCompatibleWithStandardLibrary
-
 // GetMempool gets the current mempool from the database
-func GetMempool() (timestamp time.Time, feerateMapJSON string, megabyteMarkersJSON string, mempoolSize int, err error) {
-	c := Pool.Get()
+func (p *RedisPool) GetMempool() (timestamp time.Time, feerateMapJSON string, megabyteMarkersJSON string, mempoolSize int, err error) {
+	c := p.Get()
 	defer c.Close()
 
 	prefix := "currentMempool"
@@ -43,8 +40,8 @@ func GetMempool() (timestamp time.Time, feerateMapJSON string, megabyteMarkersJS
 }
 
 // GetRecentBlocks returns the 10 most recent blocks.
-func GetRecentBlocks() (blocks []types.RecentBlock, err error) {
-	c := Pool.Get()
+func (p *RedisPool) GetRecentBlocks() (blocks []types.RecentBlock, err error) {
+	c := p.Get()
 	defer c.Close()
 
 	reJSON, err := redis.Strings(c.Do("LRANGE", "recentBlocks", 0, 9))
@@ -66,8 +63,8 @@ func GetRecentBlocks() (blocks []types.RecentBlock, err error) {
 }
 
 // GetBlockEntries returns the 20 most recent blocks with short TXIDs.
-func GetBlockEntries() (blocks []types.BlockEntry, err error) {
-	c := Pool.Get()
+func (p *RedisPool) GetBlockEntries() (blocks []types.BlockEntry, err error) {
+	c := p.Get()
 	defer c.Close()
 
 	beJSON, err := redis.Strings(c.Do("LRANGE", "blockEntries", 0, 20))
@@ -95,8 +92,8 @@ type MempoolState struct {
 	DataInBuckets     []float64 `json:"dataInBuckets"`
 }
 
-func GetHistorical(timeframe int, by string) (hmds []types.HistoricalMempoolData, err error) {
-	c := Pool.Get()
+func (p *RedisPool) GetHistorical(timeframe int, by string) (hmds []types.HistoricalMempoolData, err error) {
+	c := p.Get()
 	defer c.Close()
 
 	var timeSelector string
@@ -148,8 +145,8 @@ func GetHistorical(timeframe int, by string) (hmds []types.HistoricalMempoolData
 }
 
 // GetTransactionStats gets the Transaction Stats data from the database
-func GetTransactionStats() (tss []types.TransactionStat, err error) {
-	c := Pool.Get()
+func (p *RedisPool) GetTransactionStats() (tss []types.TransactionStat, err error) {
+	c := p.Get()
 	defer c.Close()
 
 	tssJSON, err := redis.Strings(c.Do("LRANGE", "transactionStats", 0, 180))
@@ -178,8 +175,8 @@ func GetTransactionStats() (tss []types.TransactionStat, err error) {
 }
 
 // GetMempoolEntries gets the last x mempool Entries from the database
-func GetMempoolEntries() (mes []types.MempoolEntry, err error) {
-	c := Pool.Get()
+func (p *RedisPool) GetMempoolEntries() (mes []types.MempoolEntry, err error) {
+	c := p.Get()
 	defer c.Close()
 
 	// gets recent entries from 0 to 19999 (20k)
@@ -202,8 +199,8 @@ func GetMempoolEntries() (mes []types.MempoolEntry, err error) {
 }
 
 // SetMempoolEntriesCache SETs the response of a recent GetMempoolEntries() as a cache
-func SetMempoolEntriesCache(mesJSON string) (err error) {
-	c := Pool.Get()
+func (p *RedisPool) SetMempoolEntriesCache(mesJSON string) (err error) {
+	c := p.Get()
 	defer c.Close()
 
 	_, err = c.Do("SET", "cache:mempoolEntries", mesJSON)
@@ -214,8 +211,8 @@ func SetMempoolEntriesCache(mesJSON string) (err error) {
 }
 
 // GetMempoolEntriesCache GET the cached response of a recent GetMempoolEntries() call
-func GetMempoolEntriesCache() (mesJSON string, err error) {
-	c := Pool.Get()
+func (p *RedisPool) GetMempoolEntriesCache() (mesJSON string, err error) {
+	c := p.Get()
 	defer c.Close()
 
 	mesJSON, err = redis.String(c.Do("GET", "cache:mempoolEntries"))
@@ -226,8 +223,8 @@ func GetMempoolEntriesCache() (mesJSON string, err error) {
 }
 
 // GetRecentFeerateAPIEntries returns the recent feeRate API entries from Redis
-func GetRecentFeerateAPIEntries() (entries []types.FeeRateAPIEntry, err error) {
-	c := Pool.Get()
+func (p *RedisPool) GetRecentFeerateAPIEntries() (entries []types.FeeRateAPIEntry, err error) {
+	c := p.Get()
 	defer c.Close()
 
 	entriesJSON, err := redis.Strings(c.Do("LRANGE", "feerateAPIEntries", 0, 400))

@@ -16,16 +16,16 @@ import (
 )
 
 // SetupFeerateAPIFetcher sets up a periodic feerate API fetch job
-func SetupFeerateAPIFetcher() {
+func SetupFeerateAPIFetcher(pool *database.RedisPool) {
 	feerateFetchInterval := config.GetInt("feeratefetcher.fetchInterval")
 	s := gocron.NewScheduler()
-	s.Every(uint64(feerateFetchInterval)).Seconds().Do(getFeerates)
+	s.Every(uint64(feerateFetchInterval)).Seconds().Do(getFeerates, pool)
 	logger.Info.Println("Setup feerate API fetcher. First fetch in", feerateFetchInterval, "seconds")
 	<-s.Start()
 	defer s.Clear()
 }
 
-func getFeerates() {
+func getFeerates(pool *database.RedisPool) {
 	cBTCCom := make(chan types.FeeAPIResponse1)
 	cBlockchairCom := make(chan types.FeeAPIResponse1)
 
@@ -94,7 +94,7 @@ func getFeerates() {
 		MempoolSpace:       respMempoolSpace,
 	}
 
-	database.WriteFeerateAPIEntry(entry)
+	pool.WriteFeerateAPIEntry(entry)
 }
 
 func getEarnCom(cEarnCom chan types.FeeAPIResponse3) {

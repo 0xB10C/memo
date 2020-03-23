@@ -20,7 +20,7 @@ import (
 /* ----- RAW BLOCK handling ----- */
 
 // HandleRawBlock handles a raw incoming zmq block
-func HandleRawBlock(payload string) {
+func HandleRawBlock(payload string, pool *database.RedisPool) {
 	block, err := deserializeRawBlock(payload)
 	if err != nil {
 		logger.Error.Printf("Error handling raw block: %v", err)
@@ -32,7 +32,7 @@ func HandleRawBlock(payload string) {
 	sizeWithoutWitness := block.SerializeSizeStripped()
 	weight := sizeWithWitness + sizeWithoutWitness*3
 
-	err = database.WriteNewBlockData(height, numTx, sizeWithWitness, weight)
+	err = pool.WriteNewBlockData(height, numTx, sizeWithWitness, weight)
 	if err != nil {
 		logger.Error.Printf("Error writing block to database: %v", err)
 	}
@@ -47,7 +47,7 @@ func HandleRawBlock(payload string) {
 		shortTXIDs = append(shortTXIDs, tx.TxHash().String()[0:shortTXIDLength])
 	}
 
-	err = database.WriteNewBlockEntry(height, shortTXIDs)
+	err = pool.WriteNewBlockEntry(height, shortTXIDs)
 	if err != nil {
 		logger.Error.Printf("Error writing block entries to database: %v", err)
 	}
@@ -107,7 +107,7 @@ func HandleRawTx(payload string) {
 
 // HandleRawTxWithSizeAndFee handles the special rawtx2 zmq message
 // which contains a tx, it's size and it's fee as 64 bit ints
-func HandleRawTxWithSizeAndFee(payload string) {
+func HandleRawTxWithSizeAndFee(payload string, pool *database.RedisPool) {
 	payloadLength := len(payload)
 
 	tx, err := rawtx.DeserializeRawTxBytes([]byte(payload[0 : payloadLength-16]))
@@ -183,7 +183,7 @@ func HandleRawTxWithSizeAndFee(payload string) {
 		}
 	}
 
-	err = database.WriteMempoolEntries(me)
+	err = pool.WriteMempoolEntries(me)
 	if err != nil {
 		logger.Error.Printf("Error handling raw tx: %v", err)
 	}

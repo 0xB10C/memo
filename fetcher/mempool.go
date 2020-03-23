@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/0xb10c/memo/config"
+	"github.com/0xb10c/memo/database"
 	"github.com/0xb10c/memo/encoder"
 	"github.com/0xb10c/memo/logger"
 	"github.com/0xb10c/memo/processor"
@@ -19,16 +20,16 @@ import (
 )
 
 // SetupMempoolFetcher sets up a periodic mempool fetch job
-func SetupMempoolFetcher() {
+func SetupMempoolFetcher(redisPool *database.RedisPool) {
 	mempoolFetchInterval := config.GetInt("mempool.fetchInterval")
 	s := gocron.NewScheduler()
-	s.Every(uint64(mempoolFetchInterval)).Seconds().Do(getMempool)
+	s.Every(uint64(mempoolFetchInterval)).Seconds().Do(getMempool, redisPool)
 	logger.Info.Println("Setup mempool fetcher. First fetch in", mempoolFetchInterval, "seconds")
 	<-s.Start()
 	defer s.Clear()
 }
 
-func getMempool() {
+func getMempool(redisPool *database.RedisPool) {
 
 	body, err := fetchMempool()
 	if err != nil {
@@ -41,7 +42,7 @@ func getMempool() {
 		return // we return here to stop the execution
 	}
 
-	processor.ProcessMempool(mempool)
+	processor.ProcessMempool(mempool, redisPool)
 
 	if config.GetBool("mempool.callSaveMempool") {
 		if rand.Intn(100) <= 25 { // Only call savemempool every 4th call

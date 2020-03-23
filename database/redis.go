@@ -6,6 +6,11 @@ import (
 	"github.com/gomodule/redigo/redis"
 )
 
+// RedisPool holds a pool of redis connections
+type RedisPool struct {
+	*redis.Pool
+}
+
 func newPool() *redis.Pool {
 	dbUser := config.GetString("redis.user")
 	dbPasswd := config.GetString("redis.passwd")
@@ -29,18 +34,18 @@ func newPool() *redis.Pool {
 }
 
 // SetupRedis sets up a new Redis Pool
-func SetupRedis() (err error) {
-	Pool = newPool()
+func SetupRedis() (pool *RedisPool, err error) {
+	p := newPool()
 
-	c := Pool.Get() // get a new connection
+	c := p.Get() // get a new connection
 	defer c.Close()
 
 	_, err = c.Do("PING")
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	logger.Info.Println("Setup redis database connection pool")
 
-	return nil
+	return &RedisPool{p}, nil
 }

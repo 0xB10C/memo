@@ -5,9 +5,13 @@ import (
 
 	"github.com/0xb10c/memo/config"
 	"github.com/0xb10c/memo/logger"
+	_ "github.com/mattn/go-sqlite3"
 )
 
-// SetupSQLite sets up the SQLite Database used for persitently saving mempool entries
+// SQLiteDB holds a connection to a SQLite database
+var SQLiteDB *sql.DB
+
+// SetupSQLite sets up the SQLite Database used for persistently saving mempool entries
 func SetupSQLite() (db *sql.DB, err error) {
 	filePath := config.GetString("zmq.saveMempoolEntries.dbPath")
 	db, err = sql.Open("sqlite3", filePath)

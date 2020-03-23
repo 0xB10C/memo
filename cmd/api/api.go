@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/0xb10c/memo/cache"
 	"github.com/0xb10c/memo/config"
 	"github.com/0xb10c/memo/database"
+	"github.com/0xb10c/memo/logger"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
@@ -31,12 +31,14 @@ func main() {
 	router.Use(cors.New(corsConfig))
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
 
-	err := database.SetupRedis()
+	pool, err := database.SetupRedis()
 	if err != nil {
 		panic(fmt.Errorf("Failed to setup redis: %v", err))
 	}
 
-	go cache.SetupCache()
+	go database.SetupMempoolEntriesCache(pool)
+
+	router.Use(redisPoolMiddleware(pool))
 
 	api := router.Group("/api")
 	{
@@ -53,9 +55,25 @@ func main() {
 	router.Run(portString)
 }
 
-func getMempool(c *gin.Context) {
+// ApiMiddleware will add the db connection to the context
+func redisPoolMiddleware(pool *database.RedisPool) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set("redisPool", pool)
+		c.Next()
+	}
+}
 
-	timestamp, byCount, megabyteMarkersJSON, mempoolSize, err := database.GetMempool()
+func getMempool(c *gin.Context) {
+	pool, ok := c.MustGet("redisPool").(*database.RedisPool)
+	if !ok {
+		logger.Error.Println("Could not get Redis Pool.")
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Database error",
+		})
+		return
+	}
+
+	timestamp, byCount, megabyteMarkersJSON, mempoolSize, err := pool.GetMempool()
 	if err != nil {
 		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -82,8 +100,16 @@ func getMempool(c *gin.Context) {
 }
 
 func getRecentBlocks(c *gin.Context) {
+	pool, ok := c.MustGet("redisPool").(*database.RedisPool)
+	if !ok {
+		logger.Error.Println("Could not get Redis Pool.")
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Database error",
+		})
+		return
+	}
 
-	blocks, err := database.GetRecentBlocks()
+	blocks, err := pool.GetRecentBlocks()
 	if err != nil {
 		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -96,7 +122,16 @@ func getRecentBlocks(c *gin.Context) {
 }
 
 func getBlockEntries(c *gin.Context) {
-	blocks, err := database.GetBlockEntries()
+	pool, ok := c.MustGet("redisPool").(*database.RedisPool)
+	if !ok {
+		logger.Error.Println("Could not get Redis Pool.")
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Database error",
+		})
+		return
+	}
+
+	blocks, err := pool.GetBlockEntries()
 	if err != nil {
 		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -109,6 +144,15 @@ func getBlockEntries(c *gin.Context) {
 }
 
 func getHistoricalMempool(c *gin.Context) {
+	pool, ok := c.MustGet("redisPool").(*database.RedisPool)
+	if !ok {
+		logger.Error.Println("Could not get Redis Pool.")
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Database error",
+		})
+		return
+	}
+
 	timeframe, err := strconv.ParseInt(c.Param("timeframe"), 10, 0)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -126,7 +170,7 @@ func getHistoricalMempool(c *gin.Context) {
 		return
 	}
 
-	mempoolStates, err := database.GetHistorical(int(timeframe), by)
+	mempoolStates, err := pool.GetHistorical(int(timeframe), by)
 	if err != nil {
 		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -139,7 +183,16 @@ func getHistoricalMempool(c *gin.Context) {
 }
 
 func getTransactionStats(c *gin.Context) {
-	tss, err := database.GetTransactionStats()
+	pool, ok := c.MustGet("redisPool").(*database.RedisPool)
+	if !ok {
+		logger.Error.Println("Could not get Redis Pool.")
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Database error",
+		})
+		return
+	}
+
+	tss, err := pool.GetTransactionStats()
 	if err != nil {
 		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -152,7 +205,16 @@ func getTransactionStats(c *gin.Context) {
 }
 
 func getMempoolEntries(c *gin.Context) {
-	mes, err := database.GetMempoolEntries()
+	pool, ok := c.MustGet("redisPool").(*database.RedisPool)
+	if !ok {
+		logger.Error.Println("Could not get Redis Pool.")
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Database error",
+		})
+		return
+	}
+
+	mes, err := pool.GetMempoolEntries()
 	if err != nil {
 		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -165,8 +227,16 @@ func getMempoolEntries(c *gin.Context) {
 }
 
 func getRecentFeerateAPIEntries(c *gin.Context) {
+	pool, ok := c.MustGet("redisPool").(*database.RedisPool)
+	if !ok {
+		logger.Error.Println("Could not get Redis Pool.")
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Database error",
+		})
+		return
+	}
 
-	entries, err := database.GetRecentFeerateAPIEntries()
+	entries, err := pool.GetRecentFeerateAPIEntries()
 	if err != nil {
 		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -179,7 +249,16 @@ func getRecentFeerateAPIEntries(c *gin.Context) {
 }
 
 func getCachedMempoolEntries(c *gin.Context) {
-	entries, err := database.GetMempoolEntriesCache()
+	pool, ok := c.MustGet("redisPool").(*database.RedisPool)
+	if !ok {
+		logger.Error.Println("Could not get Redis Pool.")
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Database error",
+		})
+		return
+	}
+
+	entries, err := pool.GetMempoolEntriesCache()
 	if err != nil {
 		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{

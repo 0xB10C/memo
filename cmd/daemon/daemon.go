@@ -21,7 +21,7 @@ func main() {
 	signal.Notify(exitSignals, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	go handleExitSig(exitSignals, shouldExit)
 
-	err := database.SetupRedis()
+	redisPool, err := database.SetupRedis()
 	if err != nil {
 		logger.Error.Printf("Failed to setup Redis database connection: %s", err.Error())
 		shouldExit <- true
@@ -39,7 +39,7 @@ func main() {
 	}
 
 	if noError {
-		startWorkers()
+		startWorkers(redisPool)
 	}
 
 	<-shouldExit // wait till memod should exit
@@ -53,21 +53,21 @@ func handleExitSig(exitSignals chan os.Signal, shouldExit chan bool) {
 	shouldExit <- true
 }
 
-func startWorkers() {
+func startWorkers(pool *database.RedisPool) {
 
 	if config.GetBool("mempool.enable") {
 		logger.Info.Println("Starting with mempool fetching enabled")
-		go fetcher.SetupMempoolFetcher()
+		go fetcher.SetupMempoolFetcher(pool)
 	}
 
 	if config.GetBool("feeratefetcher.enable") {
 		logger.Info.Println("Starting with feerate API fetching enabled")
-		go fetcher.SetupFeerateAPIFetcher()
+		go fetcher.SetupFeerateAPIFetcher(pool)
 	}
 
 	if config.GetBool("zmq.enable") {
 		logger.Info.Println("Starting with ZMQ interface enabled")
-		go zmq.SetupZMQ()
+		go zmq.SetupZMQ(pool)
 	}
 
 }

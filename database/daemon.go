@@ -15,9 +15,9 @@ import (
 )
 
 // WriteCurrentMempoolData writes the current mempool data into the database
-func WriteCurrentMempoolData(feerateMap map[int]int, mempoolSizeInByte int, megabyteMarkers []int) error {
+func (p *RedisPool) WriteCurrentMempoolData(feerateMap map[int]int, mempoolSizeInByte int, megabyteMarkers []int) error {
 	defer logger.TrackTime(time.Now(), "writeCurrentMempoolData()")
-	c := Pool.Get()
+	c := p.Get()
 	defer c.Close()
 
 	feerateMapJSON, err := json.Marshal(feerateMap)
@@ -46,9 +46,9 @@ func WriteCurrentMempoolData(feerateMap map[int]int, mempoolSizeInByte int, mega
 }
 
 // WriteNewBlockData writes data for a new block into the database
-func WriteNewBlockData(height int, numTx int, sizeWithWitness int, weight int) error {
+func (p *RedisPool) WriteNewBlockData(height int, numTx int, sizeWithWitness int, weight int) error {
 	defer logger.TrackTime(time.Now(), "writeNewBlockData()")
-	c := Pool.Get()
+	c := p.Get()
 	defer c.Close()
 	listName := "recentBlocks"
 
@@ -68,9 +68,9 @@ func WriteNewBlockData(height int, numTx int, sizeWithWitness int, weight int) e
 }
 
 // WriteNewBlockEntry writes a BlockEntry into the Redis database.
-func WriteNewBlockEntry(height int, shortTXIDs []string) error {
+func (p *RedisPool) WriteNewBlockEntry(height int, shortTXIDs []string) error {
 	defer logger.TrackTime(time.Now(), "WriteNewBlockEntry()")
-	c := Pool.Get()
+	c := p.Get()
 	defer c.Close()
 	listName := "blockEntries"
 
@@ -99,9 +99,9 @@ func WriteNewBlockEntry(height int, shortTXIDs []string) error {
 }
 
 // WriteHistoricalMempoolData writes the histoical mempool data into the database
-func WriteHistoricalMempoolData(countInBuckets []int, feeInBuckets []float64, sizeInBuckets []int, timeframe int) error {
+func (p *RedisPool) WriteHistoricalMempoolData(countInBuckets []int, feeInBuckets []float64, sizeInBuckets []int, timeframe int) error {
 	defer logger.TrackTime(time.Now(), "WriteHistoricalMempoolData()")
-	c := Pool.Get()
+	c := p.Get()
 	defer c.Close()
 
 	countInBucketsJSON, err := json.Marshal(types.HistoricalMempoolData{DataInBuckets: countInBuckets, Timestamp: time.Now().Unix()})
@@ -142,9 +142,9 @@ func WriteHistoricalMempoolData(countInBuckets []int, feeInBuckets []float64, si
 }
 
 // WriteCurrentTransactionStats writes the current transaction stats into the database
-func WriteCurrentTransactionStats(segwitCount int, rbfCount int, txCount int) error {
+func (p *RedisPool) WriteCurrentTransactionStats(segwitCount int, rbfCount int, txCount int) error {
 	defer logger.TrackTime(time.Now(), "WriteCurrentTransactionStats()")
-	c := Pool.Get()
+	c := p.Get()
 	defer c.Close()
 
 	ts := types.TransactionStat{SegwitCount: segwitCount, RbfCount: rbfCount, TxCount: txCount, Timestamp: time.Now().Unix()}
@@ -164,9 +164,9 @@ func WriteCurrentTransactionStats(segwitCount int, rbfCount int, txCount int) er
 }
 
 // WriteMempoolEntries writes a txid and it's feerate to the database
-func WriteMempoolEntries(me types.MempoolEntry) error {
+func (p *RedisPool) WriteMempoolEntries(me types.MempoolEntry) error {
 	//defer logger.TrackTime(time.Now(), "WriteMempoolEntries()")
-	c := Pool.Get()
+	c := p.Get()
 	defer c.Close()
 
 	meJSON, err := json.Marshal(me)
@@ -234,9 +234,9 @@ func writeMempoolEntriesSQLite(me types.MempoolEntry) error {
 }
 
 // WriteFeerateAPIEntry writes a new feerate API entry into the database
-func WriteFeerateAPIEntry(entry types.FeeRateAPIEntry) error {
+func (p *RedisPool) WriteFeerateAPIEntry(entry types.FeeRateAPIEntry) error {
 	defer logger.TrackTime(time.Now(), "WriteFeerateAPIEntry()")
-	c := Pool.Get()
+	c := p.Get()
 	defer c.Close()
 	listName := "feerateAPIEntries"
 
@@ -253,6 +253,7 @@ func WriteFeerateAPIEntry(entry types.FeeRateAPIEntry) error {
 	return nil
 }
 
+// NeedsUpdate holds information about the timeframes that need an update
 type NeedsUpdate struct {
 	Update2h   bool
 	Update12h  bool
@@ -262,9 +263,10 @@ type NeedsUpdate struct {
 	Update180d bool
 }
 
-func ReadHistoricalMempoolNeedUpdate() (nu NeedsUpdate, err error) {
+// ReadHistoricalMempoolNeedUpdate checks which time frame is due (needs an update)
+func (p *RedisPool) ReadHistoricalMempoolNeedUpdate() (nu NeedsUpdate, err error) {
 	defer logger.TrackTime(time.Now(), "ReadHistroricalMempoolNeedUpdate()")
-	c := Pool.Get()
+	c := p.Get()
 	defer c.Close()
 
 	lastUpdatedTimesStrings, err := redis.Strings(c.Do("MGET", "historicalMempool1:lastUpdated", "historicalMempool2:lastUpdated", "historicalMempool3:lastUpdated", "historicalMempool4:lastUpdated", "historicalMempool5:lastUpdated", "historicalMempool6:lastUpdated"))

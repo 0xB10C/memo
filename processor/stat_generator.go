@@ -12,32 +12,31 @@ import (
 	"github.com/0xb10c/memo/types"
 )
 
-// cMEGABYTE: size of one megabyte in byte
-const cMEGABYTE = 1000000
+// MEGABYTE size of one megabyte in byte
+const MEGABYTE = 1000000
 
-// cSATOSHIPERBITCOIN: satoshi per bitcoin
-const cSATOSHIPERBITCOIN = 100000000
+// COIN satoshi per bitcoin
+const COIN = 100000000
 
-// ProcessMempool retrives the mempool and starts various processing functions on it
-func ProcessMempool(mempool map[string]types.PartialTransaction) {
+// ProcessMempool starts various processing functions on the passed mempool map
+func ProcessMempool(mempool map[string]types.PartialTransaction, redisPool *database.RedisPool) {
 	if config.GetBool("mempool.processing.processHistoricalMempool") {
-		go historicalMempool(mempool)
+		go historicalMempool(mempool, redisPool)
 	}
 
 	if config.GetBool("mempool.processing.processCurrentMempool") {
-		go currentMempool(mempool) // start _current mempool_ stat generation in a goroutine
+		go currentMempool(mempool, redisPool) // start _current mempool_ stat generation in a goroutine
 	}
 
 	if config.GetBool("mempool.processing.processTransactionStats") {
-		go transactionStatsMempool(mempool)
+		go transactionStatsMempool(mempool, redisPool)
 	}
-
 }
 
-func currentMempool(mempool map[string]types.PartialTransaction) {
+func currentMempool(mempool map[string]types.PartialTransaction, redisPool *database.RedisPool) {
 	feerateMap, mempoolSizeInByte, megabyteMarkers := generateCurrentMempoolStats(mempool)
 
-	err := database.WriteCurrentMempoolData(feerateMap, mempoolSizeInByte, megabyteMarkers)
+	err := redisPool.WriteCurrentMempoolData(feerateMap, mempoolSizeInByte, megabyteMarkers)
 	if err != nil {
 		logger.Error.Printf("Failed to write Current Mempool to database: %s", err.Error())
 	}
@@ -45,7 +44,7 @@ func currentMempool(mempool map[string]types.PartialTransaction) {
 	logger.Info.Println("Success writing Current Mempool to database.")
 }
 
-func historicalMempool(mempool map[string]types.PartialTransaction) {
+func historicalMempool(mempool map[string]types.PartialTransaction, redisPool *database.RedisPool) {
 
 	const timeframe2h = 1
 	const timeframe12h = 2
@@ -54,7 +53,7 @@ func historicalMempool(mempool map[string]types.PartialTransaction) {
 	const timeframe30d = 5
 	const timeframe180d = 6
 
-	needsUpdate, err := database.ReadHistoricalMempoolNeedUpdate()
+	needsUpdate, err := redisPool.ReadHistoricalMempoolNeedUpdate()
 	if err != nil {
 		logger.Error.Printf("Failed to get Needs Update data from database: %s", err.Error())
 	}
@@ -65,7 +64,7 @@ func historicalMempool(mempool map[string]types.PartialTransaction) {
 
 		if needsUpdate.Update2h {
 			logger.Info.Println("Writing 2h Historical Mempool data.")
-			err = database.WriteHistoricalMempoolData(countInBuckets, feeInBuckets, sizeInBuckets, timeframe2h)
+			err = redisPool.WriteHistoricalMempoolData(countInBuckets, feeInBuckets, sizeInBuckets, timeframe2h)
 			if err != nil {
 				logger.Error.Printf("Failed to write Historical Mempool to database: %s", err.Error())
 				return
@@ -74,7 +73,7 @@ func historicalMempool(mempool map[string]types.PartialTransaction) {
 
 		if needsUpdate.Update12h {
 			logger.Info.Println("Writing 12h Historical Mempool data.")
-			err = database.WriteHistoricalMempoolData(countInBuckets, feeInBuckets, sizeInBuckets, timeframe12h)
+			err = redisPool.WriteHistoricalMempoolData(countInBuckets, feeInBuckets, sizeInBuckets, timeframe12h)
 			if err != nil {
 				logger.Error.Printf("Failed to write Historical Mempool to database: %s", err.Error())
 				return
@@ -83,7 +82,7 @@ func historicalMempool(mempool map[string]types.PartialTransaction) {
 
 		if needsUpdate.Update48h {
 			logger.Info.Println("Writing 48h Historical Mempool data.")
-			err = database.WriteHistoricalMempoolData(countInBuckets, feeInBuckets, sizeInBuckets, timeframe48h)
+			err = redisPool.WriteHistoricalMempoolData(countInBuckets, feeInBuckets, sizeInBuckets, timeframe48h)
 			if err != nil {
 				logger.Error.Printf("Failed to write Historical Mempool to database: %s", err.Error())
 				return
@@ -92,7 +91,7 @@ func historicalMempool(mempool map[string]types.PartialTransaction) {
 
 		if needsUpdate.Update7d {
 			logger.Info.Println("Writing 7d Historical Mempool data.")
-			err = database.WriteHistoricalMempoolData(countInBuckets, feeInBuckets, sizeInBuckets, timeframe7d)
+			err = redisPool.WriteHistoricalMempoolData(countInBuckets, feeInBuckets, sizeInBuckets, timeframe7d)
 			if err != nil {
 				logger.Error.Printf("Failed to write Historical Mempool to database: %s", err.Error())
 				return
@@ -101,7 +100,7 @@ func historicalMempool(mempool map[string]types.PartialTransaction) {
 
 		if needsUpdate.Update30d {
 			logger.Info.Println("Writing 30d Historical Mempool data.")
-			err = database.WriteHistoricalMempoolData(countInBuckets, feeInBuckets, sizeInBuckets, timeframe30d)
+			err = redisPool.WriteHistoricalMempoolData(countInBuckets, feeInBuckets, sizeInBuckets, timeframe30d)
 			if err != nil {
 				logger.Error.Printf("Failed to write Historical Mempool to database: %s", err.Error())
 				return
@@ -110,7 +109,7 @@ func historicalMempool(mempool map[string]types.PartialTransaction) {
 
 		if needsUpdate.Update180d {
 			logger.Info.Println("Writing 180d Historical Mempool data.")
-			err = database.WriteHistoricalMempoolData(countInBuckets, feeInBuckets, sizeInBuckets, timeframe180d)
+			err = redisPool.WriteHistoricalMempoolData(countInBuckets, feeInBuckets, sizeInBuckets, timeframe180d)
 			if err != nil {
 				logger.Error.Printf("Failed to write Historical Mempool to database: %s", err.Error())
 				return
@@ -121,10 +120,10 @@ func historicalMempool(mempool map[string]types.PartialTransaction) {
 	}
 }
 
-func transactionStatsMempool(mempool map[string]types.PartialTransaction) {
+func transactionStatsMempool(mempool map[string]types.PartialTransaction, redisPool *database.RedisPool) {
 	segwitCount, rbfCount, txCount := generateTransactionStats(mempool)
 
-	err := database.WriteCurrentTransactionStats(segwitCount, rbfCount, txCount)
+	err := redisPool.WriteCurrentTransactionStats(segwitCount, rbfCount, txCount)
 	if err != nil {
 		logger.Error.Printf("Failed to write Transaction Stats to database: %s", err.Error())
 		return
@@ -161,7 +160,7 @@ func generateCurrentMempoolStats(mempool map[string]types.PartialTransaction) (m
 
 	for _, tx := range mempool {
 		mempoolSizeInByte += tx.Size
-		feerate := tx.Fee * cSATOSHIPERBITCOIN / float64(tx.Size)
+		feerate := tx.Fee * COIN / float64(tx.Size)
 		feerateMap[int(feerate)]++
 
 		memlist[mempoolPos] = memlistEntry{feerate: feerate, size: tx.Size}
@@ -174,13 +173,13 @@ func generateCurrentMempoolStats(mempool map[string]types.PartialTransaction) (m
 	})
 
 	memlistPos := len(memlist)
-	megabyteBucket := cMEGABYTE
+	megabyteBucket := MEGABYTE
 	for _, entry := range memlist {
 		if megabyteBucket-entry.size > 0 { // if entry.size fits in the bucket
 			megabyteBucket = megabyteBucket - entry.size
 			memlistPos--
 		} else { // if entry.size doesn't fit in the bucket
-			megabyteBucket = cMEGABYTE - entry.size               // start a new megabyte bucket mineedsUpdates the current entry.size
+			megabyteBucket = MEGABYTE - entry.size                // start a new megabyte bucket mineedsUpdates the current entry.size
 			megabyteMarkers = append(megabyteMarkers, memlistPos) // append current position to the megabyteMarkers list
 			memlistPos--
 		}
@@ -199,7 +198,7 @@ func generateHistoricalMempoolStats(mempool map[string]types.PartialTransaction)
 	sizeInBuckets = make([]int, len(feerateBuckets), len(feerateBuckets))
 
 	for _, tx := range mempool {
-		feerate := tx.Fee * cSATOSHIPERBITCOIN / float64(tx.Size)
+		feerate := tx.Fee * COIN / float64(tx.Size)
 		bucketIndex := findBucketForFeerate(feerate)
 		countInBuckets[bucketIndex]++
 		feeInBuckets[bucketIndex] += tx.Fee
