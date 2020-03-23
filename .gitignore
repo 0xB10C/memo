@@ -1,9 +1,8 @@
 .DS_STORE
 .vscode
 
-config.ini
-*/config.toml
+config.toml
 
-# build binarys
-memod/memod
-api/api
+# binarys
+memo-api
+memo-daemon
