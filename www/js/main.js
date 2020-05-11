@@ -787,7 +787,7 @@ const pastBlocksCard = {
       })
     }
 
-    let currentBlockHeight = response[response.length-1].height
+    let currentBlockHeight = response[0].height
     if (state.pastBlocks.data.notifyOnNewBlock && state.pastBlocks.data.lastBlockHeight != null && state.pastBlocks.data.lastBlockHeight < currentBlockHeight){
       notifyNewBlock(currentBlockHeight)
       state.pastBlocks.data.lastBlockHeight = currentBlockHeight
