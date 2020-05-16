@@ -1,13 +1,14 @@
 // Constants
 const NEXT_BLOCK_LABELS = ["1 vMB", "2 vMB", "3 vMB"]
 const updateInterval = 30000
-const apiHost = "https://" + window.location.hostname
+const apiHost = "https://mempool.observer"// + window.location.hostname
 
 var isTabActive = true;
 
 // State
 var state = {
   currentMempool: {
+    apiCallCount: 0,
     chart: null,
     elementId: "card-current-mempool",
     isScrolledIntoView: true,
@@ -18,6 +19,7 @@ var state = {
     },
   },
   historicalMempool: {
+    apiCallCount: 0,
     chart: null,
     elementId: "card-historical-mempool",
     isScrolledIntoView: false,
@@ -29,6 +31,7 @@ var state = {
     },
   },
   pastBlocks: {
+    apiCallCount: 0,
     chart: null,
     elementId: "card-past-blocks",
     isScrolledIntoView: false,
@@ -42,6 +45,7 @@ var state = {
     },
   },
   transactionStats: {
+    apiCallCount: 0,
     chart: null,
     elementId: "card-transaction-stats",
     isScrolledIntoView: false,
@@ -940,25 +944,29 @@ const pastBlocksCard = {
 
 function reloadData() {
 
+
   // reload mempool chart data
-  axios.get(apiHost + '/api/mempool')
+  axios.get(apiHost + '/api/mempool?c='+ state.currentMempool.apiCallCount)
     .then(function (response) {
+      state.currentMempool.apiCallCount++
       state.currentMempool.data.processedMempool = currentMempoolCard.processDataForChart(response.data)
       currentMempoolCard.updateCard(state.currentMempool.data.processedMempool)
       drawChart(state.currentMempool.elementId)
     });
 
   // reload past blocks data
-  axios.get(apiHost + '/api/recentBlocks')
+  axios.get(apiHost + '/api/recentBlocks?c=' + state.pastBlocks.apiCallCount)
     .then(function (response) {
+      state.pastBlocks.apiCallCount++
       state.pastBlocks.data.processedBlocks = pastBlocksCard.processDataForChart(response.data)
       pastBlocksCard.setTimer()
       drawChart(state.pastBlocks.elementId)
     });
 
   // reload transaction stats data
-  axios.get(apiHost + '/api/transactionStats')
+  axios.get(apiHost + '/api/transactionStats?c=' + state.transactionStats.apiCallCount)
     .then(function (response) {
+      state.transactionStats.apiCallCount++
       state.transactionStats.data.processedStats = transactionstatsCard.processDataForChart(response.data)
       drawChart(state.transactionStats.elementId)
     });
@@ -973,8 +981,9 @@ function reloadData() {
 }
 
 function reloadHistoricalMempool() {
-  axios.get(apiHost + '/api/historicalMempool/' + state.historicalMempool.data.timeframe + "/" + state.historicalMempool.data.bySelector)
+  axios.get(apiHost + '/api/historicalMempool/' + state.historicalMempool.data.timeframe + "/" + state.historicalMempool.data.bySelector + '?c=' + state.historicalMempool.apiCallCount)
     .then(function (response) {
+      state.historicalMempool.apiCallCount++
       state.historicalMempool.data.processedMempool = historicalMempoolCard.processDataForChart(response.data)
       drawChart(state.historicalMempool.elementId)
     });
