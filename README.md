@@ -33,5 +33,5 @@ You might need to do some exploration on your own to get everything working.
 Keep in mind, that you need a customized Bitcoin Core version to run the Bitcoin Transaction Monitor.
 
 ## Licence
-This project and all it's files are licensed under a GNU Affero General Public License.
+This project and all its files are licensed under a GNU Affero General Public License.
 
