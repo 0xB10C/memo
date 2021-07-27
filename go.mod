@@ -15,5 +15,5 @@ require (
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/pebbe/zmq4 v1.2.0
 	github.com/spf13/viper v1.6.2
-	github.com/tidwall/gjson v1.6.0
+	github.com/tidwall/gjson v1.6.5
 )
