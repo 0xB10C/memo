@@ -110,22 +110,19 @@ func HandleRawTx(payload string) {
 func HandleRawTxWithSizeAndFee(payload string, pool *database.RedisPool) {
 	payloadLength := len(payload)
 
-	tx, err := rawtx.DeserializeRawTxBytes([]byte(payload[0 : payloadLength-16]))
+	tx, err := rawtx.DeserializeRawTxBytes([]byte(payload[0 : payloadLength-8]))
 	if err != nil {
 		logger.Error.Printf("Error handling raw tx: %v", err)
 	}
 
-	sizeBytes := []byte(payload[payloadLength-16 : payloadLength-8])
 	feeBytes := []byte(payload[payloadLength-8 : payloadLength])
-
-	sizeInByte := int64(binary.LittleEndian.Uint64(sizeBytes))
 	feeInSat := int64(binary.LittleEndian.Uint64(feeBytes))
 
 	me := types.MempoolEntry{}
 	me.EntryTime = time.Now().Unix()
 	me.TxID = tx.HashString
 	me.Fee = feeInSat
-	me.Size = sizeInByte
+	me.Size = int64(tx.GetSizeWithoutWitness())
 	me.Version = tx.Version
 	me.InputCount = tx.GetNumInputs()
 	me.OutputCount = tx.GetNumOutputs()
