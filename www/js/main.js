@@ -1,7 +1,7 @@
 // Constants
 const NEXT_BLOCK_LABELS = ["1 vMB", "2 vMB", "3 vMB"]
 const updateInterval = 30000
-const apiHost = "https://mempool.observer"// + window.location.hostname
+const apiHost = window.location.origin
 
 var isTabActive = true;
 
