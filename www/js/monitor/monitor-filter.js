@@ -96,6 +96,14 @@ let gFilters = {
     if ((filter.state == filterStates.show && tx.spends["P2MS"]!=undefined) || (filter.state == filterStates.hide && tx.spends["P2MS"]==undefined) || filter.state == filterStates.inactive ){return true} return false
   }},
 
+  spendsP2TRKP:{title:"<abbr title='Pay-to-Taproot keypath'>P2TR keypath</abbr>&nbsp;spending", id:"spendsP2TRKP", state: filterStates.inactive, type:"tri-state-switch", queryStringCode: "y", isVisibleFunc: function (filter, tx) {
+    if ((filter.state == filterStates.show && tx.spends["P2TR KeyPath"]!=undefined) || (filter.state == filterStates.hide && tx.spends["P2TR KeyPath"]==undefined) || filter.state == filterStates.inactive ){return true} return false
+  }},
+
+  spendsP2TRSP:{title:"<abbr title='Pay-to-Taproot scriptpath'>P2TR scriptpath</abbr>&nbsp;spending", id:"spendsP2TRSP", state: filterStates.inactive, type:"tri-state-switch", queryStringCode: "ab", isVisibleFunc: function (filter, tx) {
+    if ((filter.state == filterStates.show && tx.spends["P2TR ScriptPath"]!=undefined) || (filter.state == filterStates.hide && tx.spends["P2TR ScriptPath"]==undefined) || filter.state == filterStates.inactive ){return true} return false
+  }},
+
   seperatorOutputs: {title: "Outputs", type:"separator"},
 
   outputcount:{title:"Output count", id:"outputcount", state: filterStates.greaterEqual, type:"withinput", queryStringCode: "g", input: {value: "0", type: "number", step: 1, min: 0, label: "output count", queryStringCode: "gi"}, isVisibleFunc: function (filter, tx) {
@@ -106,7 +114,7 @@ let gFilters = {
     if ((filter.state == filterStates.greaterEqual && tx.outputValue >= filter.input.value*100000000) || (filter.state == filterStates.lessEqual && tx.outputValue <= filter.input.value*100000000) || (filter.state == filterStates.equal && tx.outputValue == filter.input.value*100000000)){ return true } return false
   }},
 
-  paystoP2PKH:{title:"paying to&nbsp;<abbr title='Pay-to-Public-Key-Hash'>P2PKH</abbr>", id:"paystoP2PKH", state: filterStates.inactive, type:"tri-state-switch", queryStringCode: "v", isVisibleFunc: function (filter, tx) {
+  paystoP2PKH:{title:"paying to&nbsp;<abbr title='Pay-to-Public-Key-Hash'>P2PKH</abbr>", id:"paystoP2PKH", state: filterStates.inactive, type:"tri-state-switch", queryStringCode: "aa", isVisibleFunc: function (filter, tx) {
     if ((filter.state == filterStates.show && tx.paysTo["P2PKH"]!=undefined) || (filter.state == filterStates.hide && tx.paysTo["P2PKH"]==undefined) || filter.state == filterStates.inactive ){return true} return false
   }},
 
@@ -124,6 +132,10 @@ let gFilters = {
 
   paystoP2PK:{title:"paying to&nbsp;<abbr title='Pay-to-Public-Key'>P2PK</abbr>", id:"paystoP2PK", state: filterStates.inactive, type:"tri-state-switch", queryStringCode: "u", isVisibleFunc: function (filter, tx) {
     if ((filter.state == filterStates.show && tx.paysTo["P2PK"]!=undefined) || (filter.state == filterStates.hide && tx.paysTo["P2PK"]==undefined) || filter.state == filterStates.inactive ){return true} return false
+  }},
+
+  paystoP2TR:{title:"paying to&nbsp;<abbr title='Pay-to-Taproot'>P2TR</abbr>", id:"paystoP2TR", state: filterStates.inactive, type:"tri-state-switch", queryStringCode: "ac", isVisibleFunc: function (filter, tx) {
+    if ((filter.state == filterStates.show && tx.paysTo["P2TR"]!=undefined) || (filter.state == filterStates.hide && tx.paysTo["P2TR"]==undefined) || filter.state == filterStates.inactive ){return true} return false
   }},
 
   paystoP2MS:{title:"paying to&nbsp;<abbr title='Pay-to-Multisig'>P2MS</abbr>", id:"paystoP2MS", state: filterStates.inactive, type:"tri-state-switch", queryStringCode: "I", isVisibleFunc: function (filter, tx) {
@@ -144,7 +156,7 @@ function drawFilters() {
   var target = document.getElementById("filters-row")
   for (var key in gFilters) {
     if (gFilters.hasOwnProperty(key)) {
-      var filter = gFilters[key]    
+      var filter = gFilters[key]
       if (filter.type != "separator"){
         target.appendChild(templateFilter(filter))
       } else {
