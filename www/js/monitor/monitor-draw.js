@@ -58,6 +58,7 @@ var cVersion2 = function (d) {return d.version == 2 ? color1 : color2}
 var cOpReturn = function (d) {return d.opreturnLength ? color1 : color2;}
 var cBIP69 = function (d) {return d.isBIP69 ? color1 : color2;}
 var cMultisig = function (d) {return d.spendsMultisig ? color1 : color2;}
+var cTaproot = function (d) {return d.spendsTaproot ? color1 : color2;}
 var cLNUnilateralClose = function (d) {return (d.locktime >= 500000000 && d.locktime < 600000000) ? color1 : "transparent";}
 var cBlockInclusion = function(d) {
   if (d.block != null) {
@@ -439,6 +440,10 @@ async function redraw() {
         case "10": // unconfirmed
           currentColorFunction = cUnconfirmed;
           descriptionFilter.html("Unconfirmed transactions are highlighted.");
+          break;
+        case "11": // taproot
+          currentColorFunction = cTaproot;
+          descriptionFilter.html("Taproot spending transactions are highlighted.");
           break;
       }
       drawTransactions(data)
