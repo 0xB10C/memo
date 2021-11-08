@@ -22,6 +22,10 @@ let gFilters = {
     if ((filter.state == filterStates.show && tx.spendsMultisig) || (filter.state == filterStates.hide && !tx.spendsMultisig) || filter.state == filterStates.inactive){return true}  return false
   }},
 
+  taprootSpending: {title:"Taproot spending", id:"taprootSpending", state: filterStates.inactive, type:"tri-state-switch", queryStringCode: "ad", isVisibleFunc: function (filter, tx) {
+    if ((filter.state == filterStates.show && tx.spendsTaproot) || (filter.state == filterStates.hide && !tx.spendsTaproot) || filter.state == filterStates.inactive){return true} return false
+  }},
+
   rbf: {title:"Replace By Fee", id:"rbf", state: filterStates.inactive, type:"tri-state-switch", queryStringCode: "a", isVisibleFunc: function (filter, tx) {
     if ((filter.state == filterStates.show && tx.signalsRBF) || (filter.state == filterStates.hide && !tx.signalsRBF) || filter.state == filterStates.inactive ){return true} return false
   }},

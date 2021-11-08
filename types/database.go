@@ -32,6 +32,7 @@ type MempoolEntry struct {
 	OutputSum      int64          `json:"outputValue"`
 	SpendsSegWit   bool           `json:"spendsSegWit"`
 	SpendsMultisig bool           `json:"spendsMultisig"`
+	SpendsTaproot  bool           `json:"spendsTaproot"`
 	IsBIP69        bool           `json:"isBIP69"`
 	SignalsRBF     bool           `json:"signalsRBF"`
 	OPReturnData   string         `json:"opreturnData"`

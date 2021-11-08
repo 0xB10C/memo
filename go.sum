@@ -46,6 +46,8 @@ github.com/0xb10c/memo/api v0.0.0-20200306103719-be1bc29c8d32 h1:ryp4VqhbTXWlbt0
 github.com/0xb10c/memo/api v0.0.0-20200306103719-be1bc29c8d32/go.mod h1:D3pME+NC3s6kaFJm+lKiKWqhCCRjt4lEZl8NFOH966E=
 github.com/0xb10c/rawtx v1.3.1 h1:Z33TMh4M3WwjC1GnB/8WdC/o9voQ7DpVlel6hEChKnQ=
 github.com/0xb10c/rawtx v1.3.1/go.mod h1:io8NRwsYR1B6kq/zjtIuC8srkAWez/jEEcdgRfqA8E4=
+github.com/0xb10c/rawtx v1.3.2 h1:81uBFftnFwMke0OW6XRpqrzopLS+BgySw7YpB5DXxnw=
+github.com/0xb10c/rawtx v1.3.2/go.mod h1:io8NRwsYR1B6kq/zjtIuC8srkAWez/jEEcdgRfqA8E4=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=

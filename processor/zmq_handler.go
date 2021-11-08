@@ -130,6 +130,7 @@ func HandleRawTxWithSizeAndFee(payload string, pool *database.RedisPool) {
 	me.OutputSum = tx.GetOutputSum()
 	me.SpendsSegWit = tx.IsSpendingSegWit()
 	me.SpendsMultisig = tx.IsSpendingMultisig()
+	me.SpendsTaproot = tx.IsSpendingTaproot()
 	me.IsBIP69 = tx.IsBIP69Compliant()
 	me.SignalsRBF = tx.IsExplicitlyRBFSignaling()
 
