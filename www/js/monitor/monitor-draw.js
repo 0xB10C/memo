@@ -666,6 +666,7 @@ function formatTooltip(d){
       ${formatTooltipTableRow("Explicit RBF", d.signalsRBF)}
       ${formatTooltipTableRow("BIP69 compliant", d.isBIP69)}
       ${formatTooltipTableRow("Multisig spending", d.spendsMultisig)}
+      ${formatTooltipTableRow("Taproot spending", d.spendsTaproot)}
       ${d.spendsMultisig ? formatTooltipTableRow("Multisig inputs", formatTooltipDicts(d.multisigsSpend)) : ""}
       ${formatTooltipTableRow("OP_RETURN ", d.opreturnLength > 0 ? sanitizeHTML(d.opreturnData) : false)}
       ${d.opreturnLength > 0 ? formatTooltipTableRow("OP_RETURN length", d.opreturnLength + " bytes"): ""}
