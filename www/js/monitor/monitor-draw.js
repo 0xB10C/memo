@@ -153,14 +153,18 @@ async function redraw() {
   var tooltip = d3.select(gDivChart).append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
-  
+
   data = await loadEntryData()
   dataBlocks = await loadBlockEntriesData()
+
+  // The API can, in some cases, return JSON mempool entries where only the fee
+  // and entry-time are set. This is a bug. As workaround, filter these entries.
+  data = data.filter(d => d.txid != "");
 
   var xMin = d3.min(data, function (d) {return xValue(d)})
   var xMax = d3.max(data, function (d) {return xValue(d)})
 
-  // currently no used in favor of yMinQuantile and yMaxQuantile
+  // currently not used in favor of yMinQuantile and yMaxQuantile
   var yMin = d3.min(data, function (d) {return yValue(d)})
   var yMax = d3.max(data, function (d) {return yValue(d)})
 
