@@ -8,16 +8,13 @@ require (
 	github.com/btcsuite/btcd v0.22.0-beta
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-contrib/gzip v0.0.3
-	github.com/gin-gonic/gin v1.7.7
-	github.com/go-playground/validator/v10 v10.9.0 // indirect
+	github.com/gin-gonic/gin v1.9.0
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/jasonlvhit/gocron v0.0.1
 	github.com/json-iterator/go v1.1.12
-	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/pebbe/zmq4 v1.2.7
 	github.com/spf13/viper v1.9.0
 	github.com/tidwall/gjson v1.11.0
 	github.com/ugorji/go v1.2.6 // indirect
-	golang.org/x/text v0.3.8 // indirect
 )
