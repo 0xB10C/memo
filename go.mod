@@ -5,7 +5,8 @@ go 1.13
 require (
 	github.com/0xb10c/memo/api v0.0.0-20200306103719-be1bc29c8d32
 	github.com/0xb10c/rawtx v1.3.1
-	github.com/btcsuite/btcd v0.22.0-beta
+	github.com/btcsuite/btcd v0.23.2
+	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce // indirect
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-contrib/gzip v0.0.3
 	github.com/gin-gonic/gin v1.9.1
