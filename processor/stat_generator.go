@@ -19,7 +19,7 @@ const MEGABYTE = 1000000
 const COIN = 100000000
 
 // ProcessMempool starts various processing functions on the passed mempool map
-func ProcessMempool(mempool map[string]types.PartialTransaction, redisPool *database.RedisPool) {
+func ProcessMempool(mempool map[string]types.PartialMempoolEntry, redisPool *database.RedisPool) {
 	if config.GetBool("mempool.processing.processHistoricalMempool") {
 		go historicalMempool(mempool, redisPool)
 	}
@@ -33,7 +33,7 @@ func ProcessMempool(mempool map[string]types.PartialTransaction, redisPool *data
 	}
 }
 
-func currentMempool(mempool map[string]types.PartialTransaction, redisPool *database.RedisPool) {
+func currentMempool(mempool map[string]types.PartialMempoolEntry, redisPool *database.RedisPool) {
 	feerateMap, mempoolSizeInByte, megabyteMarkers := generateCurrentMempoolStats(mempool)
 
 	err := redisPool.WriteCurrentMempoolData(feerateMap, mempoolSizeInByte, megabyteMarkers)
@@ -44,7 +44,7 @@ func currentMempool(mempool map[string]types.PartialTransaction, redisPool *data
 	logger.Info.Println("Success writing Current Mempool to database.")
 }
 
-func historicalMempool(mempool map[string]types.PartialTransaction, redisPool *database.RedisPool) {
+func historicalMempool(mempool map[string]types.PartialMempoolEntry, redisPool *database.RedisPool) {
 
 	const timeframe2h = 1
 	const timeframe12h = 2
@@ -120,7 +120,7 @@ func historicalMempool(mempool map[string]types.PartialTransaction, redisPool *d
 	}
 }
 
-func transactionStatsMempool(mempool map[string]types.PartialTransaction, redisPool *database.RedisPool) {
+func transactionStatsMempool(mempool map[string]types.PartialMempoolEntry, redisPool *database.RedisPool) {
 	segwitCount, rbfCount, txCount := generateTransactionStats(mempool)
 
 	err := redisPool.WriteCurrentTransactionStats(segwitCount, rbfCount, txCount)
@@ -141,7 +141,7 @@ This function generates the _Current Mempool_ data. Which is:
 		feerate, which each mark one megabyte worth of transactions.
 		Positions starting from the top. Named `megabyteMarkers`.
 */
-func generateCurrentMempoolStats(mempool map[string]types.PartialTransaction) (map[int]int, int, []int) {
+func generateCurrentMempoolStats(mempool map[string]types.PartialMempoolEntry) (map[int]int, int, []int) {
 	defer logger.TrackTime(time.Now(), "generateCurrentMempoolStats()")
 
 	// this represents a entry in a mempool list (memlist).
@@ -160,7 +160,7 @@ func generateCurrentMempoolStats(mempool map[string]types.PartialTransaction) (m
 
 	for _, tx := range mempool {
 		mempoolSizeInByte += tx.Size
-		feerate := tx.Fee * COIN / float64(tx.Size)
+		feerate := tx.Fees.Base * COIN / float64(tx.Size)
 		feerateMap[int(feerate)]++
 
 		memlist[mempoolPos] = memlistEntry{feerate: feerate, size: tx.Size}
@@ -191,17 +191,17 @@ func generateCurrentMempoolStats(mempool map[string]types.PartialTransaction) (m
 var feerateBuckets = [40]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 18, 22, 27, 33, 41, 50, 62, 76, 93, 114, 140, 172, 212, 261, 321, 395, 486, 598, 736, 905, 1113, 1369, 1684, 2071, 2547, 3133, 3854, 3855}
 
 // generates a list of counts of transactions representing the count in a feerate bucket
-func generateHistoricalMempoolStats(mempool map[string]types.PartialTransaction) (countInBuckets []int, feeInBuckets []float64, sizeInBuckets []int) {
+func generateHistoricalMempoolStats(mempool map[string]types.PartialMempoolEntry) (countInBuckets []int, feeInBuckets []float64, sizeInBuckets []int) {
 
 	countInBuckets = make([]int, len(feerateBuckets), len(feerateBuckets))
 	feeInBuckets = make([]float64, len(feerateBuckets), len(feerateBuckets))
 	sizeInBuckets = make([]int, len(feerateBuckets), len(feerateBuckets))
 
 	for _, tx := range mempool {
-		feerate := tx.Fee * COIN / float64(tx.Size)
+		feerate := tx.Fees.Base * COIN / float64(tx.Size)
 		bucketIndex := findBucketForFeerate(feerate)
 		countInBuckets[bucketIndex]++
-		feeInBuckets[bucketIndex] += tx.Fee
+		feeInBuckets[bucketIndex] += tx.Fees.Base
 		sizeInBuckets[bucketIndex] += tx.Size
 	}
 
@@ -219,7 +219,7 @@ func findBucketForFeerate(feerate float64) int {
 	return len(feerateBuckets) - 1
 }
 
-func generateTransactionStats(mempool map[string]types.PartialTransaction) (segwitCount int, rbfCount int, txCount int) {
+func generateTransactionStats(mempool map[string]types.PartialMempoolEntry) (segwitCount int, rbfCount int, txCount int) {
 
 	for txid, tx := range mempool {
 		if txid != tx.Wtxid {

@@ -8,13 +8,11 @@ import (
 	"github.com/0xb10c/memo/types"
 )
 
-/* decodes and encodes */
-
-// DecodeFetchedMempoolBody decode the Body of the JSON response as a map of PartialTransactions
-func DecodeFetchedMempoolBody(body []byte) (map[string]types.PartialTransaction, error) {
+// DecodeFetchedMempoolBody decode the Body of the JSON response as a map of PartialMempoolEntry
+func DecodeFetchedMempoolBody(body []byte) (map[string]types.PartialMempoolEntry, error) {
 	defer logger.TrackTime(time.Now(), "decodeFetchedMempoolBody()")
 
-	var mempool map[string]types.PartialTransaction
+	var mempool map[string]types.PartialMempoolEntry
 	err := json.Unmarshal(body, &mempool)
 	if err != nil {
 		return nil, err
