@@ -34,6 +34,11 @@ username = ""
 password = ""
 responseTimeout = 30 # seconds
 
+# When enabled authentication is via cookie - username/password settings above are ignored
+[bitcoind.jsonrpc.cookieauth]
+enabled = false          # Set to true to use cookie auth instead of username/password
+file = ""                # FIXME: Path to .cookie file (e.g., "/home/user/.bitcoin/.cookie")
+
 [mempool]
 enable = false            # enable mempool fetching
 fetchInterface = "REST"   # fetch mempool via REST or JSON-RPC

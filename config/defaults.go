@@ -22,6 +22,8 @@ func setDaemonDefaults() {
 	viper.SetDefault("bitcoind.jsonrpc.host", "localhost")
 	viper.SetDefault("bitcoind.jsonrpc.port", "8332")
 	viper.SetDefault("bitcoind.jsonrpc.responseTimeout", 30)
+	viper.SetDefault("bitcoind.jsonrpc.cookieauth.enabled", false)
+	viper.SetDefault("bitcoind.jsonrpc.cookieauth.file", "")
 
 	viper.SetDefault("mempool.enable", false)
 	viper.SetDefault("mempool.fetchInterface", "REST")

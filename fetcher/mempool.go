@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -115,6 +116,13 @@ func fetchMempoolFromJSONRPC() ([]byte, error) {
 	}
 	req.Header.Set("Content-Type", "text/plain")
 
+	if config.GetBool("bitcoind.jsonrpc.cookieauth.enabled") {
+		err = applyBitcoinCookieAuth(req)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -139,11 +147,18 @@ func fetchMempoolFromJSONRPC() ([]byte, error) {
 }
 
 func getJSONRPCURL() (rpcURL string) {
-	return config.GetString("bitcoind.jsonrpc.protocol") +
-		"://" + config.GetString("bitcoind.jsonrpc.username") +
-		":" + config.GetString("bitcoind.jsonrpc.password") +
-		"@" + config.GetString("bitcoind.jsonrpc.host") +
-		":" + config.GetString("bitcoind.jsonrpc.port")
+
+	if config.GetBool("bitcoind.jsonrpc.cookieauth.enabled") {
+		return config.GetString("bitcoind.jsonrpc.protocol") +
+			"://" + config.GetString("bitcoind.jsonrpc.host") +
+			":" + config.GetString("bitcoind.jsonrpc.port")
+	} else {
+		return config.GetString("bitcoind.jsonrpc.protocol") +
+			"://" + config.GetString("bitcoind.jsonrpc.username") +
+			":" + config.GetString("bitcoind.jsonrpc.password") +
+			"@" + config.GetString("bitcoind.jsonrpc.host") +
+			":" + config.GetString("bitcoind.jsonrpc.port")
+	}
 }
 
 func saveMempoolJSONRPC() (err error) {
@@ -159,6 +174,13 @@ func saveMempoolJSONRPC() (err error) {
 		return
 	}
 	req.Header.Set("Content-Type", "text/plain")
+
+	if config.GetBool("bitcoind.jsonrpc.cookieauth.enabled") {
+		err = applyBitcoinCookieAuth(req)
+		if err != nil {
+			return err
+		}
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -180,4 +202,33 @@ func saveMempoolJSONRPC() (err error) {
 	}
 
 	return nil
+}
+
+// applyBitcoinCookieAuth applies cookie-based authentication to the request
+func applyBitcoinCookieAuth(req *http.Request) error {
+	cookieFilePath := config.GetString("bitcoind.jsonrpc.cookieauth.file")
+
+	cookieBytes, err := os.ReadFile(cookieFilePath)
+	if err != nil {
+		logger.Error.Printf("Failed to read auth cookie file: %s", err.Error())
+		return fmt.Errorf("Failed to read auth cookie file: %s", err.Error())
+	}
+
+	cookieContent := strings.TrimSpace(string(cookieBytes))
+
+	if len(cookieContent) == 0 {
+		logger.Warning.Println("Cookie file is empty")
+		return fmt.Errorf("Cookie file is empty, cannot authenticate")
+	}
+
+	// Try standard __cookie__:hash format first
+	parts := strings.Split(cookieContent, ":")
+	if len(parts) == 2 {
+		username := parts[0]
+		password := parts[1]
+		req.SetBasicAuth(username, password)
+		return nil
+	}
+
+	return fmt.Errorf("Invalid cookie format: expected 'username:password' format")
 }
